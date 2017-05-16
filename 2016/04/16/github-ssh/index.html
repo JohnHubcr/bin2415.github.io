@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="ssh," />
 
 
 
@@ -96,12 +96,19 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="PCB博客">
-<meta property="og:url" content="http://bin2415.github.io/tags/网络/index.html">
+<meta name="description" content="在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。  首先下载git客户端，这里提供一个下载地址。 将git客户端安装之后，右键打开git bash 在git bash中输入ssh-keyg">
+<meta name="keywords" content="ssh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="github添加ssh秘钥">
+<meta property="og:url" content="http://bin2415.github.io/2016/04/16/github-ssh/index.html">
 <meta property="og:site_name" content="PCB博客">
+<meta property="og:description" content="在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。  首先下载git客户端，这里提供一个下载地址。 将git客户端安装之后，右键打开git bash 在git bash中输入ssh-keyg">
+<meta property="og:image" content="http://i.imgur.com/L2fGBS7.png">
+<meta property="og:updated_time" content="2017-05-16T10:08:38.092Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PCB博客">
+<meta name="twitter:title" content="github添加ssh秘钥">
+<meta name="twitter:description" content="在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。  首先下载git客户端，这里提供一个下载地址。 将git客户端安装之后，右键打开git bash 在git bash中输入ssh-keyg">
+<meta name="twitter:image" content="http://i.imgur.com/L2fGBS7.png">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -132,13 +139,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/tags/网络/"/>
+  <link rel="canonical" href="http://bin2415.github.io/2016/04/16/github-ssh/"/>
 
 
 
 
 
-  <title>标签: 网络 | PCB博客</title>
+  <title>github添加ssh秘钥 | PCB博客</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -173,7 +180,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -280,128 +287,161 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h1>网络<small>标签</small>
-      </h1>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/16/xss/" itemprop="url">
-              
-                <span itemprop="name">SeedLab:Web XSS</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-16T18:18:48+08:00"
-              content="2017-05-16" >
-          05-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/16/remote-dns-attack/" itemprop="url">
-              
-                <span itemprop="name">SeedLab:Remote DNS Attack</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-16T18:15:25+08:00"
-              content="2017-05-16" >
-          05-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/16/tcp-ip-attack/" itemprop="url">
-              
-                <span itemprop="name">SeedLab:TCP/IP Attack</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-16T18:13:39+08:00"
-              content="2017-05-16" >
-          05-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2016/03/16/Sniffer/" itemprop="url">
-              
-                <span itemprop="name">libpcap编程:Sniffer</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-03-16T17:06:25+08:00"
-              content="2016-03-16" >
-          03-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2016/04/16/github-ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">github添加ssh秘钥</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-16T18:00:22+08:00">
+                2016-04-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。</p>
+<ul>
+<li>首先下载git客户端，<a href="https://git-scm.com/downloads" target="_blank" rel="external">这里</a>提供一个下载地址。</li>
+<li>将git客户端安装之后，右键打开git bash</li>
+<li>在git bash中输入ssh-keygen，然后就会提示生成文件的路径，在此默认路径即可，然后提示输入密码，在此可以不输入密码，也可以输入，如果输入的时候，先记住，在后面的步骤会用到。</li>
+<li>在生成ssh公钥密钥的文件夹中找到一个.pub后缀名的文件，用记事本打开，将其全部内容粘贴。</li>
+<li>打开github客户端,在右上角自己头像处点击，找到setting，然后找到SSH and GPG keys,点解new SSH keys,将粘贴的.pub文件的内容添加进去，保存即可。</li>
+<li>在自己客户端确认。在git bash中输入ssh -T git@github.com,输入yes，然后输入上步自己填的密码，回车，即可。最后结果如图所示：</li>
+</ul>
+<p><img src="http://i.imgur.com/L2fGBS7.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ssh/" rel="tag"># ssh</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/13/ExploitTutorial/" rel="next" title="ExploitTutorial">
+                <i class="fa fa-chevron-left"></i> ExploitTutorial
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/16/xposed/" rel="prev" title="XposedHook:hook敏感函数">
+                XposedHook:hook敏感函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -409,6 +449,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -611,6 +655,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 

