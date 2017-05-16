@@ -1,55 +1,395 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <title>PCB博客</title>
-  <subtitle>快乐记录每一天</subtitle>
-  <link href="/atom.xml" rel="self"/>
+<!doctype html>
+
+
+
   
-  <link href="http://bin2415.github.io/"/>
-  <updated>2017-05-16T02:07:04.292Z</updated>
-  <id>http://bin2415.github.io/</id>
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="true" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true" />
+
+
+
+
+
+
+
   
-  <author>
-    <name>binpang</name>
-    
-  </author>
   
-  <generator uri="http://hexo.io/">Hexo</generator>
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
   
-  <entry>
-    <title>Hello World</title>
-    <link href="http://bin2415.github.io/2017/05/16/hello-world/"/>
-    <id>http://bin2415.github.io/2017/05/16/hello-world/</id>
-    <published>2017-05-16T02:07:04.292Z</published>
-    <updated>2017-05-16T02:07:04.292Z</updated>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
-    
-    </summary>
-    
-    
-  </entry>
   
-  <entry>
-    <title>Raytracing</title>
-    <link href="http://bin2415.github.io/2017/04/13/Raytracing/"/>
-    <id>http://bin2415.github.io/2017/04/13/Raytracing/</id>
-    <published>2017-04-13T07:40:03.000Z</published>
-    <updated>2017-05-16T07:42:58.784Z</updated>
+  
+  
+
+  
     
-    <content type="html"><![CDATA[<h2 id="题目要求"><a href="#题目要求" class="headerlink" title="题目要求"></a>题目要求</h2><p>本程序是根据<a href="http://run.usc.edu/cs480-s13/assignments/assign3/assign3.html" target="_blank" rel="external">Raytracing</a>的要求所写。</p>
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="计算机图形学," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="PCB博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="题目要求本程序是根据Raytracing的要求所写。 该题目要求根据其所给的框架程序来实现raytracing的功能。 具体实现 环境是virual studio 2015和opengl 具体代码及分析如下：  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515">
+<meta name="keywords" content="计算机图形学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raytracing">
+<meta property="og:url" content="http://bin2415.github.io/2017/04/13/Raytracing/index.html">
+<meta property="og:site_name" content="PCB博客">
+<meta property="og:description" content="题目要求本程序是根据Raytracing的要求所写。 该题目要求根据其所给的框架程序来实现raytracing的功能。 具体实现 环境是virual studio 2015和opengl 具体代码及分析如下：  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515">
+<meta property="og:image" content="http://i.imgur.com/u7btlLQ.png">
+<meta property="og:image" content="http://i.imgur.com/zvUZ8zG.png">
+<meta property="og:image" content="http://i.imgur.com/w2Hycqc.png">
+<meta property="og:image" content="http://i.imgur.com/6JP7yT5.png">
+<meta property="og:image" content="http://i.imgur.com/mgG1lMe.png">
+<meta property="og:image" content="http://i.imgur.com/Psy2hXj.png">
+<meta property="og:image" content="http://i.imgur.com/urixOzm.png">
+<meta property="og:updated_time" content="2017-05-16T07:42:58.784Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Raytracing">
+<meta name="twitter:description" content="题目要求本程序是根据Raytracing的要求所写。 该题目要求根据其所给的框架程序来实现raytracing的功能。 具体实现 环境是virual studio 2015和opengl 具体代码及分析如下：  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515">
+<meta name="twitter:image" content="http://i.imgur.com/u7btlLQ.png">
+
+<meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
+
+<meta name="baidu-site-verification" content="isB2Nn53Ug" />
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bin2415.github.io/2017/04/13/Raytracing/"/>
+
+
+
+
+
+  <title>Raytracing | PCB博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', '[object Object]', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">PCB博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">快乐记录每一天</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/04/13/Raytracing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Raytracing</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-13T15:40:03+08:00">
+                2017-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/计算机图形学/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机图形学</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="题目要求"><a href="#题目要求" class="headerlink" title="题目要求"></a>题目要求</h2><p>本程序是根据<a href="http://run.usc.edu/cs480-s13/assignments/assign3/assign3.html" target="_blank" rel="external">Raytracing</a>的要求所写。</p>
 <p>该题目要求根据其所给的框架程序来实现raytracing的功能。</p>
 <h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><ul>
 <li>环境是virual studio 2015和opengl</li>
@@ -65,89 +405,390 @@
 <p><img src="http://i.imgur.com/mgG1lMe.png" alt=""></p>
 <p><img src="http://i.imgur.com/Psy2hXj.png" alt=""></p>
 <p><img src="http://i.imgur.com/urixOzm.png" alt=""></p>
-]]></content>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/计算机图形学/" rel="tag"># 计算机图形学</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/13/ExploitTutorial/" rel="next" title="ExploitTutorial">
+                <i class="fa fa-chevron-left"></i> ExploitTutorial
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/16/hello-world/" rel="prev" title="Hello World">
+                Hello World <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;题目要求&quot;&gt;&lt;a href=&quot;#题目要求&quot; class=&quot;headerlink&quot; title=&quot;题目要求&quot;&gt;&lt;/a&gt;题目要求&lt;/h2&gt;&lt;p&gt;本程序是根据&lt;a href=&quot;http://run.usc.edu/cs480-s13/assignments/assign
-    
-    </summary>
-    
-      <category term="计算机图形学" scheme="http://bin2415.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/"/>
-    
-    
-      <category term="计算机图形学" scheme="http://bin2415.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/"/>
-    
-  </entry>
+  </div>
+
+
+        </div>
+        
+          
   
-  <entry>
-    <title>ExploitTutorial</title>
-    <link href="http://bin2415.github.io/2016/04/13/ExploitTutorial/"/>
-    <id>http://bin2415.github.io/2016/04/13/ExploitTutorial/</id>
-    <published>2016-04-13T07:27:07.000Z</published>
-    <updated>2017-05-16T07:38:24.862Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="声明：本博客是根据Exploit该链接所写"><a href="#声明：本博客是根据Exploit该链接所写" class="headerlink" title="声明：本博客是根据Exploit该链接所写"></a>声明：本博客是根据<a href="https://www.corelan.be/index.php/2009/07/19/exploit-writing-tutorial-part-1-stack-based-overflows/" target="_blank" rel="external">Exploit</a>该链接所写</h3><hr>
-<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><ul>
-<li>实验环境：windows xp windows xp sp3</li>
-<li></li>
-<li>下载easyRmtomp3.exe,下载地址：<a href="https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe" target="_blank" rel="external">https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe</a></li>
-</ul>
-<hr>
-<h3 id="使程序crash"><a href="#使程序crash" class="headerlink" title="使程序crash"></a>使程序crash</h3><ul>
-<li>编写一个程序生成10000个字符，可以使程序crash，程序如图所示</li>
-</ul>
-<p><img src="http://i.imgur.com/mwATA96.png" alt="图1"></p>
-<ul>
-<li>crash的程序如下图所示：</li>
-</ul>
-<p><img src="http://i.imgur.com/20ltmX6.png" alt="图2"></p>
-<p>但没有出现崩溃，可见改程序采取了保护措施，将A的数量增加，增加到20000时，也不会崩溃，当增加到30000时，程序崩溃。如图所示：</p>
-<p><img src="http://i.imgur.com/IVtRxc0.png" alt="图3"></p>
-<p>会出现地址指针EIP指向0x41414141地址，由于找不到改地址所以该程序会发生崩溃。</p>
-<hr>
-<h3 id="栈信息介绍"><a href="#栈信息介绍" class="headerlink" title="栈信息介绍"></a>栈信息介绍</h3><p>栈的信息如下图所示：</p>
-<p><img src="http://i.imgur.com/mGAjPTR.png" alt="图4"></p>
-<hr>
-<h3 id="确定return的地址偏移"><a href="#确定return的地址偏移" class="headerlink" title="确定return的地址偏移"></a>确定return的地址偏移</h3><ul>
-<li>构造buffer字符串，生成25000个’A’和5000个’B’时，观察EIP的数值<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">#include&lt;stdio.h&gt; </div><div class="line"></div><div class="line">int main() </div><div class="line">&#123; </div><div class="line">    </div><div class="line"> FILE* fp = NULL; </div><div class="line"> </div><div class="line">   fp = fopen(&quot;crash2.m3u&quot;,&quot;w+&quot;);</div><div class="line">    </div><div class="line">    int i = 0;</div><div class="line">    if(fp == NULL)</div><div class="line">    return;</div><div class="line">    for(i;i &lt; 25000; i++)</div><div class="line">    &#123;</div><div class="line">        fprintf(fp,&quot;\x41&quot;);</div><div class="line">    &#125;</div><div class="line">    for(i = 0; i &lt; 5000; i++)</div><div class="line">    &#123;</div><div class="line">        fprintf(fp, &quot;\x42&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>调试结果如图所示：</p>
-<p><img src="http://i.imgur.com/ZXmeTz4.png" alt=""></p>
-<p>可以知道EIP为0x42424242,所以return地址偏移在25000和30000之间</p>
-<ul>
-<li>测试eip的offset具体在什么位置</li>
-</ul>
-<p>利用metasploit的工具测试具体在什么位置，具体如下：cd metasplot-framework/tools</p>
-<p>./pattern_create.rb 5000 &gt; mima.txt 生成5000大小的字符串并输出到mima.txt文件</p>
-<p>构建前25000个为A，后5000个位mima.txt为内容的.m3u文件，如图所示：</p>
-<p><img src="http://i.imgur.com/lsg0d4l.png" alt=""></p>
-<p>得到的eip结果如下图所示：</p>
-<p><img src="http://i.imgur.com/WTx76bu.png" alt=""></p>
-<p>可知eip的值为0x42316A42</p>
-<p>然后利用metasploit工具找到具体是什么位置，命令如下：.pattern_offset.rb 0x423116A42 5000,得到结果为1053</p>
-<p>测试一下1053是否正确，编写如下程序：</p>
-<p><img src="http://i.imgur.com/27N33ZK.png" alt=""></p>
-<p>运行测试一下，结果如下图：</p>
-<p><img src="http://i.imgur.com/BIIpz22.png" alt=""></p>
-<p>可以看到eip指向的是0x42424242，所以找到的return的地址偏移是正确的</p>
-<hr>
-<h3 id="该教程先写到这，有空再继续-＾－＾-V"><a href="#该教程先写到这，有空再继续-＾－＾-V" class="headerlink" title="该教程先写到这，有空再继续(＾－＾)V"></a>该教程先写到这，有空再继续(＾－＾)V</h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;声明：本博客是根据Exploit该链接所写&quot;&gt;&lt;a href=&quot;#声明：本博客是根据Exploit该链接所写&quot; class=&quot;headerlink&quot; title=&quot;声明：本博客是根据Exploit该链接所写&quot;&gt;&lt;/a&gt;声明：本博客是根据&lt;a href=&quot;https
-    
-    </summary>
-    
-      <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
-    
-      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
-    
-      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
-  </entry>
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="binpang" />
+          <p class="site-author-name" itemprop="name">binpang</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目要求"><span class="nav-number">1.</span> <span class="nav-text">题目要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实现"><span class="nav-number">2.</span> <span class="nav-text">具体实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
   
-</feed>
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">binpang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
