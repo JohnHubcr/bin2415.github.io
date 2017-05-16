@@ -4,6 +4,30 @@
 
     
   <url>
+    <loc>http://bin2415.github.io/2017/05/16/seed-returnToLibc/</loc>
+    <lastmod>2017-05-16T09:03:57.389Z</lastmod>
+    <data>
+        <display>
+        <title>seed-returnToLibc</title>
+        <pubTime>2017-05-16T09:01:27.000Z</pubTime>
+        
+        <tag>反汇编</tag>
+         
+        <tag>seed</tag>
+         
+        <tag>exploit</tag>
+         
+         
+           
+             
+              <breadCrumb title="反汇编" url="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.github.io/2017/05/16/open-Rebort/</loc>
     <lastmod>2017-05-16T08:58:52.197Z</lastmod>
     <data>
