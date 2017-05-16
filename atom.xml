@@ -47,7 +47,7 @@
     <link href="http://bin2415.github.io/2016/04/13/ExploitTutorial/"/>
     <id>http://bin2415.github.io/2016/04/13/ExploitTutorial/</id>
     <published>2016-04-13T07:27:07.000Z</published>
-    <updated>2017-05-16T07:35:56.282Z</updated>
+    <updated>2017-05-16T07:38:24.862Z</updated>
     
     <content type="html"><![CDATA[<h3 id="声明：本博客是根据Exploit该链接所写"><a href="#声明：本博客是根据Exploit该链接所写" class="headerlink" title="声明：本博客是根据Exploit该链接所写"></a>声明：本博客是根据<a href="https://www.corelan.be/index.php/2009/07/19/exploit-writing-tutorial-part-1-stack-based-overflows/" target="_blank" rel="external">Exploit</a>该链接所写</h3><hr>
 <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><ul>
@@ -102,6 +102,8 @@
       &lt;h3 id=&quot;声明：本博客是根据Exploit该链接所写&quot;&gt;&lt;a href=&quot;#声明：本博客是根据Exploit该链接所写&quot; class=&quot;headerlink&quot; title=&quot;声明：本博客是根据Exploit该链接所写&quot;&gt;&lt;/a&gt;声明：本博客是根据&lt;a href=&quot;https
     
     </summary>
+    
+      <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
       <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
