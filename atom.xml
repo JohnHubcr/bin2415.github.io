@@ -4,9 +4,9 @@
   <subtitle>快乐记录每一天</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://pcbblog.github.io/"/>
+  <link href="http://bin2415.github.io/"/>
   <updated>2017-05-16T02:07:04.292Z</updated>
-  <id>http://pcbblog.github.io/</id>
+  <id>http://bin2415.github.io/</id>
   
   <author>
     <name>binpang</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>Hello World</title>
-    <link href="http://pcbblog.github.io/2017/05/16/hello-world/"/>
-    <id>http://pcbblog.github.io/2017/05/16/hello-world/</id>
+    <link href="http://bin2415.github.io/2017/05/16/hello-world/"/>
+    <id>http://bin2415.github.io/2017/05/16/hello-world/</id>
     <published>2017-05-16T02:07:04.292Z</published>
     <updated>2017-05-16T02:07:04.292Z</updated>
     
