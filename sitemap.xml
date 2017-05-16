@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://bin2415.github.io/2017/05/16/Bomb/</loc>
+    
+    <lastmod>2017-05-16T08:55:02.918Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://bin2415.github.io/2017/04/13/Raytracing/</loc>
     
     <lastmod>2017-05-16T07:42:58.784Z</lastmod>
@@ -26,13 +33,6 @@
     <loc>http://bin2415.github.io/tags/index.html</loc>
     
     <lastmod>2017-05-16T05:20:14.637Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://bin2415.github.io/2017/05/16/hello-world/</loc>
-    
-    <lastmod>2017-05-16T02:07:04.292Z</lastmod>
     
   </url>
   
