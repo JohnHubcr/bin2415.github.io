@@ -96,13 +96,13 @@
 
 
 
-<meta name="description" content="Xposed框架Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。 首先在app_main.cpp中，对appRuntime.cpp进行了修改，其中onVmCrea">
+<meta name="description" content="Xposed框架Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。">
 <meta name="keywords" content="Android,Hook">
 <meta property="og:type" content="article">
 <meta property="og:title" content="XposedHook:hook敏感函数">
 <meta property="og:url" content="http://bin2415.github.io/2016/08/16/xposed/index.html">
 <meta property="og:site_name" content="PCB博客">
-<meta property="og:description" content="Xposed框架Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。 首先在app_main.cpp中，对appRuntime.cpp进行了修改，其中onVmCrea">
+<meta property="og:description" content="Xposed框架Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。">
 <meta property="og:image" content="http://i.imgur.com/XOVoaf1.png">
 <meta property="og:image" content="http://i.imgur.com/AGSWHIX.png">
 <meta property="og:image" content="http://i.imgur.com/2wogiTz.png">
@@ -113,10 +113,10 @@
 <meta property="og:image" content="http://i.imgur.com/fNqLYSN.png">
 <meta property="og:image" content="http://i.imgur.com/NZdOdJr.png">
 <meta property="og:image" content="http://i.imgur.com/RcZsVZu.png">
-<meta property="og:updated_time" content="2017-05-18T14:17:08.915Z">
+<meta property="og:updated_time" content="2017-05-21T11:48:28.721Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="XposedHook:hook敏感函数">
-<meta name="twitter:description" content="Xposed框架Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。 首先在app_main.cpp中，对appRuntime.cpp进行了修改，其中onVmCrea">
+<meta name="twitter:description" content="Xposed框架Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。">
 <meta name="twitter:image" content="http://i.imgur.com/XOVoaf1.png">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
@@ -444,6 +444,7 @@
 
       
         <h2 id="Xposed框架"><a href="#Xposed框架" class="headerlink" title="Xposed框架"></a>Xposed框架</h2><p>Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。</p>
+<a id="more"></a>
 <p>首先在app_main.cpp中，对appRuntime.cpp进行了修改，其中onVmCreated(JNIEnv* env)修改如下：</p>
 <p><img src="http://i.imgur.com/XOVoaf1.png" alt=""></p>
 <p>在onVmCreate中，它将调用libxposed_dalvik.so中的xposedInitLib函数，然后再调用so中设置的onVmCreated函数。这个onVmCreated函数由xposedInitLib设置。</p>

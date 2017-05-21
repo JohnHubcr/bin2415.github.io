@@ -127,7 +127,7 @@
 <meta property="og:image" content="http://i.imgur.com/KO50UJE.png">
 <meta property="og:image" content="http://i.imgur.com/zFc43Dt.png">
 <meta property="og:image" content="http://i.imgur.com/WyEfqx3.png">
-<meta property="og:updated_time" content="2017-05-16T10:14:44.508Z">
+<meta property="og:updated_time" content="2017-05-21T11:48:22.808Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SeedLab:TCP&#x2F;IP Attack">
 <meta name="twitter:description" content="实验环境：该实验环境是在同一个局域网下完成的，完成整个的实验需要三台机器，这三台机器的ip和mac地址如下所示： 机器1： 192.168.47.174   mac: 00:0c:29:08:4f:9c 机器2： 192.168.47.175   mac: 00:0c:29:4c:5e:ff 机器3： 192.168.47.176   mac: 00:0c:29:1c:41:17 这三台机器的默认">
@@ -464,6 +464,7 @@
 <p>这三台机器的默认网关：192.168.47.2</p>
 <p>操作系统：ubuntu 12.04  32位</p>
 <p>所使用的工具：netwox, hunt, wireshark</p>
+<a id="more"></a>
 <h2 id="实验操作："><a href="#实验操作：" class="headerlink" title="实验操作："></a>实验操作：</h2><h3 id="实验1：ARP缓存中毒"><a href="#实验1：ARP缓存中毒" class="headerlink" title="实验1：ARP缓存中毒"></a>实验1：ARP缓存中毒</h3><p>ARP协议的主要目的在于简化OSI模型第二层和第三层间地址的翻译。第二层(也就是数据链层)使用MAC地址，以便硬件设备可以在小范围内直接进行通信。第三层(也就是网络层)使用IP地址(最常见的形式)来创建连通世界各地用户的大规模网络。数据链层直接处理连接在一起的设备，而网络层处理那些直接以及间接连接的设备，每一层都有自己的地址形式，他们必须合作才能实现网络通信。正是由于这个原因，ARP与RFC826(以太网地址解析协议)一起被创建。<br>在该实验中，首先有一个机器1在局域网中发送arp包，包的内容为将自己的mac地址与机器2的ip地址相关联，此时，如果机器3想要发送一个包给机器2，就会发不过去。具体操作如下：<br>在机器1中执行如下指令，即向局域网广播00:0c:29:08:4f:9c的mac地址对应的ip地址为192.168.47.175</p>
 <p><img src="http://i.imgur.com/wFgP5KG.png" alt=""></p>
 <p>打开wireshark后可以看到机器1就发送arp的包意思为192.168.47.175在mac地址为00:0c:29:08:4f:9c。</p>

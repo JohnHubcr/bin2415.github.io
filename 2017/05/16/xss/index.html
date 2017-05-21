@@ -126,7 +126,7 @@
 <meta property="og:image" content="http://i.imgur.com/DSi5QVq.png">
 <meta property="og:image" content="http://i.imgur.com/WEYBOkh.png">
 <meta property="og:image" content="http://i.imgur.com/1OUoH74.png">
-<meta property="og:updated_time" content="2017-05-18T14:18:03.887Z">
+<meta property="og:updated_time" content="2017-05-21T11:48:36.063Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SeedLab:Web XSS">
 <meta name="twitter:description" content="环境配置： 启动apache2服务：sudo service apache2 start 配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：  实验内容：Task 1:显示Alert窗口在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：1&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;g">
@@ -461,6 +461,7 @@
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
 <h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
+<a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
 <p>登陆用户名bin，然后查看boby的信息，结果如下，会弹出一个窗口，结果如下：</p>
