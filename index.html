@@ -426,7 +426,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/16/xss/#more" rel="contents">
@@ -1627,18 +1627,17 @@
       
         
           
-            <p>在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。</p>
-<ul>
-<li>首先下载git客户端，<a href="https://git-scm.com/downloads" target="_blank" rel="external">这里</a>提供一个下载地址。</li>
-<li>将git客户端安装之后，右键打开git bash</li>
-<li>在git bash中输入ssh-keygen，然后就会提示生成文件的路径，在此默认路径即可，然后提示输入密码，在此可以不输入密码，也可以输入，如果输入的时候，先记住，在后面的步骤会用到。</li>
-<li>在生成ssh公钥密钥的文件夹中找到一个.pub后缀名的文件，用记事本打开，将其全部内容粘贴。</li>
-<li>打开github客户端,在右上角自己头像处点击，找到setting，然后找到SSH and GPG keys,点解new SSH keys,将粘贴的.pub文件的内容添加进去，保存即可。</li>
-<li>在自己客户端确认。在git bash中输入ssh -T git@github.com,输入yes，然后输入上步自己填的密码，回车，即可。最后结果如图所示：</li>
-</ul>
-<p><img src="http://i.imgur.com/L2fGBS7.png" alt=""></p>
+          在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。
 
-          
+首先下载git客户端，这里提供一个下
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/04/16/github-ssh/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
