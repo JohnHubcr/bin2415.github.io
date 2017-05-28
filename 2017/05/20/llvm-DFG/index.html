@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="llvm," />
 
 
 
@@ -96,13 +96,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="categories">
-<meta property="og:url" content="http://bin2415.github.io/categories/index.html">
+<meta name="description" content="Data Flow Graph基本概念Data Flow Graph又叫数据流程图，表示在一个函数中的数据流动的方向。比如一个指令1定义了一个新变量%a,而另一个指令2用到了变量%a，此时就存在从指令1到指令2的边。llvm IR的表示形式是SSA，简单的来说SSA表示形式就是一个变量只能定义一次。 123x = y + 1;x = y + 2;y = 3; 上面的形式就不是SSA的表示形式，因为">
+<meta name="keywords" content="llvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="llvm:Data Flow Graph">
+<meta property="og:url" content="http://bin2415.github.io/2017/05/20/llvm-DFG/index.html">
 <meta property="og:site_name" content="PCB博客">
-<meta property="og:updated_time" content="2017-05-16T07:36:50.689Z">
+<meta property="og:description" content="Data Flow Graph基本概念Data Flow Graph又叫数据流程图，表示在一个函数中的数据流动的方向。比如一个指令1定义了一个新变量%a,而另一个指令2用到了变量%a，此时就存在从指令1到指令2的边。llvm IR的表示形式是SSA，简单的来说SSA表示形式就是一个变量只能定义一次。 123x = y + 1;x = y + 2;y = 3; 上面的形式就不是SSA的表示形式，因为">
+<meta property="og:updated_time" content="2017-05-28T02:07:34.663Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="categories">
+<meta name="twitter:title" content="llvm:Data Flow Graph">
+<meta name="twitter:description" content="Data Flow Graph基本概念Data Flow Graph又叫数据流程图，表示在一个函数中的数据流动的方向。比如一个指令1定义了一个新变量%a,而另一个指令2用到了变量%a，此时就存在从指令1到指令2的边。llvm IR的表示形式是SSA，简单的来说SSA表示形式就是一个变量只能定义一次。 123x = y + 1;x = y + 2;y = 3; 上面的形式就不是SSA的表示形式，因为">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -133,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/categories/"/>
+  <link rel="canonical" href="http://bin2415.github.io/2017/05/20/llvm-DFG/"/>
 
 
 
 
 
-  <title>categories | PCB博客</title>
+  <title>llvm:Data Flow Graph | PCB博客</title>
 </head>
 
 
@@ -180,7 +184,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -312,25 +316,202 @@
             
 
   <div id="posts" class="posts-expand">
-  <header class="post-header">
+    
 
-	<h1 class="post-title" itemprop="name headline">categories</h1>
+  
 
+  
+  
+  
 
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/20/llvm-DFG/">
 
-</header>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
 
     
-    
-      <div class="category-all-page">
-        <div class="category-all-title">
-            目前共计 5 个分类
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">llvm:Data Flow Graph</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-20T18:36:06+08:00">
+                2017-05-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/llvm/" itemprop="url" rel="index">
+                    <span itemprop="name">llvm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/05/20/llvm-DFG/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/05/20/llvm-DFG/" class="leancloud_visitors" data-flag-title="llvm:Data Flow Graph">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+		  
         </div>
-        <div class="category-all">
-          <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hook/">Hook</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/llvm/">llvm</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/反汇编/">反汇编</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络/">网络</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/计算机图形学/">计算机图形学</a><span class="category-list-count">2</span></li></ul>
-        </div>
-      </div>
+      </header>
     
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Data-Flow-Graph"><a href="#Data-Flow-Graph" class="headerlink" title="Data Flow Graph"></a>Data Flow Graph</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>Data Flow Graph又叫数据流程图，表示在一个函数中的数据流动的方向。比如一个指令1定义了一个新变量%a,而另一个指令2用到了变量%a，此时就存在从指令1到指令2的边。llvm IR的表示形式是SSA，简单的来说SSA表示形式就是一个变量只能定义一次。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">x = y + <span class="number">1</span>;</div><div class="line">x = y + <span class="number">2</span>;</div><div class="line">y = <span class="number">3</span>;</div></pre></td></tr></table></figure>
+<p>上面的形式就不是SSA的表示形式，因为x被定义（赋值）了两次，可以通过修改使其变成SSA的表示形式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">x1 = y + <span class="number">1</span>;</div><div class="line">x2 = y + <span class="number">2</span>;</div><div class="line">y = <span class="number">3</span>;</div></pre></td></tr></table></figure>
+<h3 id="实验过程"><a href="#实验过程" class="headerlink" title="实验过程"></a>实验过程</h3><p>在具体的实验中，我们遍历函数中的每一个指令，判断该指令是否为load，store指令，把load和store指令与其他指令区别开来是因为在IR中只有store和load指令直接与内存直接接触。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">                  <span class="keyword">case</span> llvm::Instruction::Load:</div><div class="line">&#123;</div><div class="line">	LoadInst* linst = dyn_cast&lt;LoadInst&gt;(curII);</div><div class="line">	Value* loadValPtr = linst-&gt;getPointerOperand();</div><div class="line">	edges.push_back(edge(node(loadValPtr, getValueName(loadValPtr)), node(curII, getValueName(curII))));</div><div class="line">	<span class="keyword">break</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">case</span> llvm::Instruction::Store: &#123;</div><div class="line">	StoreInst* sinst = dyn_cast&lt;StoreInst&gt;(curII);</div><div class="line">	Value* storeValPtr = sinst-&gt;getPointerOperand();</div><div class="line">	Value* storeVal = sinst-&gt;getValueOperand();</div><div class="line">	edges.push_back(edge(node(storeVal, getValueName(storeVal)), node(curII, getValueName(curII))));</div><div class="line">	edges.push_back(edge(node(curII, getValueName(curII)), node(storeValPtr, getValueName(storeValPtr))));</div><div class="line">	<span class="keyword">break</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对于其余的指令，遍历每一个指令的操作数，判断其是不是一个指令，如果是指令的话，就添加相应的边。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (Instruction::op_iterator op = curII-&gt;op_begin(), opEnd = curII-&gt;op_end(); op != opEnd; ++op)</div><div class="line">							&#123;</div><div class="line">								Instruction* tempIns;</div><div class="line">								<span class="keyword">if</span> (dyn_cast&lt;Instruction&gt;(*op))</div><div class="line">								&#123;</div><div class="line">									edges.push_back(edge(node(op-&gt;get(), getValueName(op-&gt;get())), node(curII, getValueName(curII))));</div><div class="line">								&#125;</div><div class="line">							&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/llvm/" rel="tag"># llvm</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/20/llvm-CGAndCFG/" rel="next" title="llvm:Call Graph And Control Flow Graph">
+                <i class="fa fa-chevron-left"></i> llvm:Call Graph And Control Flow Graph
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
   </div>
 
 
@@ -364,8 +545,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -445,6 +635,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Data-Flow-Graph"><span class="nav-number">1.</span> <span class="nav-text">Data Flow Graph</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本概念"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验过程"><span class="nav-number">1.2.</span> <span class="nav-text">实验过程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -563,6 +769,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 
