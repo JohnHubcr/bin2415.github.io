@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-07-26T02:07:32.587Z</updated>
+  <updated>2017-07-26T02:28:35.053Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,10 +20,10 @@
     <link href="http://bin2415.github.io/2017/07/26/AddressSanitizer/"/>
     <id>http://bin2415.github.io/2017/07/26/AddressSanitizer/</id>
     <published>2017-07-26T02:03:38.000Z</published>
-    <updated>2017-07-26T02:07:32.587Z</updated>
+    <updated>2017-07-26T02:28:35.053Z</updated>
     
     <content type="html"><![CDATA[<h2 id="AddressSanitizer简介"><a href="#AddressSanitizer简介" class="headerlink" title="AddressSanitizer简介"></a>AddressSanitizer简介</h2><p>AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项使用它。AddressSanitizer的源码位于/lib/Transforms/Instrumentation/AddressSanitizer.cpp中，Runtime-library的源码在llvm的另一个项目compiler-rt的/lib/asan文件夹中。</p>
-<h2 id="AddressSanitizer算法"><a href="#AddressSanitizer算法" class="headerlink" title="AddressSanitizer算法"></a>AddressSanitizer算法</h2><p>具体的算法可以参考<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="external">WIKI</a>,在此对AddressSanitizer算法做一个简短的介绍。AddressSanitizer主要包括两部分：插桩(Instrumentation)和动态运行库(Run-time library)。插桩主要是针对在llvm编译器级别对访问内存的操作(store，load，alloca等)，将它们进行处理。动态运行库主要提供一些运行时的复杂的功能(比如poison/unpoison shadow memory)以及将malloc,free等系统调用函数hook住。</p>
+<h2 id="AddressSanitizer算法"><a href="#AddressSanitizer算法" class="headerlink" title="AddressSanitizer算法"></a>AddressSanitizer算法</h2><p>具体的算法可以参考<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="external">WIKI</a>,在此对AddressSanitizer算法做一个简短的介绍。AddressSanitizer主要包括两部分：插桩(Instrumentation)和动态运行库(Run-time library)。插桩主要是针对在llvm编译器级别对访问内存的操作(store，load，alloca等)，将它们进行处理。动态运行库主要提供一些运行时的复杂的功能(比如poison/unpoison shadow memory)以及将malloc,free等系统调用函数hook住。其实该算法的思路很简单，如果想防住Buffer Overflow漏洞，只需要在每块内存区域右端（或两端，能防overflow和underflow）加一块区域（RedZone），使RedZone的区域的影子内存（Shadow Memory)设置为不可写即可。具体的示意图如下图所示。</p>
 <h3 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h3><p>AddressSanitizer保护的主要原理是对程序中的虚拟内存提供粗粒度的影子内存(没8个字节的内存对应一个字节的影子内存)，为了减少overhead，就采用了直接内存映射策略，所采用的具体策略如下：Shadow=(Mem &gt;&gt; 3) + offset。每8个字节的内存对应一个字节的影子内存，影子内存中每个字节存取一个数字k,如果k=0，则表示该影子内存对应的8个字节的内存都能访问，如果0&lt;k&lt;7,表示前k个字节可以访问，如果k为负数，不同的数字表示不同的错误（e.g. Stack buffer overflow, Heap buffer overflow)。具体的映射策略如下图所示。<br><img src="/2017/07/26/AddressSanitizer/mapping.png" alt="mapping图片"></p>
 <center> 图1： 虚拟地址映射图 </center>
 
