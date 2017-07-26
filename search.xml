@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[AddressSanitizer算法及源码解析]]></title>
+    <url>%2F2017%2F07%2F26%2FAddressSanitizer%2F</url>
+    <content type="text"><![CDATA[AddressSanitizer简介AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项使用它。AddressSanitizer的源码位于/lib/Transforms/Instrumentation/AddressSanitizer.cpp中，Runtime-library的源码在llvm的另一个项目compiler-rt的/lib/asan文件夹中。 AddressSanitizer算法具体的算法可以参考WIKI,在此对AddressSanitizer算法做一个简短的介绍。AddressSanitizer主要包括两部分：插桩(Instrumentation)和动态运行库(Run-time library)。插桩主要是针对在llvm编译器级别对访问内存的操作(store，load，alloca等)，将它们进行处理。动态运行库主要提供一些运行时的复杂的功能(比如poison/unpoison shadow memory)以及将malloc,free等系统调用函数hook住。 内存映射AddressSanitizer保护的主要原理是对程序中的虚拟内存提供粗粒度的影子内存(没8个字节的内存对应一个字节的影子内存)，为了减少overhead，就采用了直接内存映射策略，所采用的具体策略如下：Shadow=(Mem &gt;&gt; 3) + offset。每8个字节的内存对应一个字节的影子内存，影子内存中每个字节存取一个数字k,如果k=0，则表示该影子内存对应的8个字节的内存都能访问，如果0&lt;k&lt;7,表示前k个字节可以访问，如果k为负数，不同的数字表示不同的错误（e.g. Stack buffer overflow, Heap buffer overflow)。具体的映射策略如下图所示。 图1： 虚拟地址映射图 插桩为了防止buffer overflow，需要将原来分配的内存两边分配额外的内存Redzone，并将这两边的内存加锁，设为不能访问状态，这样可以有效的防止buffer overflow(但不能杜绝buffer overflow)。一下是在栈中插桩的一个例子。 未插桩的代码： 12345void foo() &#123; char a[8]; ... return;&#125; 插桩后的代码： 12345678910111213void foo() &#123; char redzone1[32]; // 32-byte aligned char a[8]; // 32-byte aligned char redzone2[24]; char redzone3[32]; // 32-byte aligned int *shadow_base = MemToShadow(redzone1); shadow_base[0] = 0xffffffff; // poison redzone1 shadow_base[1] = 0xffffff00; // poison redzone2, unpoison 'a' shadow_base[2] = 0xffffffff; // poison redzone3 ... shadow_base[0] = shadow_base[1] = shadow_base[2] = 0; // unpoison all return;&#125; 动态运行库在动态运行库中将malloc/free函数进行了替换。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。 free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)。 AddressSanitizer源码分析AddressSanitizer主要有三种层面的变量：Stack Variable(局部变量)，Global Variable, Heap Variable。由于每种变量的生命周期（life time)不同，所以对不同种类的变量处理也是不同的。下面分别从Global Variable，Stack Variable，Heap Variable三个层次来分析AddressSanitizer源码的逻辑结构。 Global VariableGlobal Variable存放在程序的数据段。在该算法的实现过程中，处理GlobalVariale的是AddressSanitizerModule类，该类继承自llvm的ModulePass，所以我们先看一下AddressSanitizerModule类的runOnModule(Module &amp;M)方法的处理过程，该过程首先进行一些初始化，然后我们可以看到对Global的插桩方法InstrumentGlobals()方法。 图2： RunOnModule 在InstrumentGlobals()方法中，主要是分成两步：首先，重新声明一个GlobalVariable，这个GlobalVariable包含以前的GlobalVariable和一个RedZone；然后，调用runtime-library将新声明的这个GlobalVariable的RedZone区域加锁。我们先来看第一步的具体实现，如图3所示。 图3： 生成包含RedZone的新的GlobalVariable 下面，我们首先看一下一个Struct结构，该结构记录GlobalVariable存储的首地址，数据的大小，Redzone的大小，Module的名字等信息，便于在Runtime-library中使用。该结构在AddressSanitizerModule和runtime-library中都有相应的定义： 然后我们可以看到对GlobalVariable进行插桩来实现RedZone的Poison和整个GlobalVariable的Poison操作。 具体的Poison RedZone和Poison GlobalVariable的实现在Runtime-library中： Stack VariableStack Variable保存在栈区，在栈中的数据我们需要控制好变量的声明周期(lifetime),当调用一个函数时，会开辟一个栈，栈中的数据会有相应的redzone和shadow memory，并将redzone的shadow memory Poison，当函数结束（正常返回，异常），栈被销毁，需要将数据和redzone清空，其相应的shadow memory也要UnPoison掉。 对于Stack Variable，AddressSanitizer算法中实现了AddressSanitizer类，该类是继承了llvm的FunctionPass，该Pass能够处理每一个函数，在处理每个函数的时候，处理每一个load，store等能够访问内存的指令，在这些指令执行前进行插桩，看其访问的内存是不是被poison。 下面我们主要看一下AddressSanitizer::runOnFunction(Module &amp;M)函数中主要的插桩过程。 Heap VariableHeap Variable保存在堆区，其分配的函数是malloc函数，该部分的主要代码在runtime-library中，该库中主要是先将malloc的库函数hook住，然后自己定义malloc函数，定义分配策略。 具体的分配策略定义在compiler-rt/lib/asan/asan-allocator.cc文件中，感兴趣可以看一下。]]></content>
+      <categories>
+        <category>LLVM</category>
+      </categories>
+      <tags>
+        <tag>LLVM</tag>
+        <tag>Sanitizer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[使用angr和Radare解决CMU的二进制炸弹]]></title>
     <url>%2F2017%2F06%2F20%2Fangr-bomb%2F</url>
     <content type="text"><![CDATA[前言最近在学习angr的使用，主要是如何利用angr来进行符号执行分析。发现了国外一篇比较实用的文章介绍如何使用angr和Radare(二进制分析框架)来分析CMU的二进制炸弹问题。故在此翻译一下这篇文章的工作。 angrangr是一个使用python语言编写的二进制分析框架，它主要是进行静态和动态的符号分析，现已成为CTF比赛的一大利器。angr最主要的一个工具就是符号执行，具体的符号执行可以参考MIT的一个课程(需要梯子才可以观看)。 Radare2radare2是从零开始重写radare，以便提供一组库和工具来处理二进制文件。 在这篇文章里是先用的Radare2对二进制炸弹进行分析，弄清二进制文件的逻辑关系，然后再用angr的符号执行工具解出答案。关于radare2工具的介绍可以参考Radare2 Book 所面临的问题要用angr和radare2所解决的问题是CMU的二进制炸弹，我们在此只分析phase2部分，如果对其他部分有兴趣的话可以参考我的另一篇博客对二进制炸弹做了全面的分析。phase2主要是要求输入6个正确的数字。 CrackRadare2分析 使用Radare2加载程序，并输入aaa开始分析二进制程序 首先利用Radare2中的工具afl来查找符合条件的函数。使用afl并且grep(使用符号~来代表)筛选关键字, 可以看到筛选结果中有phase2。 使用seek工具来定位到我们感兴趣的函数处，此处为sym.phase_2函数。并用pdf([p]rint [d]issembly of [f]unction)命令来展示该函数的内容。 如何要展示函数中的控制流程图可以在Radare2中使用VV（两个大写的V）指令。 为了进行符号执行，我们必须弄清楚程序的输入是什么，通过radare工具反汇编出来的代码可以看出，函数read_six_numbers很有可能就是处理输入的函数。 在radare2中使用ga指令进入read_six_numbers函数, 具体的函数代码如下所示： 可以看出该函数中以六个数字作为scanf函数的输入，所以我们就将此作为输入。 接下来我们需要分析符号执行所需要开始的代码处，符号执行不能走的路径以及要到达的目标代码处。从上图可以看出0x400f10和0x400f20处的代码都调用explode_bomb函数。 具体的explode_bomb函数如上图所示，我们可以看出该函数会调用exit函数，所以我们要避免走到explode_bomb函数中去。即避免走到0x400f10和0x400f20。要到达的目标函数我们可以设置到从phase2函数中返回。我们将调用完read_six_numbers函数后一条指令即0x400f0a作为程序分析的开始处。 angr分析具体的angr分析代码如下所示：123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354## Binary found here: http://csapp.cs.cmu.edu/3e/bomb.tarimport angr, loggingfrom subprocess import Popen, PIPEfrom itertools import productimport structdef main(): proj = angr.Project('bomb', load_options=&#123;'auto_load_libs':False&#125;) logging.basicConfig() logging.getLogger('angr.surveyors.explorer').setLevel(logging.DEBUG) def nop(state): return bomb_explode = 0x40143a # Start analysis at the phase_2 function after the sscanf state = proj.factory.blank_state(addr=0x400f0a) # Sscanf is looking for '%d %d %d %d %d %d' which ends up dropping 6 ints onto the stack # We will create 6 symbolic values onto the stack to mimic this for i in xrange(6): state.stack_push(state.se.BVS('int&#123;&#125;'.format(i), 4*8)) # Attempt to find a path to the end of the phase_2 function while avoiding the bomb_explode path = proj.factory.path(state=state) ex = proj.surveyors.Explorer(start=path, find=(0x400f3c,), avoid=(bomb_explode, 0x400f10, 0x400f20,), enable_veritesting=True) ex.run() if ex.found: found = ex.found[0].state answer = [] for x in xrange(3): curr_int = found.se.any_int(found.stack_pop()) # We are popping off 8 bytes at a time # 0x0000000200000001 # This is just one way to extract the individual numbers from this popped value answer.append(str(curr_int &amp; 0xffffffff)) answer.append(str(curr_int&gt;&gt;32 &amp; 0xffffffff)) return ' '.join(answer)def test(): assert main() == '1 2 4 8 16 32'if __name__ == '__main__': print(main())]]></content>
@@ -8,9 +20,9 @@
         <category>angr</category>
       </categories>
       <tags>
-        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
+        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -148,8 +160,8 @@
       </categories>
       <tags>
         <tag>反汇编</tag>
-        <tag>Exploit</tag>
         <tag>翻译</tag>
+        <tag>Exploit</tag>
       </tags>
   </entry>
   <entry>

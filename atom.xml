@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-06-20T14:40:32.805Z</updated>
+  <updated>2017-07-26T02:07:32.587Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -14,6 +14,64 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>AddressSanitizer算法及源码解析</title>
+    <link href="http://bin2415.github.io/2017/07/26/AddressSanitizer/"/>
+    <id>http://bin2415.github.io/2017/07/26/AddressSanitizer/</id>
+    <published>2017-07-26T02:03:38.000Z</published>
+    <updated>2017-07-26T02:07:32.587Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="AddressSanitizer简介"><a href="#AddressSanitizer简介" class="headerlink" title="AddressSanitizer简介"></a>AddressSanitizer简介</h2><p>AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项使用它。AddressSanitizer的源码位于/lib/Transforms/Instrumentation/AddressSanitizer.cpp中，Runtime-library的源码在llvm的另一个项目compiler-rt的/lib/asan文件夹中。</p>
+<h2 id="AddressSanitizer算法"><a href="#AddressSanitizer算法" class="headerlink" title="AddressSanitizer算法"></a>AddressSanitizer算法</h2><p>具体的算法可以参考<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="external">WIKI</a>,在此对AddressSanitizer算法做一个简短的介绍。AddressSanitizer主要包括两部分：插桩(Instrumentation)和动态运行库(Run-time library)。插桩主要是针对在llvm编译器级别对访问内存的操作(store，load，alloca等)，将它们进行处理。动态运行库主要提供一些运行时的复杂的功能(比如poison/unpoison shadow memory)以及将malloc,free等系统调用函数hook住。</p>
+<h3 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h3><p>AddressSanitizer保护的主要原理是对程序中的虚拟内存提供粗粒度的影子内存(没8个字节的内存对应一个字节的影子内存)，为了减少overhead，就采用了直接内存映射策略，所采用的具体策略如下：Shadow=(Mem &gt;&gt; 3) + offset。每8个字节的内存对应一个字节的影子内存，影子内存中每个字节存取一个数字k,如果k=0，则表示该影子内存对应的8个字节的内存都能访问，如果0&lt;k&lt;7,表示前k个字节可以访问，如果k为负数，不同的数字表示不同的错误（e.g. Stack buffer overflow, Heap buffer overflow)。具体的映射策略如下图所示。<br><img src="/2017/07/26/AddressSanitizer/mapping.png" alt="mapping图片"></p>
+<center> 图1： 虚拟地址映射图 </center>
+
+<p><img src="/2017/07/26/AddressSanitizer/typicalMapping.png" alt="typicalMapping"></p>
+<h3 id="插桩"><a href="#插桩" class="headerlink" title="插桩"></a>插桩</h3><p>为了防止buffer overflow，需要将原来分配的内存两边分配额外的内存Redzone，并将这两边的内存加锁，设为不能访问状态，这样可以有效的防止buffer overflow(但不能杜绝buffer overflow)。一下是在栈中插桩的一个例子。</p>
+<p>未插桩的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</div><div class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];</div><div class="line">  ...</div><div class="line">  <span class="keyword">return</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>插桩后的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</div><div class="line">  <span class="keyword">char</span> redzone1[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></div><div class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];          <span class="comment">// 32-byte aligned</span></div><div class="line">  <span class="keyword">char</span> redzone2[<span class="number">24</span>]; </div><div class="line">  <span class="keyword">char</span> redzone3[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></div><div class="line">  <span class="keyword">int</span>  *shadow_base = MemToShadow(redzone1);</div><div class="line">  shadow_base[<span class="number">0</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone1</span></div><div class="line">  shadow_base[<span class="number">1</span>] = <span class="number">0xffffff00</span>;  <span class="comment">// poison redzone2, unpoison 'a'</span></div><div class="line">  shadow_base[<span class="number">2</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone3</span></div><div class="line">  ...</div><div class="line">  shadow_base[<span class="number">0</span>] = shadow_base[<span class="number">1</span>] = shadow_base[<span class="number">2</span>] = <span class="number">0</span>; <span class="comment">// unpoison all</span></div><div class="line">  <span class="keyword">return</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="动态运行库"><a href="#动态运行库" class="headerlink" title="动态运行库"></a>动态运行库</h3><p>在动态运行库中将malloc/free函数进行了替换。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。</p>
+<p>free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)。</p>
+<h2 id="AddressSanitizer源码分析"><a href="#AddressSanitizer源码分析" class="headerlink" title="AddressSanitizer源码分析"></a>AddressSanitizer源码分析</h2><p>AddressSanitizer主要有三种层面的变量：Stack Variable(局部变量)，Global Variable, Heap Variable。由于每种变量的生命周期（life time)不同，所以对不同种类的变量处理也是不同的。下面分别从Global Variable，Stack Variable，Heap Variable三个层次来分析AddressSanitizer源码的逻辑结构。</p>
+<h3 id="Global-Variable"><a href="#Global-Variable" class="headerlink" title="Global Variable"></a>Global Variable</h3><p>Global Variable存放在程序的数据段。在该算法的实现过程中，处理GlobalVariale的是AddressSanitizerModule类，该类继承自llvm的ModulePass，所以我们先看一下AddressSanitizerModule类的runOnModule(Module &amp;M)方法的处理过程，该过程首先进行一些初始化，然后我们可以看到对Global的插桩方法InstrumentGlobals()方法。</p>
+<p><img src="/2017/07/26/AddressSanitizer/runOnModule.png" alt="runOnMoudle"></p>
+<center> 图2： RunOnModule </center>
+
+<p>在InstrumentGlobals()方法中，主要是分成两步：首先，重新声明一个GlobalVariable，这个GlobalVariable包含以前的GlobalVariable和一个RedZone；然后，调用runtime-library将新声明的这个GlobalVariable的RedZone区域加锁。我们先来看第一步的具体实现，如图3所示。</p>
+<p><img src="/2017/07/26/AddressSanitizer/instrument_global.png" alt="instrumentGlobal"></p>
+<center> 图3： 生成包含RedZone的新的GlobalVariable </center>
+
+<p>下面，我们首先看一下一个Struct结构，该结构记录GlobalVariable存储的首地址，数据的大小，Redzone的大小，Module的名字等信息，便于在Runtime-library中使用。该结构在AddressSanitizerModule和runtime-library中都有相应的定义：</p>
+<p><img src="/2017/07/26/AddressSanitizer/posionGlobal_struct.png" alt="poisonGlobal"><br><img src="/2017/07/26/AddressSanitizer/poisonGlobal_runtimeStruct.png" alt="poisonGlobalRuntime"></p>
+<p>然后我们可以看到对GlobalVariable进行插桩来实现RedZone的Poison和整个GlobalVariable的Poison操作。</p>
+<p><img src="/2017/07/26/AddressSanitizer/instrumentGlobal_actural.png" alt="instrumentGlobal_actural"><br><img src="/2017/07/26/AddressSanitizer/register_unregisterGlobal.png" alt="register_unregisterGlobal">  </p>
+<p>具体的Poison RedZone和Poison GlobalVariable的实现在Runtime-library中：<br><img src="/2017/07/26/AddressSanitizer/Register.png" alt="RegisterGlobal"><br><img src="/2017/07/26/AddressSanitizer/unregisterGlobal.png" alt="UnRegisterGlobal"></p>
+<h3 id="Stack-Variable"><a href="#Stack-Variable" class="headerlink" title="Stack Variable"></a>Stack Variable</h3><p>Stack Variable保存在栈区，在栈中的数据我们需要控制好变量的声明周期(lifetime),当调用一个函数时，会开辟一个栈，栈中的数据会有相应的redzone和shadow memory，并将redzone的shadow memory Poison，当函数结束（正常返回，异常），栈被销毁，需要将数据和redzone清空，其相应的shadow memory也要UnPoison掉。</p>
+<p>对于Stack Variable，AddressSanitizer算法中实现了AddressSanitizer类，该类是继承了llvm的FunctionPass，该Pass能够处理每一个函数，在处理每个函数的时候，处理每一个load，store等能够访问内存的指令，在这些指令执行前进行插桩，看其访问的内存是不是被poison。</p>
+<p>下面我们主要看一下AddressSanitizer::runOnFunction(Module &amp;M)函数中主要的插桩过程。</p>
+<p><img src="/2017/07/26/AddressSanitizer/stack_instrument.png" alt="stackInstrument"></p>
+<h3 id="Heap-Variable"><a href="#Heap-Variable" class="headerlink" title="Heap Variable"></a>Heap Variable</h3><p>Heap Variable保存在堆区，其分配的函数是malloc函数，该部分的主要代码在runtime-library中，该库中主要是先将malloc的库函数hook住，然后自己定义malloc函数，定义分配策略。</p>
+<p><img src="/2017/07/26/AddressSanitizer/hookFunction.png" alt="hookFunction"></p>
+<p>具体的分配策略定义在compiler-rt/lib/asan/asan-allocator.cc文件中，感兴趣可以看一下。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;AddressSanitizer简介&quot;&gt;&lt;a href=&quot;#AddressSanitizer简介&quot; class=&quot;headerlink&quot; title=&quot;AddressSanitizer简介&quot;&gt;&lt;/a&gt;AddressSanitizer简介&lt;/h2&gt;&lt;p&gt;Addres
+    
+    </summary>
+    
+      <category term="LLVM" scheme="http://bin2415.github.io/categories/LLVM/"/>
+    
+    
+      <category term="LLVM" scheme="http://bin2415.github.io/tags/LLVM/"/>
+    
+      <category term="Sanitizer" scheme="http://bin2415.github.io/tags/Sanitizer/"/>
+    
+  </entry>
   
   <entry>
     <title>使用angr和Radare解决CMU的二进制炸弹</title>
@@ -58,11 +116,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
+    
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -501,7 +559,7 @@
     <summary type="html">
     
       &lt;h3 id=&quot;声明&quot;&gt;&lt;a href=&quot;#声明&quot; class=&quot;headerlink&quot; title=&quot;声明&quot;&gt;&lt;/a&gt;声明&lt;/h3&gt;&lt;h2 id=&quot;该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃&quot;&gt;&lt;a href=&quot;#该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃&quot; class=&quot;headerlink&quot; title=&quot;该教程是根据Seed Lab: return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)&quot;&gt;&lt;/a&gt;该教程是根据&lt;a href=&quot;http://www.cis.syr.edu/~wedu/seed/Labs_12.04/Software/Return_to_libc/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Seed Lab: return-to-libc&lt;/a&gt;的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)&lt;/h2&gt;&lt;h3 id=&quot;一：背景介绍&quot;&gt;&lt;a href=&quot;#一：背景介绍&quot; class=&quot;headerlink&quot; title=&quot;一：背景介绍&quot;&gt;&lt;/a&gt;一：背景介绍&lt;/h3&gt;&lt;h4 id=&quot;DEP数据执行保护&quot;&gt;&lt;a href=&quot;#DEP数据执行保护&quot; class=&quot;headerlink&quot; title=&quot;DEP数据执行保护&quot;&gt;&lt;/a&gt;DEP数据执行保护&lt;/h4&gt;&lt;p&gt;  溢出攻击的根源在于现代计算机对数据和代码没有明确区分这一先天缺陷，就目前来看重新去设计计算机体系结构基本上是不可能的，我们只能靠向前兼容的修补来减少溢出带来的损害，DEP（数据执行保护，Data Execution Prevention）就是用来弥补计算机对数据和代码混淆这一天然缺陷的。DEP的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。DEP 的主要作用是阻止数据页（如默认的堆页、各种堆栈页以及内存池页）执行代码。所以一般的将shellcode存放到栈中并将shellcode执行的方式在这种机制中是不可行的。&lt;/p&gt;
-&lt;p&gt;  在Linux中，通常在编译的时候添加 -fno-stack-protector -z noexecstack 编译选项就会开启该模式，在该模式下，不能像以前的攻击将恶意代码overflow进栈中，并将return地址指向恶意代码开始处，在这种情况下应该借用系统库的调用从而达到提权等目的。&lt;br&gt;
+&lt;p&gt;  在Linux中，通常在编译的时候添加 -fno-stack-protector -z noexecstack 编译选项就会开启该模式，在该模式下，不能像以前的攻击将恶意代码overflow进栈中，并将return地址指向恶意代码开始处，在这种情况下应该借用系统库的调用从而达到提权等目的。&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
@@ -535,7 +593,7 @@
     <summary type="html">
     
       &lt;p&gt;该项目使用opengl做的一个机器人，能够行走，旋转，并对机器人贴了图。具体源码请参考&lt;a href=&quot;https://github.com/bin2415/opengl_Robot.git&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;我的github&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;实验环境：visual studio 2015&lt;br&gt;
+&lt;p&gt;实验环境：visual studio 2015&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
@@ -961,7 +1019,7 @@
 &lt;li&gt;&lt;/li&gt;
 &lt;li&gt;下载easyRmtomp3.exe,下载地址：&lt;a href=&quot;https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;
+&lt;h2 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;&lt;/h2&gt;
     
     </summary>
     
@@ -970,9 +1028,9 @@
     
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
-      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
-    
       <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
+    
+      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
     
   </entry>
   
@@ -992,7 +1050,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;主要实现运用libpcap(winpcap)的api进行数据链路层的抓包操作，并一层层进行解析，解析TCP, UDP, ICMP等协议。&lt;br&gt;
+      &lt;p&gt;主要实现运用libpcap(winpcap)的api进行数据链路层的抓包操作，并一层层进行解析，解析TCP, UDP, ICMP等协议。&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
