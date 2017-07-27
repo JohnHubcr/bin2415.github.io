@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-07-26T03:00:39.919Z</updated>
+  <updated>2017-07-27T07:49:15.414Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://bin2415.github.io/2017/07/26/AddressSanitizer/"/>
     <id>http://bin2415.github.io/2017/07/26/AddressSanitizer/</id>
     <published>2017-07-26T02:03:38.000Z</published>
-    <updated>2017-07-26T03:00:39.919Z</updated>
+    <updated>2017-07-27T07:49:15.414Z</updated>
     
     <content type="html"><![CDATA[<h2 id="AddressSanitizer简介"><a href="#AddressSanitizer简介" class="headerlink" title="AddressSanitizer简介"></a>AddressSanitizer简介</h2><p>AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项使用它。AddressSanitizer的源码位于/lib/Transforms/Instrumentation/AddressSanitizer.cpp中，Runtime-library的源码在llvm的另一个项目compiler-rt的/lib/asan文件夹中。</p>
 <h2 id="AddressSanitizer算法"><a href="#AddressSanitizer算法" class="headerlink" title="AddressSanitizer算法"></a>AddressSanitizer算法</h2><p>具体的算法可以参考<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="external">WIKI</a>,在此对AddressSanitizer算法做一个简短的介绍。AddressSanitizer主要包括两部分：插桩(Instrumentation)和动态运行库(Run-time library)。插桩主要是针对在llvm编译器级别对访问内存的操作(store，load，alloca等)，将它们进行处理。动态运行库主要提供一些运行时的复杂的功能(比如poison/unpoison shadow memory)以及将malloc,free等系统调用函数hook住。其实该算法的思路很简单，如果想防住Buffer Overflow漏洞，只需要在每块内存区域右端（或两端，能防overflow和underflow）加一块区域（RedZone），使RedZone的区域的影子内存（Shadow Memory)设置为不可写即可。具体的示意图如下图所示。</p>
@@ -54,6 +54,10 @@
 <p>对于Stack Variable，AddressSanitizer算法中实现了AddressSanitizer类，该类是继承了llvm的FunctionPass，该Pass能够处理每一个函数，在处理每个函数的时候，处理每一个load，store等能够访问内存的指令，在这些指令执行前进行插桩，看其访问的内存是不是被poison。</p>
 <p>下面我们主要看一下AddressSanitizer::runOnFunction(Module &amp;M)函数中主要的插桩过程。</p>
 <p><img src="/2017/07/26/AddressSanitizer/stack_instrument.png" alt="stackInstrument"></p>
+<p>在每次访问内存时，都会查看影子内存的值，看其是否是0，如果是0则表示都能访问具体的插桩在instrumentMop函数中，</p>
+<p><img src="/2017/07/26/AddressSanitizer/instrumentMop.png" alt="instrumentMop"></p>
+<p>其中具体的处理过程在instrumentAddress函数中：</p>
+<p><img src="/2017/07/26/AddressSanitizer/doInstrument.png" alt="instrumentAddress"></p>
 <h3 id="Heap-Variable"><a href="#Heap-Variable" class="headerlink" title="Heap Variable"></a>Heap Variable</h3><p>Heap Variable保存在堆区，其分配的函数是malloc函数，该部分的主要代码在runtime-library中，该库中主要是先将malloc的库函数hook住，然后自己定义malloc函数，定义分配策略。</p>
 <p><img src="/2017/07/26/AddressSanitizer/hookFunction.png" alt="hookFunction"></p>
 <p>具体的分配策略定义在compiler-rt/lib/asan/asan-allocator.cc文件中，感兴趣可以看一下。</p>
@@ -1027,9 +1031,9 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
-    
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
+    
+      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
     
       <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     

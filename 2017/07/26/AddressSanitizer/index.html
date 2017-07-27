@@ -115,8 +115,10 @@
 <meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/Register.png">
 <meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/unregisterGlobal.png">
 <meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/stack_instrument.png">
+<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/instrumentMop.png">
+<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/doInstrument.png">
 <meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/hookFunction.png">
-<meta property="og:updated_time" content="2017-07-26T03:00:39.919Z">
+<meta property="og:updated_time" content="2017-07-27T07:49:15.414Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AddressSanitizer算法及源码解析">
 <meta name="twitter:description" content="AddressSanitizer简介AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项">
@@ -478,6 +480,10 @@
 <p>对于Stack Variable，AddressSanitizer算法中实现了AddressSanitizer类，该类是继承了llvm的FunctionPass，该Pass能够处理每一个函数，在处理每个函数的时候，处理每一个load，store等能够访问内存的指令，在这些指令执行前进行插桩，看其访问的内存是不是被poison。</p>
 <p>下面我们主要看一下AddressSanitizer::runOnFunction(Module &amp;M)函数中主要的插桩过程。</p>
 <p><img src="/2017/07/26/AddressSanitizer/stack_instrument.png" alt="stackInstrument"></p>
+<p>在每次访问内存时，都会查看影子内存的值，看其是否是0，如果是0则表示都能访问具体的插桩在instrumentMop函数中，</p>
+<p><img src="/2017/07/26/AddressSanitizer/instrumentMop.png" alt="instrumentMop"></p>
+<p>其中具体的处理过程在instrumentAddress函数中：</p>
+<p><img src="/2017/07/26/AddressSanitizer/doInstrument.png" alt="instrumentAddress"></p>
 <h3 id="Heap-Variable"><a href="#Heap-Variable" class="headerlink" title="Heap Variable"></a>Heap Variable</h3><p>Heap Variable保存在堆区，其分配的函数是malloc函数，该部分的主要代码在runtime-library中，该库中主要是先将malloc的库函数hook住，然后自己定义malloc函数，定义分配策略。</p>
 <p><img src="/2017/07/26/AddressSanitizer/hookFunction.png" alt="hookFunction"></p>
 <p>具体的分配策略定义在compiler-rt/lib/asan/asan-allocator.cc文件中，感兴趣可以看一下。</p>
