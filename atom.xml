@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-09-23T06:20:00.082Z</updated>
+  <updated>2017-09-23T06:40:26.672Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://bin2415.github.io/2017/09/22/ptmalloc%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"/>
     <id>http://bin2415.github.io/2017/09/22/ptmalloc堆内存管理/</id>
     <published>2017-09-22T12:11:38.000Z</published>
-    <updated>2017-09-23T06:20:00.082Z</updated>
+    <updated>2017-09-23T06:40:26.672Z</updated>
     
     <content type="html"><![CDATA[<h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><p>Linux的栈内存管理相信大家都已经很熟悉了，针对栈内存的攻击也是比较常见的。然而对于堆内存的管理机制可能不太熟悉，针对堆内存的攻击也是比较困难的，所以我通过阅读各种资料以及Glibc的相关源码，对Glibc下的堆内存管理机制有了一定的了解，故在此记录下学习心得。</p>
 <p>首先不同平台的堆内存管理机制是不一样的，我现在主要是针对Glibc的堆内存管理机制进行分析，Glibc的堆内存管理机制叫做ptmalloc。其他的一些比较流行的管理机制有：</p>
@@ -51,11 +51,9 @@
 <li><p>得到了要请求的chunk大小之后，首先判断该chunk的大小是否在fast bins的范围内，如果在它们的范围内就在fast bins中找到大小相符的chunk来分配。</p>
 <p><img src="/2017/09/22/ptmalloc堆内存管理/fastbin_malloc.png" alt="fast bin图片"></p>
 </li>
-<li><p>如果要请求的大小不在fast bins范围之内或者相应的fast bin链表为空，则会判断其chunk size是否在small bins的范围之内，找到对应的small bin，取出该small bin尾部的那个chunk进行分配。</p>
+<li><p>如果要请求的大小不在fast bins范围之内或者相应的fast bin链表为空，则会判断其chunk size是否在small bins的范围之内，找到对应的small bin，取出该small bin尾部的那个chunk进行分     配。</p>
 <p><img src="/2017/09/22/ptmalloc堆内存管理/smallbin_malloc.png" alt="small bin图片"></p>
 </li>
-</ol>
-<ol>
 <li><p>如果请求的大小是一个比较大的请求，则将fast bins进行合并。其要做fast bins合作的目的是为了避免有fast bins所引起的内存碎片化问题。在实际的操作中，程序一般都是分配小的内存或者分配大的内存，而不怎么会即分配大的内存又分配小的内存。所以这样的策略在实际的程序中效率还是很理想的。</p>
 <p><img src="/2017/09/22/ptmalloc堆内存管理/fastbin_consolidate.png" alt="fast bin合并图片"></p>
 </li>
