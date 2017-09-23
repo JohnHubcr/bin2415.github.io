@@ -50,7 +50,14 @@
 
     <url>
         <loc>http://bin2415.github.io/categories/LLVM/</loc>
-        <lastmod>2017-07-26T03:00:39.919Z</lastmod>
+        <lastmod>2017-07-27T07:49:15.414Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/categories/malloc/</loc>
+        <lastmod>2017-09-23T06:20:00.082Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next mist use-motion" lang="zh-Hans">
+<html class="theme-next mist use-motion" lang="zh-EN">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -118,7 +118,7 @@
     motion: true,
     duoshuo: {
       userId: '0',
-      author: '博主'
+      author: 'Penulis'
     },
     algolia: {
       applicationID: '',
@@ -147,7 +147,7 @@
 
 																										
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-EN">
 
   
 
@@ -224,7 +224,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            首页
+            Beranda
           </a>
         </li>
       
@@ -234,7 +234,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
-            分类
+            Kategori
           </a>
         </li>
       
@@ -244,7 +244,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            归档
+            Arsip
           </a>
         </li>
       
@@ -254,7 +254,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
-            标签
+            Tags
           </a>
         </li>
       
@@ -267,7 +267,7 @@
             
               <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
             
-            搜索
+            Pencarian
           </a>
         </li>
       
@@ -287,7 +287,7 @@
     </span>
     <div class="local-search-input-wrapper">
       <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
+             placeholder="Searching..." spellcheck="false"
              type="text" id="local-search-input">
     </div>
   </div>
@@ -312,6 +312,158 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/09/22/ptmalloc堆内存管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/22/ptmalloc堆内存管理/" itemprop="url">ptmalloc堆内存管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Diposting di</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-22T20:11:38+08:00">
+                2017-09-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Di</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/malloc/" itemprop="url" rel="index">
+                    <span itemprop="name">malloc</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/09/22/ptmalloc堆内存管理/" class="leancloud_visitors" data-flag-title="ptmalloc堆内存管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Pengunjung </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+		  
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          背景介绍Linux的栈内存管理相信大家都已经很熟悉了，针对栈内存的攻击也是比较常见的。然而对于堆内存的管理机制可能不太熟悉，针对堆内存的攻击也是比较困难的，所以我通过阅读各种资料以及Glibc的相关源码，对Glibc下的堆内存管理机制有了一定的了解，故在此记录下学习心得。
+首先不同平台的堆内存管理机
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/09/22/ptmalloc堆内存管理/#more" rel="contents">
+              Baca lebih &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
     
       
 
@@ -351,9 +503,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-26T10:03:38+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-26T10:03:38+08:00">
                 2017-07-26
               </time>
             
@@ -372,7 +524,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -399,7 +551,7 @@
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -428,7 +580,7 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/07/26/AddressSanitizer/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -502,9 +654,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-20T18:05:53+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-20T18:05:53+08:00">
                 2017-06-20
               </time>
             
@@ -523,7 +675,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -550,7 +702,7 @@
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -580,7 +732,7 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/06/20/angr-bomb/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -654,9 +806,9 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-20T18:36:06+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-20T18:36:06+08:00">
                 2017-05-20
               </time>
             
@@ -675,7 +827,7 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -702,7 +854,7 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -731,7 +883,7 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/20/llvm-DFG/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -805,9 +957,9 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-20T18:35:57+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-20T18:35:57+08:00">
                 2017-05-20
               </time>
             
@@ -826,7 +978,7 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -853,7 +1005,7 @@ angrangr是一个使用python语言编写的二进制分析框架，它主要是
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -883,7 +1035,7 @@ Call GraphCall Gra
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/20/llvm-CGAndCFG/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -957,9 +1109,9 @@ Call GraphCall Gra
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:18:48+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-16T18:18:48+08:00">
                 2017-05-16
               </time>
             
@@ -978,7 +1130,7 @@ Call GraphCall Gra
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -1005,7 +1157,7 @@ Call GraphCall Gra
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -1036,7 +1188,7 @@ Call GraphCall Gra
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/16/xss/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -1110,9 +1262,9 @@ Call GraphCall Gra
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:15:25+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-16T18:15:25+08:00">
                 2017-05-16
               </time>
             
@@ -1131,7 +1283,7 @@ Call GraphCall Gra
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -1158,7 +1310,7 @@ Call GraphCall Gra
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -1187,7 +1339,7 @@ Call GraphCall Gra
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/16/remote-dns-attack/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -1261,9 +1413,9 @@ Call GraphCall Gra
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:13:39+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-16T18:13:39+08:00">
                 2017-05-16
               </time>
             
@@ -1282,7 +1434,7 @@ Call GraphCall Gra
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -1309,7 +1461,7 @@ Call GraphCall Gra
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -1342,7 +1494,7 @@ Call GraphCall Gra
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/16/tcp-ip-attack/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -1416,9 +1568,9 @@ Call GraphCall Gra
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T17:01:27+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-16T17:01:27+08:00">
                 2017-05-16
               </time>
             
@@ -1437,7 +1589,7 @@ Call GraphCall Gra
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -1464,7 +1616,7 @@ Call GraphCall Gra
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -1492,7 +1644,7 @@ Call GraphCall Gra
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/16/seed-returnToLibc/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -1566,9 +1718,9 @@ Call GraphCall Gra
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">发表于</span>
+                <span class="post-meta-item-text">Diposting di</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T16:57:30+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-16T16:57:30+08:00">
                 2017-05-16
               </time>
             
@@ -1587,7 +1739,7 @@ Call GraphCall Gra
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">分类于</span>
+                <span class="post-meta-item-text">Di</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -1614,7 +1766,7 @@ Call GraphCall Gra
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">Pengunjung </span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -1642,175 +1794,7 @@ Call GraphCall Gra
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/16/open-Rebort/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/05/16/Bomb/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="binpang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="PCB博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/16/Bomb/" itemprop="url">Bomb</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T16:46:22+08:00">
-                2017-05-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/反汇编/" itemprop="url" rel="index">
-                    <span itemprop="name">反汇编</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/05/16/Bomb/" class="leancloud_visitors" data-flag-title="Bomb">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-		  
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>x86上的二进制炸弹对于反汇编的练习来说还是比较经典的，由于网上有很多该程序的讲解，所以在此我打算写一下arm平台上的二进制拆炸弹这个游戏。</p>
-<h2 id="环境的搭建"><a href="#环境的搭建" class="headerlink" title="环境的搭建"></a>环境的搭建</h2><ul>
-<li><p>由于是arm平台的环境，所以需要在linux环境下安装一个模拟器，在此我选择了qemu该模拟器，具体操作如下(该操作对Ubuntu环境有效，其他linux版本可自行查找方法)</p>
-<p>  sudo apt-get install qemu-user</p>
-</li>
-<li><p>运行ARM指令集模拟器并运行开启gdbserver和运行bomb_1程序</p>
-<p>  qemu-arm -g 8009 bomb_1</p>
-</li>
-</ul>
-<p>其中，-g参数是为了添加调试信息，为了使远程gdb调试能够起作用，8009为自定义的端口号。</p>
-<ul>
-<li><p>另外启动一个终端，通过命令远程开启gdb调试器并加载待调试程序。</p>
-<p>  arm-linux-gdb bomb_1</p>
-</li>
-<li><p>输命令来连接模拟器中的gdbserver</p>
-<p>  target  remote  localhost:8009</p>
-</li>
-<li><p>辅助工具IDA pro。IDA pro是一款静态分析的反汇编工具，利用它可以查看数据段的具体数据，用起来十分方便。</p>
-</li>
-</ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/16/Bomb/#more" rel="contents">
-              阅读全文 &raquo;
+              Baca lebih &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -1895,8 +1879,8 @@ Call GraphCall Gra
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">15</span>
-                <span class="site-state-item-name">日志</span>
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">posting</span>
               </a>
             </div>
           
@@ -1906,8 +1890,8 @@ Call GraphCall Gra
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">7</span>
-                <span class="site-state-item-name">分类</span>
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">kategori</span>
               </a>
             </div>
           
@@ -1917,8 +1901,8 @@ Call GraphCall Gra
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">17</span>
-                <span class="site-state-item-name">标签</span>
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">tags</span>
               </a>
             </div>
           
@@ -1986,11 +1970,11 @@ Call GraphCall Gra
 
 
 <div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
 </div>
 
 <div class="theme-info">
-  主题 -
+  Tema -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
     NexT.Mist
   </a>

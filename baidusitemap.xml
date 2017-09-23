@@ -4,6 +4,26 @@
 
     
   <url>
+    <loc>http://bin2415.coding.me/2017/09/22/ptmalloc%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</loc>
+    <lastmod>2017-09-23T06:20:00.082Z</lastmod>
+    <data>
+        <display>
+        <title>ptmalloc堆内存管理</title>
+        <pubTime>2017-09-22T12:11:38.000Z</pubTime>
+        
+        <tag>ptmalloc</tag>
+         
+         
+           
+             
+              <breadCrumb title="malloc" url="http://bin2415.coding.me/categories/malloc/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.coding.me/2017/07/26/AddressSanitizer/</loc>
     <lastmod>2017-07-27T07:49:15.414Z</lastmod>
     <data>
@@ -275,9 +295,9 @@
         <title>openGL_Rebort</title>
         <pubTime>2017-05-16T08:57:30.000Z</pubTime>
         
-        <tag>计算机图形学</tag>
-         
         <tag>opengl</tag>
+         
+        <tag>计算机图形学</tag>
          
          
            
