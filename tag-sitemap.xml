@@ -93,13 +93,6 @@
     </url>
 
     <url>
-        <loc>http://bin2415.github.io/tags/exploit/</loc>
-        <lastmod>2017-06-20T14:40:32.805Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://bin2415.github.io/tags/angr/</loc>
         <lastmod>2017-06-20T14:40:32.805Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -121,8 +114,22 @@
     </url>
 
     <url>
+        <loc>http://bin2415.github.io/tags/exploit/</loc>
+        <lastmod>2017-09-24T04:00:29.480Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/tags/fastbin/</loc>
+        <lastmod>2017-09-24T04:00:29.480Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>http://bin2415.github.io/tags/ptmalloc/</loc>
-        <lastmod>2017-09-23T06:56:52.775Z</lastmod>
+        <lastmod>2017-10-20T11:44:46.075Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
