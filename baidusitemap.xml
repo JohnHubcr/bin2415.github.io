@@ -4,6 +4,26 @@
 
     
   <url>
+    <loc>http://bin2415.coding.me/2017/11/18/llvm-rdrand/</loc>
+    <lastmod>2017-11-18T01:56:19.868Z</lastmod>
+    <data>
+        <display>
+        <title>llvm生成rdrand指令</title>
+        <pubTime>2017-11-18T01:27:03.000Z</pubTime>
+        
+        <tag>llvm</tag>
+         
+         
+           
+             
+              <breadCrumb title="llvm" url="http://bin2415.coding.me/categories/llvm/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.coding.me/2017/09/22/ptmalloc%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</loc>
     <lastmod>2017-10-20T11:44:46.075Z</lastmod>
     <data>
@@ -31,9 +51,9 @@
         <title>linux堆内存漏洞利用之fastbin</title>
         <pubTime>2017-09-24T02:14:15.000Z</pubTime>
         
-        <tag>exploit</tag>
-         
         <tag>fastbin</tag>
+         
+        <tag>exploit</tag>
          
          
            
@@ -93,15 +113,15 @@
     
   <url>
     <loc>http://bin2415.coding.me/2016/04/13/ExploitTutorial/</loc>
-    <lastmod>2017-06-20T10:23:52.973Z</lastmod>
+    <lastmod>2017-06-20T10:23:52.974Z</lastmod>
     <data>
         <display>
         <title>ExploitTutorial</title>
         <pubTime>2016-04-13T07:27:07.000Z</pubTime>
         
-        <tag>反汇编</tag>
-         
         <tag>Exploit</tag>
+         
+        <tag>反汇编</tag>
          
         <tag>翻译</tag>
          
@@ -137,7 +157,7 @@
     
   <url>
     <loc>http://bin2415.coding.me/2017/05/20/llvm-CGAndCFG/</loc>
-    <lastmod>2017-05-29T00:01:42.108Z</lastmod>
+    <lastmod>2017-05-29T00:01:42.109Z</lastmod>
     <data>
         <display>
         <title>llvm:Call Graph And Control Flow Graph</title>
@@ -179,7 +199,7 @@
     
   <url>
     <loc>http://bin2415.coding.me/2016/08/16/xposed/</loc>
-    <lastmod>2017-05-21T11:48:28.721Z</lastmod>
+    <lastmod>2017-05-21T11:48:28.722Z</lastmod>
     <data>
         <display>
         <title>XposedHook:hook敏感函数</title>
@@ -245,7 +265,7 @@
     
   <url>
     <loc>http://bin2415.coding.me/2017/05/16/seed-returnToLibc/</loc>
-    <lastmod>2017-05-21T11:48:10.248Z</lastmod>
+    <lastmod>2017-05-21T11:48:10.249Z</lastmod>
     <data>
         <display>
         <title>seedLab:returnToLibc</title>
@@ -253,9 +273,9 @@
         
         <tag>反汇编</tag>
          
-        <tag>seed</tag>
-         
         <tag>exploit</tag>
+         
+        <tag>seed</tag>
          
          
            
@@ -269,7 +289,7 @@
     
   <url>
     <loc>http://bin2415.coding.me/2017/05/16/remote-dns-attack/</loc>
-    <lastmod>2017-05-21T11:48:04.833Z</lastmod>
+    <lastmod>2017-05-21T11:48:04.834Z</lastmod>
     <data>
         <display>
         <title>SeedLab:Remote DNS Attack</title>
@@ -311,7 +331,7 @@
     
   <url>
     <loc>http://bin2415.coding.me/2017/05/16/open-Rebort/</loc>
-    <lastmod>2017-05-21T11:47:51.373Z</lastmod>
+    <lastmod>2017-05-21T11:47:51.374Z</lastmod>
     <data>
         <display>
         <title>openGL_Rebort</title>

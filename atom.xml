@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-09-24T04:00:29.480Z</updated>
+  <updated>2017-11-18T01:56:19.868Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -14,6 +14,37 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>llvm生成rdrand指令</title>
+    <link href="http://bin2415.github.io/2017/11/18/llvm-rdrand/"/>
+    <id>http://bin2415.github.io/2017/11/18/llvm-rdrand/</id>
+    <published>2017-11-18T01:27:03.000Z</published>
+    <updated>2017-11-18T01:56:19.868Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在做一个project的时候需要使用llvm的pass对函数进行插桩，在每一个函数头之前插入一条指令 <figure class="highlight plain"><figcaption><span>%rax ```，在寻找llvm基本指令之后发现并没有生成随机数的指令，这时就想到了llvm中intrinsic函数中是否有关于rdrand指令的函数，在对llvm整个源码进行扫描之后，发现有x86的rdrand的intrinsic函数:</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">```c</div><div class="line"></div><div class="line">  X86_INTRINSIC_DATA(rdrand_16, RDRAND, X86ISD::RDRAND, 0),</div><div class="line">  X86_INTRINSIC_DATA(rdrand_32, RDRAND, X86ISD::RDRAND, 0),</div><div class="line">  X86_INTRINSIC_DATA(rdrand_64, RDRAND, X86ISD::RDRAND, 0),</div></pre></td></tr></table></figure></p>
+<p>既然有对它们的定义，那是否有关于它们的使用呢，又经过一番查找，终于在一个测试文件中(/test/CodeGen/X86/rdrand.ll)找到相应的使用:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">declare &#123;i16, i32&#125; @llvm.x86.rdrand<span class="number">.16</span>()</div><div class="line">declare &#123;i32, i32&#125; @llvm.x86.rdrand<span class="number">.32</span>()</div><div class="line">declare &#123;i64, i32&#125; @llvm.x86.rdrand<span class="number">.64</span>()</div><div class="line"></div><div class="line">define i32 @_rdrand16_step(i16* %random_val) &#123;</div><div class="line">  %call = call &#123;i16, i32&#125; @llvm.x86.rdrand<span class="number">.16</span>()</div><div class="line">  %randval = extractvalue &#123;i16, i32&#125; %call, <span class="number">0</span></div><div class="line">  store i16 %randval, i16* %random_val</div><div class="line">  %isvalid = extractvalue &#123;i16, i32&#125; %call, <span class="number">1</span></div><div class="line">  ret i32 %isvalid</div><div class="line">; CHECK-LABEL: _rdrand16_step:</div><div class="line">; CHECK: rdrandw	%ax</div><div class="line">; CHECK: movzwl	%ax, %ecx</div><div class="line">; CHECK: movl	$<span class="number">1</span>, %eax</div><div class="line">; CHECK: cmovael	%ecx, %eax</div><div class="line">; CHECK: movw	%cx, (%r[[A0:di|cx]])</div><div class="line">; CHECK: ret</div><div class="line">&#125;</div><div class="line"></div><div class="line">define i32 @_rdrand32_step(i32* %random_val) &#123;</div><div class="line">  %call = call &#123;i32, i32&#125; @llvm.x86.rdrand<span class="number">.32</span>()</div><div class="line">  %randval = extractvalue &#123;i32, i32&#125; %call, <span class="number">0</span></div><div class="line">  store i32 %randval, i32* %random_val</div><div class="line">  %isvalid = extractvalue &#123;i32, i32&#125; %call, <span class="number">1</span></div><div class="line">  ret i32 %isvalid</div><div class="line">; CHECK-LABEL: _rdrand32_step:</div><div class="line">; CHECK: rdrandl	%e[[T0:[a-z]+]]</div><div class="line">; CHECK: movl	$<span class="number">1</span>, %eax</div><div class="line">; CHECK: cmovael	%e[[T0]], %eax</div><div class="line">; CHECK: movl	%e[[T0]], (%r[[A0]])</div><div class="line">; CHECK: ret</div><div class="line">&#125;</div><div class="line"></div><div class="line">define i32 @_rdrand64_step(i64* %random_val) &#123;</div><div class="line">  %call = call &#123;i64, i32&#125; @llvm.x86.rdrand<span class="number">.64</span>()</div><div class="line">  %randval = extractvalue &#123;i64, i32&#125; %call, <span class="number">0</span></div><div class="line">  store i64 %randval, i64* %random_val</div><div class="line">  %isvalid = extractvalue &#123;i64, i32&#125; %call, <span class="number">1</span></div><div class="line">  ret i32 %isvalid</div><div class="line">; CHECK-LABEL: _rdrand64_step:</div><div class="line">; CHECK: rdrandq	%r[[T1:[a-z]+]]</div><div class="line">; CHECK: movl	$<span class="number">1</span>, %eax</div><div class="line">; CHECK: cmovael	%e[[T1]], %eax</div><div class="line">; CHECK: movq	%r[[T1]], (%r[[A0]])</div><div class="line">; CHECK: ret</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个系列函数是对rdrandx_step(address)系列函数的包装，在这些函数中是生成随机数，并将该随机数保存到address参数中。发现在该系列函数中对@llvm.x86.rdrand.xx()系列函数的调用，可以发现，在该函数第一个语句是对@llvm.x86.rdrand.xx() intrinsic函数的调用，该函数返回一个StructType类型的结果，该结果一共有两个成员组成，第一个成员是@llvm.x86.rdrand.xx()函数产生的随机数，第二个参数表示该函数是否调用成功。第二个语句就是从结果中取出随机数。弄清了该函数的逻辑后就可以通过llvm C API产生相应的IR指令。</p>
+<h2 id="llvm-C-API"><a href="#llvm-C-API" class="headerlink" title="llvm C API"></a>llvm C API</h2><p>下面是我通过llvm的C API产生的相应的IR指令的代码:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">AllocaInst* AI3 = B.CreateAlloca(PtrTy, <span class="literal">nullptr</span>, <span class="string">"RandomValue"</span>);</div><div class="line">	</div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Type *&gt; arg_type;</div><div class="line">	</div><div class="line">Function *fun = Intrinsic::getDeclaration(F-&gt;getParent(), Intrinsic::x86_rdrand_64, arg_type);</div><div class="line">CallInst* result = B.CreateCall(fun, &#123;&#125;);</div><div class="line">	<span class="comment">//B.CreateRet(result);</span></div><div class="line">	<span class="comment">//result-&gt;dump();</span></div><div class="line"><span class="keyword">if</span> (dyn_cast&lt;StructType&gt;(result-&gt;getType())) &#123;</div><div class="line">		<span class="comment">//errs() &lt;&lt; "Hello\n";</span></div><div class="line">	Value* randomValue = B.CreateExtractValue(result, (<span class="keyword">uint64_t</span>)<span class="number">0</span>);</div><div class="line">	Value* randomValuePtr = B.CreateIntToPtr(randomValue, Type::getInt8PtrTy(B.getContext()));</div><div class="line">	B.CreateStore(randomValuePtr, AI3, <span class="literal">true</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>在生成了.ll文件后，需要用llc工具生成二进制文件，此时需要添加-mattr=rdrnd的属性:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">llc -filetype=obj input.ll -mattr=+rdrnd -o output.o</div></pre></td></tr></table></figure>
+<p>否则会出现LLVM ERROR: Cannot select: t74: i64,i32,ch = X86ISD::RDRAND t0错误</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;在做一个project的时候需要使用llvm的pass对函数进行插桩，在每一个函数头之前插入一条指令 &lt;figure class=&quot;high
+    
+    </summary>
+    
+      <category term="llvm" scheme="http://bin2415.github.io/categories/llvm/"/>
+    
+    
+      <category term="llvm" scheme="http://bin2415.github.io/tags/llvm/"/>
+    
+  </entry>
   
   <entry>
     <title>linux堆内存漏洞利用之fastbin</title>
@@ -66,9 +97,9 @@
       <category term="ptmalloc" scheme="http://bin2415.github.io/categories/ptmalloc/"/>
     
     
-      <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
-    
       <category term="fastbin" scheme="http://bin2415.github.io/tags/fastbin/"/>
+    
+      <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
   </entry>
   
@@ -319,7 +350,7 @@
     <link href="http://bin2415.github.io/2017/05/20/llvm-CGAndCFG/"/>
     <id>http://bin2415.github.io/2017/05/20/llvm-CGAndCFG/</id>
     <published>2017-05-20T10:35:57.000Z</published>
-    <updated>2017-05-29T00:01:42.108Z</updated>
+    <updated>2017-05-29T00:01:42.109Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近对llvm框架进行了初步的了解，才体会了llvm真正的魅力。它不仅是一个编译器框架，更是研究者们研究程序的一个有力的工具。本篇文章主要介绍一下如何对llvm的中间语言IR进行处理从而生成Call Graph(CG)和Control Flow Graph。</p>
 <h2 id="Call-Graph"><a href="#Call-Graph" class="headerlink" title="Call Graph"></a>Call Graph</h2><p>Call Graph又叫做函数调用图，用来记录程序中的函数调用关系的。比如：</p>
@@ -446,7 +477,7 @@
     <link href="http://bin2415.github.io/2017/05/16/remote-dns-attack/"/>
     <id>http://bin2415.github.io/2017/05/16/remote-dns-attack/</id>
     <published>2017-05-16T10:15:25.000Z</published>
-    <updated>2017-05-21T11:48:04.833Z</updated>
+    <updated>2017-05-21T11:48:04.834Z</updated>
     
     <content type="html"><![CDATA[<h2 id="实验环境："><a href="#实验环境：" class="headerlink" title="实验环境："></a>实验环境：</h2><p>服务器ip：192.168.86.139</p>
 <p>Victim ip: 192.168.86.137</p>
@@ -683,7 +714,7 @@
     <link href="http://bin2415.github.io/2017/05/16/seed-returnToLibc/"/>
     <id>http://bin2415.github.io/2017/05/16/seed-returnToLibc/</id>
     <published>2017-05-16T09:01:27.000Z</published>
-    <updated>2017-05-21T11:48:10.248Z</updated>
+    <updated>2017-05-21T11:48:10.249Z</updated>
     
     <content type="html"><![CDATA[<h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><h2 id="该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃"><a href="#该教程是根据Seed-Lab-return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击-′▽-〃" class="headerlink" title="该教程是根据Seed Lab: return-to-libc的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)"></a>该教程是根据<a href="http://www.cis.syr.edu/~wedu/seed/Labs_12.04/Software/Return_to_libc/" target="_blank" rel="external">Seed Lab: return-to-libc</a>的实验要求所写的，该教程只是演示了一下return-to-libc的一些基本的攻击原理，由于关了编译器及系统的一些保护措施，所以并不能在实际的情况下实现攻击(′▽`〃)</h2><h3 id="一：背景介绍"><a href="#一：背景介绍" class="headerlink" title="一：背景介绍"></a>一：背景介绍</h3><h4 id="DEP数据执行保护"><a href="#DEP数据执行保护" class="headerlink" title="DEP数据执行保护"></a>DEP数据执行保护</h4><p>  溢出攻击的根源在于现代计算机对数据和代码没有明确区分这一先天缺陷，就目前来看重新去设计计算机体系结构基本上是不可能的，我们只能靠向前兼容的修补来减少溢出带来的损害，DEP（数据执行保护，Data Execution Prevention）就是用来弥补计算机对数据和代码混淆这一天然缺陷的。DEP的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。DEP 的主要作用是阻止数据页（如默认的堆页、各种堆栈页以及内存池页）执行代码。所以一般的将shellcode存放到栈中并将shellcode执行的方式在这种机制中是不可行的。</p>
 <p>  在Linux中，通常在编译的时候添加 -fno-stack-protector -z noexecstack 编译选项就会开启该模式，在该模式下，不能像以前的攻击将恶意代码overflow进栈中，并将return地址指向恶意代码开始处，在这种情况下应该借用系统库的调用从而达到提权等目的。<br><a id="more"></a></p>
@@ -727,9 +758,9 @@
     
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
-      <category term="seed" scheme="http://bin2415.github.io/tags/seed/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
+    
+      <category term="seed" scheme="http://bin2415.github.io/tags/seed/"/>
     
   </entry>
   
@@ -738,7 +769,7 @@
     <link href="http://bin2415.github.io/2017/05/16/open-Rebort/"/>
     <id>http://bin2415.github.io/2017/05/16/open-Rebort/</id>
     <published>2017-05-16T08:57:30.000Z</published>
-    <updated>2017-05-21T11:47:51.373Z</updated>
+    <updated>2017-05-21T11:47:51.374Z</updated>
     
     <content type="html"><![CDATA[<p>该项目使用opengl做的一个机器人，能够行走，旋转，并对机器人贴了图。具体源码请参考<a href="https://github.com/bin2415/opengl_Robot.git" target="_blank" rel="external">我的github</a></p>
 <p>实验环境：visual studio 2015<br><a id="more"></a></p>
@@ -931,7 +962,7 @@
     <link href="http://bin2415.github.io/2016/08/16/xposed/"/>
     <id>http://bin2415.github.io/2016/08/16/xposed/</id>
     <published>2016-08-16T09:58:59.000Z</published>
-    <updated>2017-05-21T11:48:28.721Z</updated>
+    <updated>2017-05-21T11:48:28.722Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Xposed框架"><a href="#Xposed框架" class="headerlink" title="Xposed框架"></a>Xposed框架</h2><p>Xposed框架通过修改Android系统的源码，并替换Android的主程序Zygote(Init 是所有Linux程序的起点，而Zygote于Android，正如它的英文意思，是所有java程序的’孵化池’)，从而能够控制Android进程的执行流程，hook java层的API。</p>
 <a id="more"></a>
@@ -1121,7 +1152,7 @@
     <link href="http://bin2415.github.io/2016/04/13/ExploitTutorial/"/>
     <id>http://bin2415.github.io/2016/04/13/ExploitTutorial/</id>
     <published>2016-04-13T07:27:07.000Z</published>
-    <updated>2017-06-20T10:23:52.973Z</updated>
+    <updated>2017-06-20T10:23:52.974Z</updated>
     
     <content type="html"><![CDATA[<h3 id="声明：本博客是根据Exploit该链接所写"><a href="#声明：本博客是根据Exploit该链接所写" class="headerlink" title="声明：本博客是根据Exploit该链接所写"></a>声明：本博客是根据<a href="https://www.corelan.be/index.php/2009/07/19/exploit-writing-tutorial-part-1-stack-based-overflows/" target="_blank" rel="external">Exploit</a>该链接所写</h3><hr>
 <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><ul>
@@ -1185,9 +1216,9 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
       <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
+    
+      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
       <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
