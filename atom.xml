@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-11-18T01:56:19.868Z</updated>
+  <updated>2017-11-18T02:10:33.984Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,9 +20,10 @@
     <link href="http://bin2415.github.io/2017/11/18/llvm-rdrand/"/>
     <id>http://bin2415.github.io/2017/11/18/llvm-rdrand/</id>
     <published>2017-11-18T01:27:03.000Z</published>
-    <updated>2017-11-18T01:56:19.868Z</updated>
+    <updated>2017-11-18T02:10:33.984Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在做一个project的时候需要使用llvm的pass对函数进行插桩，在每一个函数头之前插入一条指令 <figure class="highlight plain"><figcaption><span>%rax ```，在寻找llvm基本指令之后发现并没有生成随机数的指令，这时就想到了llvm中intrinsic函数中是否有关于rdrand指令的函数，在对llvm整个源码进行扫描之后，发现有x86的rdrand的intrinsic函数:</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">```c</div><div class="line"></div><div class="line">  X86_INTRINSIC_DATA(rdrand_16, RDRAND, X86ISD::RDRAND, 0),</div><div class="line">  X86_INTRINSIC_DATA(rdrand_32, RDRAND, X86ISD::RDRAND, 0),</div><div class="line">  X86_INTRINSIC_DATA(rdrand_64, RDRAND, X86ISD::RDRAND, 0),</div></pre></td></tr></table></figure></p>
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在做一个project的时候需要使用llvm的pass对函数进行插桩，在每一个函数头之前插入一条指令rdrand %rax，在寻找llvm基本指令之后发现并没有生成随机数的指令，这时就想到了llvm中intrinsic函数中是否有关于rdrand指令的函数，在对llvm整个源码进行扫描之后，发现有x86的rdrand的intrinsic函数:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">X86_INTRINSIC_DATA(rdrand_16, RDRAND, X86ISD::RDRAND, <span class="number">0</span>),</div><div class="line">X86_INTRINSIC_DATA(rdrand_32, RDRAND, X86ISD::RDRAND, <span class="number">0</span>),</div><div class="line">X86_INTRINSIC_DATA(rdrand_64, RDRAND, X86ISD::RDRAND, <span class="number">0</span>),</div></pre></td></tr></table></figure>
 <p>既然有对它们的定义，那是否有关于它们的使用呢，又经过一番查找，终于在一个测试文件中(/test/CodeGen/X86/rdrand.ll)找到相应的使用:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">declare &#123;i16, i32&#125; @llvm.x86.rdrand<span class="number">.16</span>()</div><div class="line">declare &#123;i32, i32&#125; @llvm.x86.rdrand<span class="number">.32</span>()</div><div class="line">declare &#123;i64, i32&#125; @llvm.x86.rdrand<span class="number">.64</span>()</div><div class="line"></div><div class="line">define i32 @_rdrand16_step(i16* %random_val) &#123;</div><div class="line">  %call = call &#123;i16, i32&#125; @llvm.x86.rdrand<span class="number">.16</span>()</div><div class="line">  %randval = extractvalue &#123;i16, i32&#125; %call, <span class="number">0</span></div><div class="line">  store i16 %randval, i16* %random_val</div><div class="line">  %isvalid = extractvalue &#123;i16, i32&#125; %call, <span class="number">1</span></div><div class="line">  ret i32 %isvalid</div><div class="line">; CHECK-LABEL: _rdrand16_step:</div><div class="line">; CHECK: rdrandw	%ax</div><div class="line">; CHECK: movzwl	%ax, %ecx</div><div class="line">; CHECK: movl	$<span class="number">1</span>, %eax</div><div class="line">; CHECK: cmovael	%ecx, %eax</div><div class="line">; CHECK: movw	%cx, (%r[[A0:di|cx]])</div><div class="line">; CHECK: ret</div><div class="line">&#125;</div><div class="line"></div><div class="line">define i32 @_rdrand32_step(i32* %random_val) &#123;</div><div class="line">  %call = call &#123;i32, i32&#125; @llvm.x86.rdrand<span class="number">.32</span>()</div><div class="line">  %randval = extractvalue &#123;i32, i32&#125; %call, <span class="number">0</span></div><div class="line">  store i32 %randval, i32* %random_val</div><div class="line">  %isvalid = extractvalue &#123;i32, i32&#125; %call, <span class="number">1</span></div><div class="line">  ret i32 %isvalid</div><div class="line">; CHECK-LABEL: _rdrand32_step:</div><div class="line">; CHECK: rdrandl	%e[[T0:[a-z]+]]</div><div class="line">; CHECK: movl	$<span class="number">1</span>, %eax</div><div class="line">; CHECK: cmovael	%e[[T0]], %eax</div><div class="line">; CHECK: movl	%e[[T0]], (%r[[A0]])</div><div class="line">; CHECK: ret</div><div class="line">&#125;</div><div class="line"></div><div class="line">define i32 @_rdrand64_step(i64* %random_val) &#123;</div><div class="line">  %call = call &#123;i64, i32&#125; @llvm.x86.rdrand<span class="number">.64</span>()</div><div class="line">  %randval = extractvalue &#123;i64, i32&#125; %call, <span class="number">0</span></div><div class="line">  store i64 %randval, i64* %random_val</div><div class="line">  %isvalid = extractvalue &#123;i64, i32&#125; %call, <span class="number">1</span></div><div class="line">  ret i32 %isvalid</div><div class="line">; CHECK-LABEL: _rdrand64_step:</div><div class="line">; CHECK: rdrandq	%r[[T1:[a-z]+]]</div><div class="line">; CHECK: movl	$<span class="number">1</span>, %eax</div><div class="line">; CHECK: cmovael	%e[[T1]], %eax</div><div class="line">; CHECK: movq	%r[[T1]], (%r[[A0]])</div><div class="line">; CHECK: ret</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这个系列函数是对rdrandx_step(address)系列函数的包装，在这些函数中是生成随机数，并将该随机数保存到address参数中。发现在该系列函数中对@llvm.x86.rdrand.xx()系列函数的调用，可以发现，在该函数第一个语句是对@llvm.x86.rdrand.xx() intrinsic函数的调用，该函数返回一个StructType类型的结果，该结果一共有两个成员组成，第一个成员是@llvm.x86.rdrand.xx()函数产生的随机数，第二个参数表示该函数是否调用成功。第二个语句就是从结果中取出随机数。弄清了该函数的逻辑后就可以通过llvm C API产生相应的IR指令。</p>
@@ -35,7 +36,7 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;在做一个project的时候需要使用llvm的pass对函数进行插桩，在每一个函数头之前插入一条指令 &lt;figure class=&quot;high
+      &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;在做一个project的时候需要使用llvm的pass对函数进行插桩，在每一个函数头之前插入一条指令rdrand %rax，在寻找llvm基
     
     </summary>
     
@@ -97,9 +98,9 @@
       <category term="ptmalloc" scheme="http://bin2415.github.io/categories/ptmalloc/"/>
     
     
-      <category term="fastbin" scheme="http://bin2415.github.io/tags/fastbin/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
+    
+      <category term="fastbin" scheme="http://bin2415.github.io/tags/fastbin/"/>
     
   </entry>
   
@@ -396,7 +397,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -459,7 +460,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     
@@ -1216,9 +1217,9 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
-    
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
+    
+      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
     
       <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
