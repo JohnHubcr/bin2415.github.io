@@ -4,6 +4,26 @@
 
     
   <url>
+    <loc>http://bin2415.coding.me/2017/11/18/llvm%E5%AD%98%E5%8F%96fs%E6%AE%B5%E5%86%85%E5%AE%B9/</loc>
+    <lastmod>2017-11-18T02:48:26.580Z</lastmod>
+    <data>
+        <display>
+        <title>llvm存取fs段内容</title>
+        <pubTime>2017-11-18T02:26:29.000Z</pubTime>
+        
+        <tag>llvm</tag>
+         
+         
+           
+             
+              <breadCrumb title="llvm" url="http://bin2415.coding.me/categories/llvm/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.coding.me/2017/11/18/llvm-rdrand/</loc>
     <lastmod>2017-11-18T02:10:33.984Z</lastmod>
     <data>

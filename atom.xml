@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-11-18T02:10:33.984Z</updated>
+  <updated>2017-11-18T02:48:26.580Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -14,6 +14,37 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>llvm存取fs段内容</title>
+    <link href="http://bin2415.github.io/2017/11/18/llvm%E5%AD%98%E5%8F%96fs%E6%AE%B5%E5%86%85%E5%AE%B9/"/>
+    <id>http://bin2415.github.io/2017/11/18/llvm存取fs段内容/</id>
+    <published>2017-11-18T02:26:29.000Z</published>
+    <updated>2017-11-18T02:48:26.580Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>最近想使用llvm的pass来对每个函数进行插桩，来模拟stack guard的功能。其中碰到了一个很棘手的问题就是如何通过llvm C API实现对fs段内容的存取。要想实现该问题，我通过查看llvm如何实现stack guard,找到了具体的解决方案。下面首先看一下llvm中stackProtector pass如何实现对fs段的存取，然后再介绍一下我自己简化版本的Stack guard。</p>
+<h2 id="stackProtector对fs段的存取"><a href="#stackProtector对fs段的存取" class="headerlink" title="stackProtector对fs段的存取"></a>stackProtector对fs段的存取</h2><p>在stackProtector中，调用getIRStackGuard(IRBuilder&lt;&gt; &amp;IRB) const函数对fs段进行存取的，其在x86下实现的具体代码如下:</p>
+<p><img src="/2017/11/18/llvm存取fs段内容/fs_fetch.png" alt="fs_fetch"></p>
+<p><img src="/2017/11/18/llvm存取fs段内容/fs_address.png" alt="fs_address"></p>
+<p>其中fs段的addressSpace为257</p>
+<h2 id="实现存取"><a href="#实现存取" class="headerlink" title="实现存取"></a>实现存取</h2><p>所以对fs段的存取代码如下:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Address为257表示在用户模式下的fs段寄存器</span></div><div class="line"><span class="function"><span class="keyword">static</span> Constant* <span class="title">SegmentOffsetStack</span><span class="params">(IRBuilder&lt;&gt; &amp;IRB, <span class="keyword">unsigned</span> Offset, <span class="keyword">unsigned</span> AddressSpace)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> ConstantExpr::getIntToPtr(</div><div class="line">		ConstantInt::get(Type::getInt32Ty(IRB.getContext()), Offset),</div><div class="line">		Type::getInt8PtrTy(IRB.getContext())-&gt;getPointerTo(AddressSpace)</div><div class="line">	);</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">static</span> Value* <span class="title">getTheStackGuardValue</span><span class="params">(IRBuilder&lt;&gt; &amp;IRB, <span class="keyword">unsigned</span> offset)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> SegmentOffsetStack(IRB, offset, <span class="number">257</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中offset为从fs段偏移offset处取数据。</p>
+<p>下附我对stack guard的一个简单的实现:<br><a href="https://github.com/bin2415/llvm-stack-guard" target="_blank" rel="external">stackguard</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;最近想使用llvm的pass来对每个函数进行插桩，来模拟stack guard的功能。其中碰到了一个很棘手的问题就是如何通过llvm C A
+    
+    </summary>
+    
+      <category term="llvm" scheme="http://bin2415.github.io/categories/llvm/"/>
+    
+    
+      <category term="llvm" scheme="http://bin2415.github.io/tags/llvm/"/>
+    
+  </entry>
   
   <entry>
     <title>llvm生成rdrand指令</title>
@@ -397,7 +428,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -460,7 +491,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     

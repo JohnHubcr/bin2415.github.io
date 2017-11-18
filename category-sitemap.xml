@@ -15,7 +15,7 @@
 
     <url>
         <loc>http://bin2415.github.io/categories/Hook/</loc>
-        <lastmod>2017-05-21T11:48:28.721Z</lastmod>
+        <lastmod>2017-05-21T11:48:28.722Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -28,15 +28,8 @@
     </url>
 
     <url>
-        <loc>http://bin2415.github.io/categories/llvm/</loc>
-        <lastmod>2017-05-29T00:03:47.063Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/</loc>
-        <lastmod>2017-06-20T10:23:52.973Z</lastmod>
+        <lastmod>2017-06-20T10:23:52.974Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -65,6 +58,13 @@
     <url>
         <loc>http://bin2415.github.io/categories/malloc/</loc>
         <lastmod>2017-10-20T11:44:46.075Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/categories/llvm/</loc>
+        <lastmod>2017-11-18T02:48:26.580Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
