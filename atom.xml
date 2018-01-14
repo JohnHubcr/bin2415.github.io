@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-01-14T12:26:07.236Z</updated>
+  <updated>2018-01-14T12:28:17.091Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://bin2415.github.io/2018/01/14/qemu-mips/"/>
     <id>http://bin2415.github.io/2018/01/14/qemu-mips/</id>
     <published>2018-01-14T12:15:22.000Z</published>
-    <updated>2018-01-14T12:26:07.236Z</updated>
+    <updated>2018-01-14T12:28:17.091Z</updated>
     
     <content type="html"><![CDATA[<p>使用Qemu可以运行不同环境的程序，比方说在i386架构下运行arm和mips架构的程序。</p>
 <ul>
@@ -50,7 +50,7 @@
     
     </summary>
     
-      <category term="llvm" scheme="http://bin2415.github.io/categories/llvm/"/>
+      <category term="qemu" scheme="http://bin2415.github.io/categories/qemu/"/>
     
     
       <category term="qemu" scheme="http://bin2415.github.io/tags/qemu/"/>
@@ -380,11 +380,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
+    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
-    
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -830,9 +830,9 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
-    
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
+    
+      <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="seed" scheme="http://bin2415.github.io/tags/seed/"/>
     
@@ -1290,11 +1290,11 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
       <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
+    
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   

@@ -5,7 +5,7 @@
     <url>%2F2018%2F01%2F14%2Fqemu-mips%2F</url>
     <content type="text"><![CDATA[使用Qemu可以运行不同环境的程序，比方说在i386架构下运行arm和mips架构的程序。 安装Qemu sudo apt-get install qemu sudo apt-get install qemu-user-static 将qemu-mips-static文件拷贝到当前文件 cp /usr/bin/qemu-mips-static ./ 运行mips程序(其中./bin/busybox为要执行的busybox) sudo chroot . ./qemu-mips-static ./bin/busybox]]></content>
       <categories>
-        <category>llvm</category>
+        <category>qemu</category>
       </categories>
       <tags>
         <tag>qemu</tag>
@@ -76,9 +76,9 @@
         <category>angr</category>
       </categories>
       <tags>
+        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
-        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -147,8 +147,8 @@
         <category>反汇编</category>
       </categories>
       <tags>
-        <tag>exploit</tag>
         <tag>反汇编</tag>
+        <tag>exploit</tag>
         <tag>seed</tag>
       </tags>
   </entry>
@@ -215,9 +215,9 @@
         <category>反汇编</category>
       </categories>
       <tags>
-        <tag>翻译</tag>
         <tag>反汇编</tag>
         <tag>Exploit</tag>
+        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>

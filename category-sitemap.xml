@@ -64,7 +64,14 @@
 
     <url>
         <loc>http://bin2415.github.io/categories/llvm/</loc>
-        <lastmod>2018-01-14T12:26:07.236Z</lastmod>
+        <lastmod>2017-11-18T02:48:26.580Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/categories/qemu/</loc>
+        <lastmod>2018-01-14T12:28:17.091Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
