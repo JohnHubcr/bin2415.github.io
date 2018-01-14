@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2017-11-18T02:48:26.580Z</updated>
+  <updated>2018-01-14T12:26:07.236Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -14,6 +14,48 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Qemu模拟Mips程序运行</title>
+    <link href="http://bin2415.github.io/2018/01/14/qemu-mips/"/>
+    <id>http://bin2415.github.io/2018/01/14/qemu-mips/</id>
+    <published>2018-01-14T12:15:22.000Z</published>
+    <updated>2018-01-14T12:26:07.236Z</updated>
+    
+    <content type="html"><![CDATA[<p>使用Qemu可以运行不同环境的程序，比方说在i386架构下运行arm和mips架构的程序。</p>
+<ul>
+<li>安装Qemu<ul>
+<li>sudo apt-get install qemu</li>
+<li>sudo apt-get install qemu-user-static</li>
+</ul>
+</li>
+<li>将qemu-mips-static文件拷贝到当前文件<ul>
+<li>cp /usr/bin/qemu-mips-static ./</li>
+</ul>
+</li>
+<li>运行mips程序(其中./bin/busybox为要执行的busybox)<ul>
+<li>sudo chroot . ./qemu-mips-static ./bin/busybox</li>
+</ul>
+</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;使用Qemu可以运行不同环境的程序，比方说在i386架构下运行arm和mips架构的程序。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;安装Qemu&lt;ul&gt;
+&lt;li&gt;sudo apt-get install qemu&lt;/li&gt;
+&lt;li&gt;sudo apt-get install qemu-us
+    
+    </summary>
+    
+      <category term="llvm" scheme="http://bin2415.github.io/categories/llvm/"/>
+    
+    
+      <category term="qemu" scheme="http://bin2415.github.io/tags/qemu/"/>
+    
+  </entry>
   
   <entry>
     <title>llvm存取fs段内容</title>
@@ -338,11 +380,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
+    
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -428,7 +470,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -491,7 +533,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     
@@ -788,9 +830,9 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
+    
+      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
       <category term="seed" scheme="http://bin2415.github.io/tags/seed/"/>
     
@@ -1248,11 +1290,11 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
+    
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
       <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
-    
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   

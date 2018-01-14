@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Qemu模拟Mips程序运行]]></title>
+    <url>%2F2018%2F01%2F14%2Fqemu-mips%2F</url>
+    <content type="text"><![CDATA[使用Qemu可以运行不同环境的程序，比方说在i386架构下运行arm和mips架构的程序。 安装Qemu sudo apt-get install qemu sudo apt-get install qemu-user-static 将qemu-mips-static文件拷贝到当前文件 cp /usr/bin/qemu-mips-static ./ 运行mips程序(其中./bin/busybox为要执行的busybox) sudo chroot . ./qemu-mips-static ./bin/busybox]]></content>
+      <categories>
+        <category>llvm</category>
+      </categories>
+      <tags>
+        <tag>qemu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[llvm存取fs段内容]]></title>
     <url>%2F2017%2F11%2F18%2Fllvm%E5%AD%98%E5%8F%96fs%E6%AE%B5%E5%86%85%E5%AE%B9%2F</url>
     <content type="text"><![CDATA[问题最近想使用llvm的pass来对每个函数进行插桩，来模拟stack guard的功能。其中碰到了一个很棘手的问题就是如何通过llvm C API实现对fs段内容的存取。要想实现该问题，我通过查看llvm如何实现stack guard,找到了具体的解决方案。下面首先看一下llvm中stackProtector pass如何实现对fs段的存取，然后再介绍一下我自己简化版本的Stack guard。 stackProtector对fs段的存取在stackProtector中，调用getIRStackGuard(IRBuilder&lt;&gt; &amp;IRB) const函数对fs段进行存取的，其在x86下实现的具体代码如下: 其中fs段的addressSpace为257 实现存取所以对fs段的存取代码如下: 12345678910//Address为257表示在用户模式下的fs段寄存器static Constant* SegmentOffsetStack(IRBuilder&lt;&gt; &amp;IRB, unsigned Offset, unsigned AddressSpace) &#123; return ConstantExpr::getIntToPtr( ConstantInt::get(Type::getInt32Ty(IRB.getContext()), Offset), Type::getInt8PtrTy(IRB.getContext())-&gt;getPointerTo(AddressSpace) );&#125;static Value* getTheStackGuardValue(IRBuilder&lt;&gt; &amp;IRB, unsigned offset) &#123; return SegmentOffsetStack(IRB, offset, 257);&#125; 其中offset为从fs段偏移offset处取数据。 下附我对stack guard的一个简单的实现:stackguard]]></content>
@@ -65,9 +76,9 @@
         <category>angr</category>
       </categories>
       <tags>
-        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
+        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -136,8 +147,8 @@
         <category>反汇编</category>
       </categories>
       <tags>
-        <tag>反汇编</tag>
         <tag>exploit</tag>
+        <tag>反汇编</tag>
         <tag>seed</tag>
       </tags>
   </entry>
@@ -204,9 +215,9 @@
         <category>反汇编</category>
       </categories>
       <tags>
+        <tag>翻译</tag>
         <tag>反汇编</tag>
         <tag>Exploit</tag>
-        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
