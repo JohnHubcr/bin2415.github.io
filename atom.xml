@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-01-22T11:18:17.535Z</updated>
+  <updated>2018-01-22T11:26:01.555Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,14 +20,14 @@
     <link href="http://bin2415.github.io/2018/01/22/gdb%E6%97%A0%E6%B3%95%E5%AE%9A%E4%BD%8Dmain/"/>
     <id>http://bin2415.github.io/2018/01/22/gdb无法定位main/</id>
     <published>2018-01-22T11:01:10.000Z</published>
-    <updated>2018-01-22T11:18:17.535Z</updated>
+    <updated>2018-01-22T11:26:01.555Z</updated>
     
     <content type="html"><![CDATA[<p>最近在用gdb调试一个程序的时候，由于程序经过了strip处理，没有debug信息，所以当b main的时候会出现”Function main not defined”错误信息，也就是无法定位main函数。而当b <strong>libc_start_main函数时是可以定位到的，而</strong>libc_start_main函数的第一个参数就是main函数的地址，因此可以通过定位__libc_start_main函数，然后获得第一个参数的内容，此时就是main函数的地址。具体操作如下：</p>
 <h2 id="传进-libc-start-main函数的参数"><a href="#传进-libc-start-main函数的参数" class="headerlink" title="传进__libc_start_main函数的参数"></a>传进__libc_start_main函数的参数</h2><p>查看汇编可以看到将__libc_start_main的第一个参数传进了$RDI寄存器中（64位机器）：</p>
-<p><img src="/2018/01/22/gdb无法定位main/./gdb无法定位main/main_address.png" alt="first_param"></p>
+<p><img src="/2018/01/22/gdb无法定位main/main_address.png" alt="first_param"></p>
 <p>因此在gdb中先在<strong>libc_start_main函数下断点: ```b </strong>libc_start_main```</p>
 <h2 id="在-RDI指向的内容处下断点"><a href="#在-RDI指向的内容处下断点" class="headerlink" title="在$RDI指向的内容处下断点"></a>在$RDI指向的内容处下断点</h2><p>在 <strong>libc_start_main处下了断点后，run一下会在</strong>libc_start_main入口处停下，此时$rdi寄存器存储的是main函数的地址，<code>b *$rdi</code>则会在main处下断点</p>
-<p><img src="/2018/01/22/gdb无法定位main/./gdb无法定位main/rdi.png" alt="rdi"></p>
+<p><img src="/2018/01/22/gdb无法定位main/rdi.png" alt="rdi"></p>
 ]]></content>
     
     <summary type="html">
@@ -408,11 +408,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
+    
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -1318,11 +1318,11 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
-    
       <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
       <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
+    
+      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
     
   </entry>
   
