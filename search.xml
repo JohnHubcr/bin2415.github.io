@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[gdb无法找到main]]></title>
+    <url>%2F2018%2F01%2F22%2Fgdb%E6%97%A0%E6%B3%95%E5%AE%9A%E4%BD%8Dmain%2F</url>
+    <content type="text"><![CDATA[最近在用gdb调试一个程序的时候，由于程序经过了strip处理，没有debug信息，所以当b main的时候会出现”Function main not defined”错误信息，也就是无法定位main函数。而当b libc_start_main函数时是可以定位到的，而libc_start_main函数的第一个参数就是main函数的地址，因此可以通过定位__libc_start_main函数，然后获得第一个参数的内容，此时就是main函数的地址。具体操作如下： 传进__libc_start_main函数的参数查看汇编可以看到将__libc_start_main的第一个参数传进了$RDI寄存器中（64位机器）： 因此在gdb中先在libc_start_main函数下断点: ```b libc_start_main``` 在$RDI指向的内容处下断点在 libc_start_main处下了断点后，run一下会在libc_start_main入口处停下，此时$rdi寄存器存储的是main函数的地址，b *$rdi则会在main处下断点]]></content>
+      <categories>
+        <category>gdb</category>
+      </categories>
+      <tags>
+        <tag>gdb</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Qemu模拟Mips程序运行]]></title>
     <url>%2F2018%2F01%2F14%2Fqemu-mips%2F</url>
     <content type="text"><![CDATA[使用Qemu可以运行不同环境的程序，比方说在i386架构下运行arm和mips架构的程序。 安装Qemu sudo apt-get install qemu sudo apt-get install qemu-user-static 将qemu-mips-static文件拷贝到当前文件 cp /usr/bin/qemu-mips-static ./ 运行mips程序(其中./bin/busybox为要执行的busybox) sudo chroot . ./qemu-mips-static ./bin/busybox]]></content>
@@ -215,8 +226,8 @@
         <category>反汇编</category>
       </categories>
       <tags>
-        <tag>反汇编</tag>
         <tag>Exploit</tag>
+        <tag>反汇编</tag>
         <tag>翻译</tag>
       </tags>
   </entry>

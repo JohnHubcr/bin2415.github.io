@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="gdb," />
 
 
 
@@ -96,12 +96,20 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="PCB博客">
-<meta property="og:url" content="http://bin2415.github.io/categories/ptmalloc/index.html">
+<meta name="description" content="最近在用gdb调试一个程序的时候，由于程序经过了strip处理，没有debug信息，所以当b main的时候会出现”Function main not defined”错误信息，也就是无法定位main函数。而当b libc_start_main函数时是可以定位到的，而libc_start_main函数的第一个参数就是main函数的地址，因此可以通过定位__libc_start_main函数，然后获">
+<meta name="keywords" content="gdb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gdb无法找到main">
+<meta property="og:url" content="http://bin2415.github.io/2018/01/22/gdb无法定位main/index.html">
 <meta property="og:site_name" content="PCB博客">
+<meta property="og:description" content="最近在用gdb调试一个程序的时候，由于程序经过了strip处理，没有debug信息，所以当b main的时候会出现”Function main not defined”错误信息，也就是无法定位main函数。而当b libc_start_main函数时是可以定位到的，而libc_start_main函数的第一个参数就是main函数的地址，因此可以通过定位__libc_start_main函数，然后获">
+<meta property="og:image" content="http://bin2415.github.io/2018/01/22/gdb无法定位main/gdb无法定位main/main_address.png">
+<meta property="og:image" content="http://bin2415.github.io/2018/01/22/gdb无法定位main/gdb无法定位main/rdi.png">
+<meta property="og:updated_time" content="2018-01-22T11:18:17.535Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PCB博客">
+<meta name="twitter:title" content="gdb无法找到main">
+<meta name="twitter:description" content="最近在用gdb调试一个程序的时候，由于程序经过了strip处理，没有debug信息，所以当b main的时候会出现”Function main not defined”错误信息，也就是无法定位main函数。而当b libc_start_main函数时是可以定位到的，而libc_start_main函数的第一个参数就是main函数的地址，因此可以通过定位__libc_start_main函数，然后获">
+<meta name="twitter:image" content="http://bin2415.github.io/2018/01/22/gdb无法定位main/gdb无法定位main/main_address.png">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -132,13 +140,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/categories/ptmalloc/"/>
+  <link rel="canonical" href="http://bin2415.github.io/2018/01/22/gdb无法定位main/"/>
 
 
 
 
 
-  <title>Category: ptmalloc | PCB博客</title>
+  <title>gdb无法找到main | PCB博客</title>
 </head>
 
 
@@ -179,7 +187,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -310,45 +318,202 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h1>ptmalloc<small>Category</small>
-      </h1>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/24/linux堆内存漏洞利用之fastbin/" itemprop="url">
-              
-                <span itemprop="name">linux堆内存漏洞利用之fastbin</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-24T10:14:15+08:00"
-              content="2017-09-24" >
-          09-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </section>
 
   
 
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2018/01/22/gdb无法定位main/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">gdb无法找到main</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-22T19:01:10+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gdb/" itemprop="url" rel="index">
+                    <span itemprop="name">gdb</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2018/01/22/gdb无法定位main/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/gdb无法定位main/" class="leancloud_visitors" data-flag-title="gdb无法找到main">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+		  
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在用gdb调试一个程序的时候，由于程序经过了strip处理，没有debug信息，所以当b main的时候会出现”Function main not defined”错误信息，也就是无法定位main函数。而当b <strong>libc_start_main函数时是可以定位到的，而</strong>libc_start_main函数的第一个参数就是main函数的地址，因此可以通过定位__libc_start_main函数，然后获得第一个参数的内容，此时就是main函数的地址。具体操作如下：</p>
+<h2 id="传进-libc-start-main函数的参数"><a href="#传进-libc-start-main函数的参数" class="headerlink" title="传进__libc_start_main函数的参数"></a>传进__libc_start_main函数的参数</h2><p>查看汇编可以看到将__libc_start_main的第一个参数传进了$RDI寄存器中（64位机器）：</p>
+<p><img src="/2018/01/22/gdb无法定位main/./gdb无法定位main/main_address.png" alt="first_param"></p>
+<p>因此在gdb中先在<strong>libc_start_main函数下断点: ```b </strong>libc_start_main```</p>
+<h2 id="在-RDI指向的内容处下断点"><a href="#在-RDI指向的内容处下断点" class="headerlink" title="在$RDI指向的内容处下断点"></a>在$RDI指向的内容处下断点</h2><p>在 <strong>libc_start_main处下了断点后，run一下会在</strong>libc_start_main入口处停下，此时$rdi寄存器存储的是main函数的地址，<code>b *$rdi</code>则会在main处下断点</p>
+<p><img src="/2018/01/22/gdb无法定位main/./gdb无法定位main/rdi.png" alt="rdi"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gdb/" rel="tag"># gdb</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/14/qemu-mips/" rel="next" title="Qemu模拟Mips程序运行">
+                <i class="fa fa-chevron-left"></i> Qemu模拟Mips程序运行
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
 
 
           </div>
@@ -356,6 +521,12 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
 
         </div>
         
@@ -375,8 +546,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -456,6 +636,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#传进-libc-start-main函数的参数"><span class="nav-number">1.</span> <span class="nav-text">传进__libc_start_main函数的参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-RDI指向的内容处下断点"><span class="nav-number">2.</span> <span class="nav-text">在$RDI指向的内容处下断点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -574,6 +770,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 
