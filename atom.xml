@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-07-01T12:00:53.116Z</updated>
+  <updated>2018-07-01T12:08:25.507Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://bin2415.github.io/2018/07/01/pwnable-tw/"/>
     <id>http://bin2415.github.io/2018/07/01/pwnable-tw/</id>
     <published>2018-07-01T08:50:23.000Z</published>
-    <updated>2018-07-01T12:00:53.116Z</updated>
+    <updated>2018-07-01T12:08:25.507Z</updated>
     
     <content type="html"><![CDATA[<p>该题是模拟了apple的商店，来售卖apple的各种产品，其提供了6个功能:</p>
 <ul>
@@ -34,18 +34,18 @@
 <p>其中，购物车是用双向链表实现的，其每一项的结构如下，其在32位机器下的大小为16字节。链表头是一个全局变量，存在0x804b068处。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">cart_entry</span>&#123;</span></div><div class="line">    <span class="keyword">char</span>* product_name,</div><div class="line">    <span class="keyword">int</span> price,</div><div class="line">    cart_entry* next,</div><div class="line">    cart_entry* previous</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
 <h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>下面简单的分析添加，删除，购物车输出和结算功能。</p>
 <h3 id="添加商品"><a href="#添加商品" class="headerlink" title="添加商品"></a>添加商品</h3><p>添加商品是在add()函数中实现的，其在ida中反汇编出来的结果如下图所示：</p>
-<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/add_all.png" alt="add_all"></p>
+<p><img src="/2018/07/01/pwnable-tw/./add_all.png" alt="add_all"></p>
 <p>该函数的逻辑也比较简单，其首先通过malloc在堆上分配16自己大小的空间，然后进行初始化，最后将该结构体添加到双向链表中。</p>
 <h3 id="结算"><a href="#结算" class="headerlink" title="结算"></a>结算</h3><p>结算功能是在checkout()函数中实现的，其在ida中反汇编出来的结果如下图所示:</p>
-<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/checkout.png" alt="checkout"></p>
+<p><img src="/2018/07/01/pwnable-tw/./checkout.png" alt="checkout"></p>
 <p>由上图可知，其当满足总金额=7174时，则将一个临时变量v2(位于ebp-0x20)加入到双向链表中，而ebp-0x20处的内存如果能被我们所控制的话就可能进行攻击(泄露内存等)。而通过分析可知在cart()函数接收输入的时候我们的输入是能够覆盖到ebp-0x20处的。所以此时只需要满足购物车的总金额=7174即可。我们观察到一共有4种不同的价格(199,299,399,499),我们可以列个方程求出多种解。最直接的方法是交给<a href="https://github.com/Z3Prover/z3" target="_blank" rel="external">z3</a>求解器，具体求解如下:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> z3 <span class="keyword">import</span> *</div><div class="line">In [<span class="number">2</span>]: x = Int(<span class="string">'x'</span>)</div><div class="line">In [<span class="number">3</span>]: y = Int(<span class="string">'y'</span>)</div><div class="line">In [<span class="number">4</span>]: m = Int(<span class="string">'m'</span>)</div><div class="line">In [<span class="number">5</span>]: n = Int(<span class="string">'n'</span>)</div><div class="line">In [<span class="number">7</span>]: solve(x&gt;=<span class="number">0</span>,y&gt;=<span class="number">0</span>,m&gt;=<span class="number">0</span>,n&gt;=<span class="number">0</span>,<span class="number">199</span>*x+<span class="number">299</span>*y+<span class="number">399</span>*m+<span class="number">499</span>*n==<span class="number">7174</span>)</div><div class="line">[y = <span class="number">20</span>, x = <span class="number">6</span>, n = <span class="number">0</span>, m = <span class="number">0</span>]</div></pre></td></tr></table></figure>
 <p>即可求出结果，使得满足购物车总金额=7174.</p>
 <h3 id="输出购物车"><a href="#输出购物车" class="headerlink" title="输出购物车"></a>输出购物车</h3><p>输出购物车功能是在cart()函数中实现的，其在ida中反汇编出来的结果如下图所示：</p>
-<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/cart.png" alt="cart"></p>
+<p><img src="/2018/07/01/pwnable-tw/./cart.png" alt="cart"></p>
 <p>在cart()函数中，有一个可以利用的地方就是在my_read()时，用户能输入0x15大小的数据，而输入的数据存进的内存即在ebp-0x22开始处，正好可以将checkout中的添加到双向链表的临时变量(ebp-0x20)给覆盖掉。如果我们将临时变量的第一个元素(存放商品名称)的地方存入atoi的got地址，则可以将libc的地址泄露出来。</p>
 <h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>删除功能是在delete()函数中实现的，其在ida中反汇编出来的结果如下图所示:</p>
-<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/delete.png" alt="delete"></p>
+<p><img src="/2018/07/01/pwnable-tw/./delete.png" alt="delete"></p>
 <p>删除操作就是在双向链表中找到要删除的项，然后就是正规的双向链表操作。由于我们可以通过输入控制ebp-0x20处的项的数据，如果我们将next和previous元素修改成特定的值，就有可能修改got表项，此时就造成了控制流的劫持。一开始我是将next修改成got[‘atoi’]-0xc，将previous改成system的地址，最后发生segment fault. 仔细一想，此时确实将atoi的got表项改成了system的地址了，但是也需要将system.addr+8赋值为got[‘atoi’]-0xc，而system.addr+8处是代码段，改程序又开了NX保护，所以会发生segment fault.</p>
 <h2 id="Attack"><a href="#Attack" class="headerlink" title="Attack"></a>Attack</h2><p>通过前面的分析，我们可以利用cart()函数覆盖ebp-0x20处的内容，进而可以进行内存泄露攻击，将glibc的地址和栈中的地址泄露出来。通过delete函数，我们可以修改某一内存处的内容，如果我们修改ebp的值，使其在leave操作(mov esp, ebp; pop ebp)时，将修改后的ebp值赋给ebp寄存器，从而控制栈，进而修改got表项。</p>
 <h3 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h3><p>通过前面的分析我们可以看到在cart()函数中，如果将ebp-0x20处的内容覆盖为got[‘atoi’]的地址，则在cart函数输出的时候，就可以将atoi的got表项的内容泄露出来，即glibc的atoi函数的地址。</p>
@@ -466,11 +466,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
+    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
-    
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -556,7 +556,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -619,7 +619,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     

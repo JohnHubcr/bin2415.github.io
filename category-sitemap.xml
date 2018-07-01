@@ -78,7 +78,14 @@
 
     <url>
         <loc>http://bin2415.github.io/categories/gdb/</loc>
-        <lastmod>2018-01-22T11:18:17.535Z</lastmod>
+        <lastmod>2018-01-22T11:26:01.555Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/categories/pwnable/</loc>
+        <lastmod>2018-07-01T12:08:25.507Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
