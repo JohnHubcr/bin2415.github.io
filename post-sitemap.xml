@@ -7,8 +7,16 @@
     </url>
 
     <url>
+        <loc>http://bin2415.github.io/2018/07/10/firmware-reverse/</loc>
+        <lastmod>2018-07-10T15:02:51.931Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://bin2415.github.io/2018/07/01/pwnable-tw/</loc>
-        <lastmod>2018-07-01T12:08:25.507Z</lastmod>
+        <lastmod>2018-07-01T12:10:59.809Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

@@ -106,8 +106,8 @@
 <meta property="og:image" content="http://bin2415.github.io/2018/07/01/pwnable-tw/add_all.png">
 <meta property="og:image" content="http://bin2415.github.io/2018/07/01/pwnable-tw/checkout.png">
 <meta property="og:image" content="http://bin2415.github.io/2018/07/01/pwnable-tw/cart.png">
-<meta property="og:image" content="http://bin2415.github.io/2018/07/01/pwnable-tw/delete.png">
-<meta property="og:updated_time" content="2018-07-01T12:08:25.507Z">
+<meta property="og:image" content="http://bin2415.github.io/2018/07/01/pwnable-tw/pwnable-tw/delete.png">
+<meta property="og:updated_time" content="2018-07-01T12:10:59.809Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pwnable.tw之applestore">
 <meta name="twitter:description" content="该题是模拟了apple的商店，来售卖apple的各种产品，其提供了6个功能:  1: 展示商店的商品 2: 添加商品到购物车 3: 从购物车里面将某一商品删除 4: 展示购物车里面的商品 5: 结算 6: 退出  其中，购物车是用双向链表实现的，其每一项的结构如下，其在32位机器下的大小为16字节。链表头是一个全局变量，存在0x804b068处。123456struct cart_entry&amp;#1">
@@ -460,7 +460,7 @@
 <p><img src="/2018/07/01/pwnable-tw/./cart.png" alt="cart"></p>
 <p>在cart()函数中，有一个可以利用的地方就是在my_read()时，用户能输入0x15大小的数据，而输入的数据存进的内存即在ebp-0x22开始处，正好可以将checkout中的添加到双向链表的临时变量(ebp-0x20)给覆盖掉。如果我们将临时变量的第一个元素(存放商品名称)的地方存入atoi的got地址，则可以将libc的地址泄露出来。</p>
 <h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>删除功能是在delete()函数中实现的，其在ida中反汇编出来的结果如下图所示:</p>
-<p><img src="/2018/07/01/pwnable-tw/./delete.png" alt="delete"></p>
+<p><img src="/2018/07/01/pwnable-tw/./pwnable-tw/delete.png" alt="delete"></p>
 <p>删除操作就是在双向链表中找到要删除的项，然后就是正规的双向链表操作。由于我们可以通过输入控制ebp-0x20处的项的数据，如果我们将next和previous元素修改成特定的值，就有可能修改got表项，此时就造成了控制流的劫持。一开始我是将next修改成got[‘atoi’]-0xc，将previous改成system的地址，最后发生segment fault. 仔细一想，此时确实将atoi的got表项改成了system的地址了，但是也需要将system.addr+8赋值为got[‘atoi’]-0xc，而system.addr+8处是代码段，改程序又开了NX保护，所以会发生segment fault.</p>
 <h2 id="Attack"><a href="#Attack" class="headerlink" title="Attack"></a>Attack</h2><p>通过前面的分析，我们可以利用cart()函数覆盖ebp-0x20处的内容，进而可以进行内存泄露攻击，将glibc的地址和栈中的地址泄露出来。通过delete函数，我们可以修改某一内存处的内容，如果我们修改ebp的值，使其在leave操作(mov esp, ebp; pop ebp)时，将修改后的ebp值赋给ebp寄存器，从而控制栈，进而修改got表项。</p>
 <h3 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h3><p>通过前面的分析我们可以看到在cart()函数中，如果将ebp-0x20处的内容覆盖为got[‘atoi’]的地址，则在cart函数输出的时候，就可以将atoi的got表项的内容泄露出来，即glibc的atoi函数的地址。</p>
@@ -519,6 +519,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/10/firmware-reverse/" rel="prev" title="IoT firmware逆向之入门篇">
+                IoT firmware逆向之入门篇 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -598,7 +602,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -609,7 +613,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">13</span>
                 <span class="site-state-item-name">categories</span>
               </a>
             </div>
@@ -620,7 +624,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
