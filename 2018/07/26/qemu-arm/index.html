@@ -96,17 +96,17 @@
 
 
 
-<meta name="description" content="安装qemu sudo apt-get install qemu  安装arm文件所需要的动态库 apt-get install gcc-multilib-arm-linux-gnueabi```1-  ```sudo apt-get install gcc-armhf-cross  此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接">
+<meta name="description" content="安装qemu sudo apt-get install qemu  安装arm文件所需要的动态库 sudo apt-get install gcc-multilib-arm-linux-gnueabi sudo apt-get install gcc-armhf-cross 此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直">
 <meta name="keywords" content="arm,qemu">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Intel linux调试arm程序">
 <meta property="og:url" content="http://bin2415.github.io/2018/07/26/qemu-arm/index.html">
 <meta property="og:site_name" content="PCB博客">
-<meta property="og:description" content="安装qemu sudo apt-get install qemu  安装arm文件所需要的动态库 apt-get install gcc-multilib-arm-linux-gnueabi```1-  ```sudo apt-get install gcc-armhf-cross  此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接">
-<meta property="og:updated_time" content="2018-07-26T06:57:40.366Z">
+<meta property="og:description" content="安装qemu sudo apt-get install qemu  安装arm文件所需要的动态库 sudo apt-get install gcc-multilib-arm-linux-gnueabi sudo apt-get install gcc-armhf-cross 此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直">
+<meta property="og:updated_time" content="2018-07-26T06:59:37.955Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Intel linux调试arm程序">
-<meta name="twitter:description" content="安装qemu sudo apt-get install qemu  安装arm文件所需要的动态库 apt-get install gcc-multilib-arm-linux-gnueabi```1-  ```sudo apt-get install gcc-armhf-cross  此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接">
+<meta name="twitter:description" content="安装qemu sudo apt-get install qemu  安装arm文件所需要的动态库 sudo apt-get install gcc-multilib-arm-linux-gnueabi sudo apt-get install gcc-armhf-cross 此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -436,10 +436,9 @@
 <li>sudo apt-get install qemu</li>
 </ul>
 <h3 id="安装arm文件所需要的动态库"><a href="#安装arm文件所需要的动态库" class="headerlink" title="安装arm文件所需要的动态库"></a>安装arm文件所需要的动态库</h3><ul>
-<li><figure class="highlight plain"><figcaption><span>apt-get install gcc-multilib-arm-linux-gnueabi```</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-  ```sudo apt-get install gcc-armhf-cross</div></pre></td></tr></table></figure>
-</li>
-<li><p>此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直接指向的/lib/ld-linux-armhf.so.3文件的，所以此时需要将/usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3软连接到/lib/文件夹下: ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3</p>
-</li>
+<li>sudo apt-get install gcc-multilib-arm-linux-gnueabi</li>
+<li>sudo apt-get install gcc-armhf-cross</li>
+<li>此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直接指向的/lib/ld-linux-armhf.so.3文件的，所以此时需要将/usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3软连接到/lib/文件夹下: ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3</li>
 </ul>
 <h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><ul>
 <li>在运行前添加/usr/arm-linux-gnueabihf/lib文件夹到LD_LIBRARY_PATH环境变量里面: export LD_LIBRARY_PATH=/usr/arm-linux-gnueabihf/lib/:$LD_LIBRARY_PATH</li>
