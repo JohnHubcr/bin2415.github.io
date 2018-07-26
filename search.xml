@@ -3,13 +3,13 @@
   <entry>
     <title><![CDATA[Intel linux调试arm程序]]></title>
     <url>%2F2018%2F07%2F26%2Fqemu-arm%2F</url>
-    <content type="text"><![CDATA[安装qemu apt-get install qemu```123### 安装arm文件所需要的动态库- ```sudo apt-get install gcc-multilib-arm-linux-gnueabi apt-get install gcc-armhf-cross```1- 此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直接指向的/lib/ld-linux-armhf.so.3文件的，所以此时需要将/usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3软连接到/lib/文件夹下:```ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3 运行 在运行前添加/usr/arm-linux-gnueabihf/lib文件夹到LD_LIBRARY_PATH环境变量里面: LD_LIBRARY_PATH=/usr/arm-linux-gnueabihf/lib/:$LD_LIBRARY_PATH```12345- qemu-arm运行arm程序: ```qemu-arm -g 1234 /path/of/arm-executable```,即在1234端口上开启调试模式### 调试- 此时就可以在自己机器上进行调试改程序，既可以使用IDA pro进行远端调试，也可以使用gdb进行调试，此处介绍gdb调试- 在调试前请确保自己安装了gdb-multiarch，如果没有安装，则```sudo apt install gdb-multiarch 用gdb打开待调试文件: gdb-multiarch /path/of/arm-executable 在gdb中连接调试端口: target remote 1234，调试即可 Enjoy it!!!]]></content>
+    <content type="text"><![CDATA[安装qemu sudo apt-get install qemu 安装arm文件所需要的动态库 sudo apt-get install gcc-multilib-arm-linux-gnueabi sudo apt-get install gcc-armhf-cross 此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直接指向的/lib/ld-linux-armhf.so.3文件的，所以此时需要将/usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3软连接到/lib/文件夹下:-s/lib/ld-linux-armhf.so.3```12345678910### 运行- 在运行前添加/usr/arm-linux-gnueabihf/lib文件夹到LD_LIBRARY_PATH环境变量里面: export LD_LIBRARY_PATH=/usr/arm-linux-gnueabihf/lib/:$LD_LIBRARY_PATH- qemu-arm运行arm程序: qemu-arm -g 1234 /path/of/arm-executable, 即在1234端口上开启调试模式### 调试- 此时就可以在自己机器上进行调试改程序，既可以使用IDA pro进行远端调试，也可以使用gdb进行调试，此处介绍gdb调试- 在调试前请确保自己安装了gdb-multiarch，如果没有安装，则```sudo apt install gdb-multiarch 用gdb打开待调试文件: gdb-multiarch /path/of/arm-executable 在gdb中连接调试端口: target remote 1234，调试即可 Enjoy it!!!]]></content>
       <categories>
         <category>qemu</category>
       </categories>
       <tags>
-        <tag>arm</tag>
         <tag>qemu</tag>
+        <tag>arm</tag>
       </tags>
   </entry>
   <entry>
@@ -121,9 +121,9 @@
         <category>angr</category>
       </categories>
       <tags>
+        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
-        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -260,9 +260,9 @@
         <category>反汇编</category>
       </categories>
       <tags>
+        <tag>Exploit</tag>
         <tag>反汇编</tag>
         <tag>翻译</tag>
-        <tag>Exploit</tag>
       </tags>
   </entry>
   <entry>
