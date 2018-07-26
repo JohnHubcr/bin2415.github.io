@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Intel linux调试arm程序]]></title>
+    <url>%2F2018%2F07%2F26%2Fqemu-arm%2F</url>
+    <content type="text"><![CDATA[安装qemu apt-get install qemu```123### 安装arm文件所需要的动态库- ```sudo apt-get install gcc-multilib-arm-linux-gnueabi apt-get install gcc-armhf-cross```1- 此时在/usr/arm-linux-gnueabihf/lib/文件夹中会有安装的这些库，有的arm文件在动态链接的时候是直接指向的/lib/ld-linux-armhf.so.3文件的，所以此时需要将/usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3软连接到/lib/文件夹下:```ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3 运行 在运行前添加/usr/arm-linux-gnueabihf/lib文件夹到LD_LIBRARY_PATH环境变量里面: LD_LIBRARY_PATH=/usr/arm-linux-gnueabihf/lib/:$LD_LIBRARY_PATH```12345- qemu-arm运行arm程序: ```qemu-arm -g 1234 /path/of/arm-executable```,即在1234端口上开启调试模式### 调试- 此时就可以在自己机器上进行调试改程序，既可以使用IDA pro进行远端调试，也可以使用gdb进行调试，此处介绍gdb调试- 在调试前请确保自己安装了gdb-multiarch，如果没有安装，则```sudo apt install gdb-multiarch 用gdb打开待调试文件: gdb-multiarch /path/of/arm-executable 在gdb中连接调试端口: target remote 1234，调试即可 Enjoy it!!!]]></content>
+      <categories>
+        <category>qemu</category>
+      </categories>
+      <tags>
+        <tag>arm</tag>
+        <tag>qemu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[IoT firmware逆向之入门篇]]></title>
     <url>%2F2018%2F07%2F10%2Ffirmware-reverse%2F</url>
     <content type="text"><![CDATA[前言随着IoT(Internet of Things)设备快速增长，IoT设备的安全也逐渐引起大家的注意。如论文[1]所述，IoT的安全问题主要包括如下方面: 感知层安全。IoT的感知层主要包括wireless sensor networks, RFID, 802.11, BLE(Bluetooth low energy), zigbee and etc. 这些通信网络本身可能会存在一些安全问题。 网络层安全。IoT的网络层安全主要包括通信协议的安全，隐私泄露等问题。 应用层安全。应用层安全主要包括软件安全，认证问题，隐私数据的保护，认证和校验的问题。 它们的关系如下图所示： 图1 IoT安全概览 由于IoT设备对于能耗和及时性的要求比较高，所以其具体实现(操作系统及软件的保护机制)都和PC端和手机端有很大的区别。由于能耗的要求，大部分IoT设备都采用低能耗的处理器(比如arm Contex-M系列)，这些处理器大部分都没有MMU，所以没有虚拟地址到物理地址的转换，更无法提供ASLR等防护(arm Contex-M由于有MPU功能，能提供比较局限的内存防护机制)；由于实时性的要求，大部分采用的系统是RTOS(Real Time Operating System)或者直接是bare mental system，其每个设备的内存布局可能都是固定的。所以IoT设备的应用层的安全也是非常严峻的。 Firmware在IoT设备中，其代码和数据一般存储在ROM中(大部分都是Flash，关于Flash的种类可以访问here来了解一下)。一般将这部分代码和数据称为Firmware(可能表述不准确，欢迎指正)。Firmware没有一个固定的格式，它更像是一个binary blob，具体的格式和解析根据设备的不同而有所不同。 一般获取firmware的方式主要有三种: 从厂商官网下载或者逆向厂商的App获得 劫持(中间人攻击)firmware更新过程 硬件逆向，直接读取存放firmware的flash或者UART串口调试 由于现在有很多IoT设备都是Over-The-Air Firmware Update，所以有很多厂商并不会在官网上提供firmware的下载，所以一般比较通用的获取firmware的方法都是通过硬件逆向方法。关于硬件逆向，推荐两篇文章物联网硬件安全分析基础-固件提取和物联网硬件安全分析基础-串口调试。 逆向Firmware最近在查看关于firmware逆向有关的资料，发现有如下几个问题: 不知道哪些是代码段和数据段 不知道内存布局，即不知道firmware的基址 …… 在浏览了很多教程之后，发现了关于Marvell IoT SDK的一些小经验，特总结下来，以备日后查阅。具体的教程可参阅Inside The Bulb: Adventures in Reverse Engineering Smart Bulb Firmware和dustcloud。dustcloud做了挺多关于小米iot逆向的工作的，其中小米的yeelight和智能网管设备的firmware都是采用的Marvell IoT SDK。由于dustcloud直接提供了yeelight的firmware，所以就省去了我硬件逆向提取firmware的步骤了，我直接从dustcloud下载firmware。 Inside The Bulb: Adventures in Reverse Engineering Smart Bulb Firmware介绍了如何将Marvell IoT SDK格式的firmware提取出代码，并将其合并成elf文件的，由于里面细节有限，我在此重复了里面的步骤，并总结出了一些方法。 首先在二进制编辑器中可以看到该firmware是MRVL(Marvell)的，而该文件含有一些entries, 表示了不同”段”的偏移，大小和地址信息: 12345DWORD magic; // Always 0x2DWORD offset; // Offset into the fileDWORD size; // Size of the sectionDWORD address; // Memory address where this section will be loadedDWORD unknown; // Probably some kind of checksum? 具体的firmware二进制数据如下图所示: 图2 firmware二进制 可知其含有三个不同的entry，可使用dd工具将这三个不同的”段”提取出来: 123dd if=yeelink.light.strip1.bin bs=1 skip=200 count=12824 of=s1.bindd if=yeelink.light.strip1.bin bs=1 skip=13024 count=299984 of=s2.bindd if=yeelink.light.strip1.bin bs=1 skip=313008 count=5420 of=s3.bin 此时，得到了三个二进制文件，使用arm-none-eabi-objcopy将其合并成ELF文件: 1arm-none-eabi-objcopy -I binary -O elf32-littlearm --adjust-vma 0x100000 --binary-architecture arm --rename-section .data=.text,contents,alloc,load,readonly,code --add-section .text2=s2.bin --set-section-flags .text2=contents,alloc,load,readonly,code --change-section-address .text2=0x1f0032e0 --add-section .text3=s3.bin --set-section-flags .text3=contents,alloc,load,readonly,code --change-section-address .text3=0x20000040 s1.bin firmware_yeelink.elf 上面的命令就是将三个文件合并成一个ELF文件，并且分别将其置为不同的section，设置virtual address。 如果直接将生成的文件firmware_yeelink.elf扔到IDA pro中会出现一个问题：由于objcopy生成的elf文件是可重定位类型(relocatable file)，扔到IDA中虚拟地址是从0开始的，并不是从0x100000开始的。 我最后终于找到一个方法：再使用ld链接器将可重定位类型的文件生成可执行类型(executable file)，并给每一个section添加虚拟地址: 1arm-none-eabi-ld --section-start=.text=0x100000 --section-start=.text2=0x1f0032e0 --section-start=.text3=0x20000040 firmware_yeelink.elf -o firmware.elf 此时扔给IDA，虚拟地址正确. （–未完待更–） 引用 [1] Mendez, Diego M., Ioannis Papapanagiotou, and Baijian Yang. “Internet of things: Survey on security and privacy.” arXiv preprint arXiv:1707.01879 (2017).]]></content>
@@ -109,9 +121,9 @@
         <category>angr</category>
       </categories>
       <tags>
-        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
+        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -249,8 +261,8 @@
       </categories>
       <tags>
         <tag>反汇编</tag>
-        <tag>Exploit</tag>
         <tag>翻译</tag>
+        <tag>Exploit</tag>
       </tags>
   </entry>
   <entry>
