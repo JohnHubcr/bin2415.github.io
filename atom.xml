@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-07-31T04:05:13.079Z</updated>
+  <updated>2018-07-31T04:12:23.590Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,11 +20,10 @@
     <link href="http://bin2415.github.io/2018/07/31/afl-asan/"/>
     <id>http://bin2415.github.io/2018/07/31/afl-asan/</id>
     <published>2018-07-31T03:05:45.000Z</published>
-    <updated>2018-07-31T04:05:13.079Z</updated>
+    <updated>2018-07-31T04:12:23.590Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="http://lcamtuf.coredump.cx/afl/" target="_blank" rel="external">AFL</a>是使用比较广泛的fuzzing工具，ASAN(<a href="https://github.com/google/sanitizers/wiki/AddressSanitizer" target="_blank" rel="external">AddressSanitizer</a>)是google的一个非常高效的内存错误检测工具，其能够检查出UAF,Heap/Stack buffer overflow, Use after return, Use after scope, Initialization order bugs and Memory leaks。这两者都有基于llvm的版本，所以将这两者相结合效果也是非常好的。</p>
-<p>## </p>
-<p>在用AFL和ASAN来fuzzing heartbleed(教程链接<a href="https://github.com/ThalesIgnite/afl-training/tree/master/challenges/heartbleed" target="_blank" rel="external">afl-training</a>)的时候出现了一个问题:</p>
+<h2 id="Problem"><a href="#Problem" class="headerlink" title="Problem"></a>Problem</h2><p>在用AFL和ASAN来fuzzing heartbleed(教程链接<a href="https://github.com/ThalesIgnite/afl-training/tree/master/challenges/heartbleed" target="_blank" rel="external">afl-training</a>)的时候出现了一个问题:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Since it seems to be built with ASAN and you have a</div><div class="line">    restrictive memory limit configured, this is expected; please read</div><div class="line">    /usr/local/share/doc/afl/notes_for_asan.txt for help</div></pre></td></tr></table></figure>
 <p>这是因为ASAN工具是跟踪所有内存的，所以理论上可能需要的内存比较大，在32位系统中，最多占用800多MB内存。在64位系统中，ASAN的shadow memory的理论上占用的最大内存是17.5TB和20TB，而一般的电脑并没有这么大的内存，所以可能会使电脑死机。所以AFL会在64位机器运行64位程序的时候，报出这种错误。<a href="https://github.com/mirrorer/afl/blob/master/docs/notes_for_asan.txt" target="_blank" rel="external">链接</a>也提供了这种情况的解决方法。</p>
 <p>实际上，以上最大内存只是理论上的，一般运行的程序shadow memory所占用的内存并没有这么多，所以第一种解决方法就是使用-m none选项，来忽略此错误:</p>
@@ -169,9 +168,9 @@
       <category term="qemu" scheme="http://bin2415.github.io/categories/qemu/"/>
     
     
-      <category term="qemu" scheme="http://bin2415.github.io/tags/qemu/"/>
-    
       <category term="arm" scheme="http://bin2415.github.io/tags/arm/"/>
+    
+      <category term="qemu" scheme="http://bin2415.github.io/tags/qemu/"/>
     
   </entry>
   
@@ -693,11 +692,11 @@
       <category term="angr" scheme="http://bin2415.github.io/categories/angr/"/>
     
     
+      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
+    
       <category term="exploit" scheme="http://bin2415.github.io/tags/exploit/"/>
     
       <category term="angr" scheme="http://bin2415.github.io/tags/angr/"/>
-    
-      <category term="翻译" scheme="http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
   </entry>
   
@@ -783,7 +782,7 @@
 <li>启动apache2服务：sudo service apache2 start</li>
 <li>配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：<br><img src="http://i.imgur.com/5pqUZOD.png" alt=""></li>
 </ul>
-<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);&lt;/script&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h2><h3 id="Task-1-显示Alert窗口"><a href="#Task-1-显示Alert窗口" class="headerlink" title="Task 1:显示Alert窗口"></a>Task 1:显示Alert窗口</h3><p>在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;alert(‘XSS’);<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>如下图所示:</p>
 <p><img src="http://i.imgur.com/N9cIcKG.png" alt=""></p>
@@ -846,7 +845,7 @@
 &lt;li&gt;启动apache2服务：sudo service apache2 start&lt;/li&gt;
 &lt;li&gt;配置Apache服务，在/etc/apache2/sites-available/default中，配置如下：&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/5pqUZOD.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&amp;lt;/script&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;实验内容：&quot;&gt;&lt;a href=&quot;#实验内容：&quot; class=&quot;headerlink&quot; title=&quot;实验内容：&quot;&gt;&lt;/a&gt;实验内容：&lt;/h2&gt;&lt;h3 id=&quot;Task-1-显示Alert窗口&quot;&gt;&lt;a href=&quot;#Task-1-显示Alert窗口&quot; class=&quot;headerlink&quot; title=&quot;Task 1:显示Alert窗口&quot;&gt;&lt;/a&gt;Task 1:显示Alert窗口&lt;/h3&gt;&lt;p&gt;在用户名boby下的修改信息这一网页中，在个人说明中插入alert信息：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;script&amp;gt;alert(‘XSS’);&lt;span class=&quot;xml&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
     
     </summary>
     

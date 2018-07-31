@@ -103,7 +103,7 @@
 <meta property="og:url" content="http://bin2415.github.io/2018/07/31/afl-asan/index.html">
 <meta property="og:site_name" content="PCB博客">
 <meta property="og:description" content="前言AFL是使用比较广泛的fuzzing工具，ASAN(AddressSanitizer)是google的一个非常高效的内存错误检测工具，其能够检查出UAF,Heap/Stack buffer overflow, Use after return, Use after scope, Initialization order bugs and Memory leaks。这两者都有基于llvm的版本，">
-<meta property="og:updated_time" content="2018-07-31T04:05:13.079Z">
+<meta property="og:updated_time" content="2018-07-31T04:12:23.590Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AFL Fuzzing with ASAN">
 <meta name="twitter:description" content="前言AFL是使用比较广泛的fuzzing工具，ASAN(AddressSanitizer)是google的一个非常高效的内存错误检测工具，其能够检查出UAF,Heap/Stack buffer overflow, Use after return, Use after scope, Initialization order bugs and Memory leaks。这两者都有基于llvm的版本，">
@@ -433,8 +433,7 @@
 
       
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="http://lcamtuf.coredump.cx/afl/" target="_blank" rel="external">AFL</a>是使用比较广泛的fuzzing工具，ASAN(<a href="https://github.com/google/sanitizers/wiki/AddressSanitizer" target="_blank" rel="external">AddressSanitizer</a>)是google的一个非常高效的内存错误检测工具，其能够检查出UAF,Heap/Stack buffer overflow, Use after return, Use after scope, Initialization order bugs and Memory leaks。这两者都有基于llvm的版本，所以将这两者相结合效果也是非常好的。</p>
-<p>## </p>
-<p>在用AFL和ASAN来fuzzing heartbleed(教程链接<a href="https://github.com/ThalesIgnite/afl-training/tree/master/challenges/heartbleed" target="_blank" rel="external">afl-training</a>)的时候出现了一个问题:</p>
+<h2 id="Problem"><a href="#Problem" class="headerlink" title="Problem"></a>Problem</h2><p>在用AFL和ASAN来fuzzing heartbleed(教程链接<a href="https://github.com/ThalesIgnite/afl-training/tree/master/challenges/heartbleed" target="_blank" rel="external">afl-training</a>)的时候出现了一个问题:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Since it seems to be built with ASAN and you have a</div><div class="line">    restrictive memory limit configured, this is expected; please read</div><div class="line">    /usr/local/share/doc/afl/notes_for_asan.txt for help</div></pre></td></tr></table></figure>
 <p>这是因为ASAN工具是跟踪所有内存的，所以理论上可能需要的内存比较大，在32位系统中，最多占用800多MB内存。在64位系统中，ASAN的shadow memory的理论上占用的最大内存是17.5TB和20TB，而一般的电脑并没有这么大的内存，所以可能会使电脑死机。所以AFL会在64位机器运行64位程序的时候，报出这种错误。<a href="https://github.com/mirrorer/afl/blob/master/docs/notes_for_asan.txt" target="_blank" rel="external">链接</a>也提供了这种情况的解决方法。</p>
 <p>实际上，以上最大内存只是理论上的，一般运行的程序shadow memory所占用的内存并没有这么多，所以第一种解决方法就是使用-m none选项，来忽略此错误:</p>
@@ -652,7 +651,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引用"><span class="nav-number">2.</span> <span class="nav-text">引用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Problem"><span class="nav-number">2.</span> <span class="nav-text">Problem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引用"><span class="nav-number">3.</span> <span class="nav-text">引用</span></a></li></ol></div>
             
 
           </div>
