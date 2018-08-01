@@ -56,9 +56,9 @@
     <link href="http://bin2415.github.io/2018/07/29/format-string/"/>
     <id>http://bin2415.github.io/2018/07/29/format-string/</id>
     <published>2018-07-29T06:50:37.000Z</published>
-    <updated>2018-07-29T09:02:53.787Z</updated>
+    <updated>2018-08-01T09:17:29.179Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这两天做了一个CTF的题目，该题目的二进制<a href="./babyecho">链接</a>。该题目的逻辑非常简单，就是接受输入，并将其打印，在打印的时候利用了printf函数，很明显是个format string漏洞。但由于格式化的字符串并没有在栈中，所以利用起来有一点困难，在此记录一下自己利用的方法。</p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这两天做了一个CTF的题目，该题目的二进制<a href="./babyformat">链接</a>。该题目的逻辑非常简单，就是接受输入，并将其打印，在打印的时候利用了printf函数，很明显是个format string漏洞。但由于格式化的字符串并没有在栈中，所以利用起来有一点困难，在此记录一下自己利用的方法。</p>
 <h2 id="格式化字符串漏洞"><a href="#格式化字符串漏洞" class="headerlink" title="格式化字符串漏洞"></a>格式化字符串漏洞</h2><blockquote>
 <p>格式化字符串函数可以接受可变数量的参数，并将第一个参数作为格式化字符串，根据其来解析之后的参数 <a href="https://ctf-wiki.github.io/ctf-wiki/pwn/fmtstr/fmtstr_intro/" target="_blank" rel="external">参考</a>。</p>
 </blockquote>
@@ -117,7 +117,7 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;这两天做了一个CTF的题目，该题目的二进制&lt;a href=&quot;./babyecho&quot;&gt;链接&lt;/a&gt;。该题目的逻辑非常简单，就是接受输入，并将其
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;这两天做了一个CTF的题目，该题目的二进制&lt;a href=&quot;./babyformat&quot;&gt;链接&lt;/a&gt;。该题目的逻辑非常简单，就是接受输入，并
     
     </summary>
     
