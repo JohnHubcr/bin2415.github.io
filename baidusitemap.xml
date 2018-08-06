@@ -4,6 +4,28 @@
 
     
   <url>
+    <loc>http://bin2415.coding.me/2018/08/06/afl-fork-server/</loc>
+    <lastmod>2018-08-06T12:55:35.451Z</lastmod>
+    <data>
+        <display>
+        <title>afl fork server</title>
+        <pubTime>2018-08-06T12:25:14.000Z</pubTime>
+        
+        <tag>afl</tag>
+         
+        <tag>fuzzing</tag>
+         
+         
+           
+             
+              <breadCrumb title="fuzzing" url="http://bin2415.coding.me/categories/fuzzing/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.coding.me/2018/07/29/format-string/</loc>
     <lastmod>2018-08-01T09:17:29.179Z</lastmod>
     <data>
@@ -51,9 +73,9 @@
         <title>Intel linux调试arm程序</title>
         <pubTime>2018-07-26T06:43:55.000Z</pubTime>
         
-        <tag>arm</tag>
-         
         <tag>qemu</tag>
+         
+        <tag>arm</tag>
          
          
            
@@ -257,11 +279,11 @@
         <title>使用angr和Radare解决CMU的二进制炸弹</title>
         <pubTime>2017-06-20T10:05:53.000Z</pubTime>
         
-        <tag>翻译</tag>
-         
         <tag>exploit</tag>
          
         <tag>angr</tag>
+         
+        <tag>翻译</tag>
          
          
            
@@ -283,9 +305,9 @@
         
         <tag>反汇编</tag>
          
-        <tag>Exploit</tag>
-         
         <tag>翻译</tag>
+         
+        <tag>Exploit</tag>
          
          
            

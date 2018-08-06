@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[afl fork server]]></title>
+    <url>%2F2018%2F08%2F06%2Fafl-fork-server%2F</url>
+    <content type="text"><![CDATA[前言fuzz解析数据的库函数的方法一般是找一个简单的二进制来测试库函数的功能，通过生成不同的输入来不断地运行该二进制程序。一般是通过fork和execve来生成子进程运行目标二进制程序，fuzz程序通过waitpid()函数来等待子进程退出，如果子进程发出SIGSEGV或SIGABORT等信号，则证明子进程崩溃了，此时可能会发生了memory corruption bugs。然而没有一个输入，就调用ececve()函数来进行程序的链接，库函数的初始化等操作，大大地降低了fuzzing的效率[1]。AFL通过在目标程序中插入fork server的逻辑代码来保证在fuzzing的时候只进行一次程序的链接，库函数的初始化等操作，而通过fork()函数的copy-on-write机制，大大提高了fuzzing的效率。 fork server通过在二进制程序中插入fork server代码，该fork server会在main函数之前执行，它会暂停，等待AFL fuzzing端的输入，当AFL fuzzing端”发号施令”给fork server之后，fork server此时就通过fork()函数来生成子进程，子进程继续main函数的逻辑，由于fork server已经将各种资源都加载好，所以每次子进程只需要执行main函数的代码即可。 上面的例子是在afl中的llvm_mode文件夹中的afl-llvm-rt.o.c文件中定义的，fork server的逻辑也是比较简单，一个while循环，从FORKSRV_FD文件中读取AFL端给传来的数据，其中FORKSRV_FD是一个管道的一端，负责从AFL端读取数据。如果AFL端传来数据，则证明此时AFL的输入已准备好，则可以通过fork()来生成一个子进程，来运行main函数，进行fuzzing。 引用 Fuzzing random programs without execve(). https://lcamtuf.blogspot.com/2014/10/fuzzing-binaries-without-execve.html]]></content>
+      <categories>
+        <category>fuzzing</category>
+      </categories>
+      <tags>
+        <tag>afl</tag>
+        <tag>fuzzing</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[AFL Fuzzing with ASAN]]></title>
     <url>%2F2018%2F07%2F31%2Fafl-asan%2F</url>
     <content type="text"><![CDATA[前言AFL是使用比较广泛的fuzzing工具，ASAN(AddressSanitizer)是google的一个非常高效的内存错误检测工具，其能够检查出UAF,Heap/Stack buffer overflow, Use after return, Use after scope, Initialization order bugs and Memory leaks。这两者都有基于llvm的版本，所以将这两者相结合效果也是非常好的。 Problem在用AFL和ASAN来fuzzing heartbleed(教程链接afl-training)的时候出现了一个问题: 123Since it seems to be built with ASAN and you have a restrictive memory limit configured, this is expected; please read /usr/local/share/doc/afl/notes_for_asan.txt for help 这是因为ASAN工具是跟踪所有内存的，所以理论上可能需要的内存比较大，在32位系统中，最多占用800多MB内存。在64位系统中，ASAN的shadow memory的理论上占用的最大内存是17.5TB和20TB，而一般的电脑并没有这么大的内存，所以可能会使电脑死机。所以AFL会在64位机器运行64位程序的时候，报出这种错误。链接也提供了这种情况的解决方法。 实际上，以上最大内存只是理论上的，一般运行的程序shadow memory所占用的内存并没有这么多，所以第一种解决方法就是使用-m none选项，来忽略此错误: 1afl-fuzz -i in -o out -m none ./executable 第二种方法就是使用cgroup来限定改程序使用的资源： 1sudo ~/afl/experimental/asan_cgroups/limit_memory.sh -u usename afl-fuzz -i in -o out -m none ./executable 第二种方法是比较稳妥的方法，并不会对系统造成非常大的影响，因为其限定了程序所使用的内存资源。 引用 AFL: http://lcamtuf.coredump.cx/afl/ ASAN: https://github.com/google/sanitizers/wiki/AddressSanitizer afl-training: https://github.com/ThalesIgnite/afl-training/tree/master/challenges/heartbleed]]></content>
@@ -30,8 +42,8 @@
         <category>qemu</category>
       </categories>
       <tags>
-        <tag>arm</tag>
         <tag>qemu</tag>
+        <tag>arm</tag>
       </tags>
   </entry>
   <entry>
@@ -143,9 +155,9 @@
         <category>angr</category>
       </categories>
       <tags>
-        <tag>翻译</tag>
         <tag>exploit</tag>
         <tag>angr</tag>
+        <tag>翻译</tag>
       </tags>
   </entry>
   <entry>
@@ -283,8 +295,8 @@
       </categories>
       <tags>
         <tag>反汇编</tag>
-        <tag>Exploit</tag>
         <tag>翻译</tag>
+        <tag>Exploit</tag>
       </tags>
   </entry>
   <entry>

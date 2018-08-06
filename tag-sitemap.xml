@@ -65,13 +65,6 @@
     </url>
 
     <url>
-        <loc>http://bin2415.github.io/tags/Exploit/</loc>
-        <lastmod>2017-06-20T10:23:52.974Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://bin2415.github.io/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/</loc>
         <lastmod>2017-06-20T10:23:52.974Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -79,14 +72,21 @@
     </url>
 
     <url>
-        <loc>http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/</loc>
-        <lastmod>2017-06-20T14:40:32.805Z</lastmod>
+        <loc>http://bin2415.github.io/tags/Exploit/</loc>
+        <lastmod>2017-06-20T10:23:52.974Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>http://bin2415.github.io/tags/angr/</loc>
+        <lastmod>2017-06-20T14:40:32.805Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/tags/%E7%BF%BB%E8%AF%91/</loc>
         <lastmod>2017-06-20T14:40:32.805Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -156,13 +156,6 @@
     </url>
 
     <url>
-        <loc>http://bin2415.github.io/tags/arm/</loc>
-        <lastmod>2018-07-26T06:59:37.955Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://bin2415.github.io/tags/qemu/</loc>
         <lastmod>2018-07-26T06:59:37.955Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -170,15 +163,29 @@
     </url>
 
     <url>
+        <loc>http://bin2415.github.io/tags/arm/</loc>
+        <lastmod>2018-07-26T06:59:37.955Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>http://bin2415.github.io/tags/ctf/</loc>
-        <lastmod>2018-07-29T09:02:53.787Z</lastmod>
+        <lastmod>2018-08-01T09:17:29.179Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://bin2415.github.io/tags/afl/</loc>
+        <lastmod>2018-08-06T12:55:35.451Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>http://bin2415.github.io/tags/fuzzing/</loc>
-        <lastmod>2018-07-31T04:12:23.590Z</lastmod>
+        <lastmod>2018-08-06T12:55:35.451Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
