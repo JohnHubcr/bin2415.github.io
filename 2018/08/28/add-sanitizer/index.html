@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="llvm," />
 
 
 
@@ -96,12 +96,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="PCB博客">
-<meta property="og:url" content="http://bin2415.github.io/tags/qemu/index.html">
+<meta name="description" content="有的时候需要在编译器LLVM上添加自己写的sanitizer，比如自己写的sanitizer名字叫做Bitype，想通过指定-fsanitize=bitype来开启Bitype sanitizer，则需要如下步骤:  在clang/Basic/Sanitizers.def文件中添加SANITIZER(“bitype”, Bitype) 在clang/Driver/SanitizerArgs.h中添">
+<meta name="keywords" content="llvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLVM添加sanitizer">
+<meta property="og:url" content="http://bin2415.github.io/2018/08/28/add-sanitizer/index.html">
 <meta property="og:site_name" content="PCB博客">
+<meta property="og:description" content="有的时候需要在编译器LLVM上添加自己写的sanitizer，比如自己写的sanitizer名字叫做Bitype，想通过指定-fsanitize=bitype来开启Bitype sanitizer，则需要如下步骤:  在clang/Basic/Sanitizers.def文件中添加SANITIZER(“bitype”, Bitype) 在clang/Driver/SanitizerArgs.h中添">
+<meta property="og:updated_time" content="2018-08-28T08:42:32.446Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PCB博客">
+<meta name="twitter:title" content="LLVM添加sanitizer">
+<meta name="twitter:description" content="有的时候需要在编译器LLVM上添加自己写的sanitizer，比如自己写的sanitizer名字叫做Bitype，想通过指定-fsanitize=bitype来开启Bitype sanitizer，则需要如下步骤:  在clang/Basic/Sanitizers.def文件中添加SANITIZER(“bitype”, Bitype) 在clang/Driver/SanitizerArgs.h中添">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -132,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/tags/qemu/"/>
+  <link rel="canonical" href="http://bin2415.github.io/2018/08/28/add-sanitizer/"/>
 
 
 
 
 
-  <title>Tag: qemu | PCB博客</title>
+  <title>LLVM添加sanitizer | PCB博客</title>
 </head>
 
 
@@ -179,7 +184,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -310,72 +315,202 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h1>qemu<small>Tag</small>
-      </h1>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/07/26/qemu-arm/" itemprop="url">
-              
-                <span itemprop="name">Intel linux调试arm程序</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-26T14:43:55+08:00"
-              content="2018-07-26" >
-          07-26
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/01/14/qemu-mips/" itemprop="url">
-              
-                <span itemprop="name">Qemu模拟Mips程序运行</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-01-14T20:15:22+08:00"
-              content="2018-01-14" >
-          01-14
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2018/08/28/add-sanitizer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LLVM添加sanitizer</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-28T16:24:13+08:00">
+                2018-08-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/llvm/" itemprop="url" rel="index">
+                    <span itemprop="name">llvm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2018/08/28/add-sanitizer/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/08/28/add-sanitizer/" class="leancloud_visitors" data-flag-title="LLVM添加sanitizer">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+		  
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>有的时候需要在编译器LLVM上添加自己写的sanitizer，比如自己写的sanitizer名字叫做Bitype，想通过指定-fsanitize=bitype来开启Bitype sanitizer，则需要如下步骤:</p>
+<ul>
+<li>在clang/Basic/Sanitizers.def文件中添加SANITIZER(“bitype”, Bitype)</li>
+<li>在clang/Driver/SanitizerArgs.h中添加needsBitypeRt函数</li>
+<li>在clang/lib/Deriver/ToolChain.cpp文件中getSupportedSanitizers()函数添加Res对Bitype的支持</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/llvm/" rel="tag"># llvm</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/06/afl-fork-server/" rel="next" title="afl fork server">
+                <i class="fa fa-chevron-left"></i> afl fork server
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
 
 
           </div>
@@ -383,6 +518,12 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
 
         </div>
         
@@ -601,6 +742,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 

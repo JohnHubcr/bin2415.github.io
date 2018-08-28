@@ -98,7 +98,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="PCB博客">
-<meta property="og:url" content="http://bin2415.github.io/tags/llvm/index.html">
+<meta property="og:url" content="http://bin2415.github.io/tags/LLVM/index.html">
 <meta property="og:site_name" content="PCB博客">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PCB博客">
@@ -132,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/tags/llvm/"/>
+  <link rel="canonical" href="http://bin2415.github.io/tags/LLVM/"/>
 
 
 
 
 
-  <title>Tag: llvm | PCB博客</title>
+  <title>Tag: LLVM | PCB博客</title>
 </head>
 
 
@@ -312,7 +312,7 @@
 
   <div id="posts" class="posts-collapse">
     <div class="collection-title">
-      <h1>llvm<small>Tag</small>
+      <h1>LLVM<small>Tag</small>
       </h1>
     </div>
 
@@ -324,37 +324,9 @@
 
       <h2 class="post-title">
         
-            <a class="post-title-link" href="/2017/11/18/llvm存取fs段内容/" itemprop="url">
+            <a class="post-title-link" href="/2017/07/26/AddressSanitizer/" itemprop="url">
               
-                <span itemprop="name">llvm存取fs段内容</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-11-18T10:26:29+08:00"
-              content="2017-11-18" >
-          11-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/11/18/llvm-rdrand/" itemprop="url">
-              
-                <span itemprop="name">llvm生成rdrand指令</span>
+                <span itemprop="name">AddressSanitizer算法及源码解析</span>
               
             </a>
         
@@ -362,65 +334,9 @@
 
       <div class="post-meta">
         <time class="post-time" itemprop="dateCreated"
-              datetime="2017-11-18T09:27:03+08:00"
-              content="2017-11-18" >
-          11-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/20/llvm-DFG/" itemprop="url">
-              
-                <span itemprop="name">llvm:Data Flow Graph</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-20T18:36:06+08:00"
-              content="2017-05-20" >
-          05-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/20/llvm-CGAndCFG/" itemprop="url">
-              
-                <span itemprop="name">llvm:Call Graph And Control Flow Graph</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-20T18:35:57+08:00"
-              content="2017-05-20" >
-          05-20
+              datetime="2017-07-26T10:03:38+08:00"
+              content="2017-07-26" >
+          07-26
         </time>
       </div>
 
@@ -474,7 +390,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">28</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -1074,6 +990,94 @@
     function addCount(Counter) {
       var $visitors = $(".leancloud_visitors");
       var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.1"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.1"></script>
+
+
+  
+
+</body>
+</html>
+trim();
       var title = $visitors.attr('data-flag-title').trim();
       var query = new AV.Query(Counter);
 
