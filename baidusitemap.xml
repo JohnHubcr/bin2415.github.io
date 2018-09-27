@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://bin2415.coding.me/2018/09/27/os-tutorial/</loc>
+    <lastmod>2018-09-27T13:19:56.784Z</lastmod>
+    <data>
+        <display>
+        <title>os tutorial</title>
+        <pubTime>2018-09-27T13:17:19.000Z</pubTime>
+        
+        <tag>OS</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.coding.me/2018/09/27/llvm-gold/</loc>
     <lastmod>2018-09-27T12:11:53.758Z</lastmod>
     <data>
@@ -48,9 +65,9 @@
         <title>afl fork server</title>
         <pubTime>2018-08-06T12:25:14.000Z</pubTime>
         
-        <tag>afl</tag>
-         
         <tag>fuzzing</tag>
+         
+        <tag>afl</tag>
          
          
            
