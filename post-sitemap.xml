@@ -7,8 +7,16 @@
     </url>
 
     <url>
+        <loc>http://bin2415.github.io/2018/09/27/os-tutorial/</loc>
+        <lastmod>2018-09-27T13:24:08.610Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://bin2415.github.io/2018/09/27/llvm-gold/</loc>
-        <lastmod>2018-09-27T11:46:54.091Z</lastmod>
+        <lastmod>2018-09-27T12:11:53.758Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
