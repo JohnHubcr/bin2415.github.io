@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="llvm," />
 
 
 
@@ -96,12 +96,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="PCB博客">
-<meta property="og:url" content="http://bin2415.github.io/tags/pwnable/index.html">
+<meta name="description" content="Binutils Building Download binutils source code  1git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils  Build binutils  1234mkdir buildcd build../binutils/configure --enable-gold --e">
+<meta name="keywords" content="llvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="llvm gold build">
+<meta property="og:url" content="http://bin2415.github.io/2018/09/27/llvm-gold/index.html">
 <meta property="og:site_name" content="PCB博客">
+<meta property="og:description" content="Binutils Building Download binutils source code  1git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils  Build binutils  1234mkdir buildcd build../binutils/configure --enable-gold --e">
+<meta property="og:updated_time" content="2018-09-27T11:44:53.165Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PCB博客">
+<meta name="twitter:title" content="llvm gold build">
+<meta name="twitter:description" content="Binutils Building Download binutils source code  1git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils  Build binutils  1234mkdir buildcd build../binutils/configure --enable-gold --e">
 
 <meta name="google-site-verification" content="6X0VEc7S4OCLuVOpAVhTrqQS6qCLzeJWET8siPhU0IE" />
 
@@ -132,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://bin2415.github.io/tags/pwnable/"/>
+  <link rel="canonical" href="http://bin2415.github.io/2018/09/27/llvm-gold/"/>
 
 
 
 
 
-  <title>Tag: pwnable | PCB博客</title>
+  <title>llvm gold build | PCB博客</title>
 </head>
 
 
@@ -179,7 +184,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -310,44 +315,191 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h1>pwnable<small>Tag</small>
-      </h1>
-    </div>
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bin2415.github.io/2018/09/27/llvm-gold/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="binpang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PCB博客">
+    </span>
 
     
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">llvm gold build</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-27T19:30:17+08:00">
+                2018-09-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2018/09/27/llvm-gold/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/09/27/llvm-gold/" class="leancloud_visitors" data-flag-title="llvm gold build">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+		  
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <h3 id="Binutils-Building"><a href="#Binutils-Building" class="headerlink" title="Binutils Building"></a>Binutils Building</h3><ol>
+<li>Download binutils source code</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils</div></pre></td></tr></table></figure>
+<ol>
+<li>Build binutils</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">../binutils/configure --enable-gold --enable-plugins --disable-werror</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+<h3 id="LLVMgold-so-build"><a href="#LLVMgold-so-build" class="headerlink" title="LLVMgold.so build"></a>LLVMgold.so build</h3><ol>
+<li>Download LLVM source code</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">https://github.com/llvm-mirror/llvm.git</div></pre></td></tr></table></figure>
+<ol>
+<li>Build LLVM with gold-plugin</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ../llvm -DLLVM_BINUTILS_INCDIR=&quot;path/to/binutils/include&quot;</div><div class="line">make -j($nproc)</div></pre></td></tr></table></figure>
+<p>And the LLVMgold.so will appear in the lib folder.</p>
 
-      <h2 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2018/07/01/pwnable-tw/" itemprop="url">
-              
-                <span itemprop="name">pwnable.tw之applestore</span>
-              
-            </a>
+
+      
+    </div>
+
+    <div>
+      
         
-      </h2>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-01T16:50:23+08:00"
-              content="2018-07-01" >
-          07-01
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/llvm/" rel="tag"># llvm</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/28/add-sanitizer/" rel="next" title="LLVM添加sanitizer">
+                <i class="fa fa-chevron-left"></i> LLVM添加sanitizer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </div>
 
-  
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
 
 
           </div>
@@ -355,6 +507,12 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
 
         </div>
         
@@ -374,8 +532,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -455,6 +622,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Binutils-Building"><span class="nav-number">1.</span> <span class="nav-text">Binutils Building</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LLVMgold-so-build"><span class="nav-number">2.</span> <span class="nav-text">LLVMgold.so build</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -573,6 +756,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 

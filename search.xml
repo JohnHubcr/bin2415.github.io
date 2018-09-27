@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[llvm gold build]]></title>
+    <url>%2F2018%2F09%2F27%2Fllvm-gold%2F</url>
+    <content type="text"><![CDATA[Binutils Building Download binutils source code 1git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils Build binutils 1234mkdir buildcd build../binutils/configure --enable-gold --enable-plugins --disable-werrorsudo make install LLVMgold.so build Download LLVM source code 1https://github.com/llvm-mirror/llvm.git Build LLVM with gold-plugin 1234mkdir buildcd buildcmake ../llvm -DLLVM_BINUTILS_INCDIR=&quot;path/to/binutils/include&quot;make -j($nproc) And the LLVMgold.so will appear in the lib folder.]]></content>
+      <tags>
+        <tag>llvm</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[LLVM添加sanitizer]]></title>
     <url>%2F2018%2F08%2F28%2Fadd-sanitizer%2F</url>
     <content type="text"><![CDATA[有的时候需要在编译器LLVM上添加自己写的sanitizer，比如自己写的sanitizer名字叫做Bitype，想通过指定-fsanitize=bitype来开启Bitype sanitizer，则需要如下步骤: 在clang/Basic/Sanitizers.def文件中添加SANITIZER(“bitype”, Bitype) 在clang/Driver/SanitizerArgs.h中添加needsBitypeRt函数 在clang/lib/Deriver/ToolChain.cpp文件中getSupportedSanitizers()函数添加Res对Bitype的支持]]></content>
@@ -305,8 +313,8 @@
         <category>反汇编</category>
       </categories>
       <tags>
-        <tag>反汇编</tag>
         <tag>Exploit</tag>
+        <tag>反汇编</tag>
         <tag>翻译</tag>
       </tags>
   </entry>

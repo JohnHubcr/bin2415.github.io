@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://bin2415.coding.me/2018/09/27/llvm-gold/</loc>
+    <lastmod>2018-09-27T11:44:53.165Z</lastmod>
+    <data>
+        <display>
+        <title>llvm gold build</title>
+        <pubTime>2018-09-27T11:30:17.000Z</pubTime>
+        
+        <tag>llvm</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://bin2415.coding.me/2018/08/28/add-sanitizer/</loc>
     <lastmod>2018-08-28T08:42:32.446Z</lastmod>
     <data>
@@ -323,9 +340,9 @@
         <title>ExploitTutorial</title>
         <pubTime>2016-04-13T07:27:07.000Z</pubTime>
         
-        <tag>反汇编</tag>
-         
         <tag>Exploit</tag>
+         
+        <tag>反汇编</tag>
          
         <tag>翻译</tag>
          
