@@ -5,7 +5,7 @@
     
   <url>
     <loc>http://bin2415.coding.me/2018/09/27/llvm-gold/</loc>
-    <lastmod>2018-09-27T11:44:53.165Z</lastmod>
+    <lastmod>2018-09-27T11:46:54.091Z</lastmod>
     <data>
         <display>
         <title>llvm gold build</title>
@@ -110,9 +110,9 @@
         <title>Intel linux调试arm程序</title>
         <pubTime>2018-07-26T06:43:55.000Z</pubTime>
         
-        <tag>arm</tag>
-         
         <tag>qemu</tag>
+         
+        <tag>arm</tag>
          
          
            

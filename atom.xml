@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bin2415.github.io/"/>
-  <updated>2018-09-27T11:44:53.165Z</updated>
+  <updated>2018-09-27T11:46:54.091Z</updated>
   <id>http://bin2415.github.io/</id>
   
   <author>
@@ -20,31 +20,18 @@
     <link href="http://bin2415.github.io/2018/09/27/llvm-gold/"/>
     <id>http://bin2415.github.io/2018/09/27/llvm-gold/</id>
     <published>2018-09-27T11:30:17.000Z</published>
-    <updated>2018-09-27T11:44:53.165Z</updated>
+    <updated>2018-09-27T11:46:54.091Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="Binutils-Building"><a href="#Binutils-Building" class="headerlink" title="Binutils Building"></a>Binutils Building</h3><ol>
-<li>Download binutils source code</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils</div></pre></td></tr></table></figure>
-<ol>
-<li>Build binutils</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">../binutils/configure --enable-gold --enable-plugins --disable-werror</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
-<h3 id="LLVMgold-so-build"><a href="#LLVMgold-so-build" class="headerlink" title="LLVMgold.so build"></a>LLVMgold.so build</h3><ol>
-<li>Download LLVM source code</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">https://github.com/llvm-mirror/llvm.git</div></pre></td></tr></table></figure>
-<ol>
-<li>Build LLVM with gold-plugin</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ../llvm -DLLVM_BINUTILS_INCDIR=&quot;path/to/binutils/include&quot;</div><div class="line">make -j($nproc)</div></pre></td></tr></table></figure>
+    <content type="html"><![CDATA[<h3 id="Binutils-Building"><a href="#Binutils-Building" class="headerlink" title="Binutils Building"></a>Binutils Building</h3><h4 id="Download-binutils-source-code"><a href="#Download-binutils-source-code" class="headerlink" title="Download binutils source code"></a>Download binutils source code</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils</div></pre></td></tr></table></figure>
+<h4 id="Build-binutils"><a href="#Build-binutils" class="headerlink" title="Build binutils"></a>Build binutils</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">../binutils/configure --enable-gold --enable-plugins --disable-werror</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+<h3 id="LLVMgold-so-build"><a href="#LLVMgold-so-build" class="headerlink" title="LLVMgold.so build"></a>LLVMgold.so build</h3><h4 id="Download-LLVM-source-code"><a href="#Download-LLVM-source-code" class="headerlink" title="Download LLVM source code"></a>Download LLVM source code</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">https://github.com/llvm-mirror/llvm.git</div></pre></td></tr></table></figure>
+<h4 id="Build-LLVM-with-gold-plugin"><a href="#Build-LLVM-with-gold-plugin" class="headerlink" title="Build LLVM with gold-plugin"></a>Build LLVM with gold-plugin</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ../llvm -DLLVM_BINUTILS_INCDIR=&quot;path/to/binutils/include&quot;</div><div class="line">make -j($nproc)</div></pre></td></tr></table></figure>
 <p>And the LLVMgold.so will appear in the lib folder.</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h3 id=&quot;Binutils-Building&quot;&gt;&lt;a href=&quot;#Binutils-Building&quot; class=&quot;headerlink&quot; title=&quot;Binutils Building&quot;&gt;&lt;/a&gt;Binutils Building&lt;/h3&gt;&lt;ol&gt;
-&lt;li&gt;Down
+      &lt;h3 id=&quot;Binutils-Building&quot;&gt;&lt;a href=&quot;#Binutils-Building&quot; class=&quot;headerlink&quot; title=&quot;Binutils Building&quot;&gt;&lt;/a&gt;Binutils Building&lt;/h3&gt;&lt;h4 id=&quot;Downl
     
     </summary>
     
@@ -269,9 +256,9 @@
       <category term="qemu" scheme="http://bin2415.github.io/categories/qemu/"/>
     
     
-      <category term="arm" scheme="http://bin2415.github.io/tags/arm/"/>
-    
       <category term="qemu" scheme="http://bin2415.github.io/tags/qemu/"/>
+    
+      <category term="arm" scheme="http://bin2415.github.io/tags/arm/"/>
     
   </entry>
   

@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[llvm gold build]]></title>
     <url>%2F2018%2F09%2F27%2Fllvm-gold%2F</url>
-    <content type="text"><![CDATA[Binutils Building Download binutils source code 1git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils Build binutils 1234mkdir buildcd build../binutils/configure --enable-gold --enable-plugins --disable-werrorsudo make install LLVMgold.so build Download LLVM source code 1https://github.com/llvm-mirror/llvm.git Build LLVM with gold-plugin 1234mkdir buildcd buildcmake ../llvm -DLLVM_BINUTILS_INCDIR=&quot;path/to/binutils/include&quot;make -j($nproc) And the LLVMgold.so will appear in the lib folder.]]></content>
+    <content type="text"><![CDATA[Binutils BuildingDownload binutils source code1git clone --depth 1 git://sourceware.org/git/binutils-gdb.git binutils Build binutils1234mkdir buildcd build../binutils/configure --enable-gold --enable-plugins --disable-werrorsudo make install LLVMgold.so buildDownload LLVM source code1https://github.com/llvm-mirror/llvm.git Build LLVM with gold-plugin1234mkdir buildcd buildcmake ../llvm -DLLVM_BINUTILS_INCDIR=&quot;path/to/binutils/include&quot;make -j($nproc) And the LLVMgold.so will appear in the lib folder.]]></content>
       <tags>
         <tag>llvm</tag>
       </tags>
@@ -61,8 +61,8 @@
         <category>qemu</category>
       </categories>
       <tags>
-        <tag>arm</tag>
         <tag>qemu</tag>
+        <tag>arm</tag>
       </tags>
   </entry>
   <entry>

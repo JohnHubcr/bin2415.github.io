@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>http://bin2415.github.io/2018/09/27/llvm-gold/</loc>
+        <lastmod>2018-09-27T11:46:54.091Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://bin2415.github.io/2018/08/28/add-sanitizer/</loc>
         <lastmod>2018-08-28T08:42:32.446Z</lastmod>
         <changefreq>weekly</changefreq>
